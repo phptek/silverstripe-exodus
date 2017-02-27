@@ -1,5 +1,5 @@
 {
-	"name": "silverstripe/staticsiteconnector",
+	"name": "phptek/staticsiteconnector",
 	"description": "An external-content connector that retrieves content by scraping a public website.",
 	"license": "BSD-3-Clause",
 	"type": "silverstripe-module",
@@ -10,16 +10,18 @@
 	},
 	{
 		"name": "Russell Michell",
-		"email": "russ@silverstripe.com"
+		"email": "russ@theruss.com"
 	},
 	{
 		"name": "Stig Lindqvist",
 		"email": "stig@silverstripe.com"
 	},
 	{
-		"name": "Mike Parkhill",
-		"email": "mike@silverstripe.com"
+		"name": "Mike Parkhill"
 	}],
+	"replace": {
+    		"silverstripe/staticsiteconnector":"*"
+	},
 	"require": {
 		"silverstripe/framework": ">=3.0.0",
 		"silverstripe/external-content":"dev-master",
