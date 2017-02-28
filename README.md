@@ -1,12 +1,5 @@
 # SilverStripe Static Site Connector
 
-## Authors
-
-* [Sam Minnee](https://github.com/sminnee)
-* [Russell Michell](https://github.com/phptek)
-* [Mike Parkhill](https://github.com/mparkhill)
-* [Stig Lindqvist](https://github.com/stojg)
-
 ## Introduction
 
 This module allows you to extract content from another website by crawling and parsing
@@ -58,7 +51,7 @@ configure script:
 Once that's done, you can use [Composer](http://getcomposer.org) to add the module
 to your SilverStripe project:
 
-    #> composer require silverstripe/staticsiteconnector
+    #> composer require phptek/staticsiteconnector
 
 Please see the included [Migration](docs/en/migration.md) document, that describes
 exactly how to configure the tool to perform a site-scrape / migration.
@@ -66,8 +59,14 @@ exactly how to configure the tool to perform a site-scrape / migration.
 There is also an [example database-dump](docs/en/example.sql) (MySQL/MariaDB only)
 provided which you can import into your DB to get you up and running quickly.
 
-License
--------
+## License
 
 This code is available under the BSD license, with the exception of the [PHPCrawl](http://cuab.de/)
 library, bundled with this module which is GPL version 2.
+
+## Authors
+
+* [Sam Minnee](https://github.com/sminnee)
+* [Russell Michell](https://github.com/phptek)
+* [Mike Parkhill](https://github.com/mparkhill)
+* [Stig Lindqvist](https://github.com/stojg)
