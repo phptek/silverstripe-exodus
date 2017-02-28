@@ -27,6 +27,9 @@
 		"silverstripe/external-content":"dev-master",
 		"cuab/phpcrawl": "*",
 		"electrolinux/phpquery": "dev-master"
-	}
+	},
+	"extra": {
+        	"installer-name": "staticsiteconnector"
+    	}
 }
 
