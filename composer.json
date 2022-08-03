@@ -1,35 +1,35 @@
 {
-	"name": "phptek/staticsiteconnector",
-	"description": "An external-content connector that retrieves content by scraping a public website.",
-	"license": "BSD-3-Clause",
-	"type": "silverstripe-module",
-	"keywords": ["silverstripe", "external-content", "staticsiteconnector", "scraper", "html"],
-	"authors": [{
-		"name": "Sam Minnee",
-		"email": "sam@silverstripe.com"
-	},
-	{
-		"name": "Russell Michell",
-		"email": "russ@theruss.com"
-	},
-	{
-		"name": "Stig Lindqvist",
-		"email": "stig@silverstripe.com"
-	},
-	{
-		"name": "Mike Parkhill"
-	}],
-	"replace": {
-    		"silverstripe/staticsiteconnector":"*"
-	},
-	"require": {
-		"silverstripe/framework": ">=3.0.0",
-		"silverstripe/external-content":"dev-master",
-		"cuab/phpcrawl": "*",
-		"electrolinux/phpquery": "dev-master"
-	},
-	"extra": {
-        	"installer-name": "staticsiteconnector"
-    	}
+  "name": "phptek/silverstripe-exodus",
+  "description": "An ETL provider for migrating content from any website into a Silverstripe based project.",
+  "license": "BSD-3-Clause",
+  "type": "silverstripe-module",
+  "keywords": [
+    "silverstripe",
+    "migrate",
+    "migration",
+    "migrator",
+    "content",
+    "content migration",
+    "staticsiteconnector",
+    "scraper",
+    "scrape"
+  ],
+  "authors": [
+    {
+      "name": "Russell Michell",
+      "email": "russ@theruss.com"
+    }
+  ],
+  "replace": {
+    "phptek/staticsiteconnector": "*"
+  },
+  "require": {
+    "silverstripe/framework": "^4.10",
+    "silverstripe/external-content": "dev-master",
+    "brittainmedia/phpcrawl": "^0.9",
+    "electrolinux/phpquery": "dev-master"
+  },
+  "extra": {
+    "installer-name": "exodus"
+  }
 }
-

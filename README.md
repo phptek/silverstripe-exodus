@@ -1,11 +1,12 @@
-# SilverStripe Static Site Connector
+# Silverstripe Exodus
 
 ## Introduction
 
-This module allows you to extract content from another website by crawling and parsing
-its DOM structure and transforms it directly into native SilverStripe objects, then
-imports those objects into SilverStripe's database as though they had been created
-via the CMS.
+This module allows you to extract content from another website in an ETL fashion (Extract Transform Load).
+
+It will crawl a source website, parse its DOM structure and transform it into native Silverstripe objects, saving
+them into a target Silverstripe install as though they had been created
+via the Silverstripe CMS itself.
 
 Although this has the disadvantage of leaving it unable to extract any information
 or structure that _isn't_ represented in the site's markup, it means no special access
@@ -28,7 +29,7 @@ Each cached URL corresponds to a page or asset (css, image, pdf etc) that the mo
 will attempt to import into native SilverStripe objects e.g. `SiteTree` and `File`.
 
 Page content is imported page-by-page using cUrl, and the desired DOM elements
-extracted via configurable CSS selectors via [phpQuery](http://code.google.com/p/phpquery/)
+extracted via configurable CSS selectors via [phpQuery](https://github.com/electrolinux/phpquery)
 which is leveraged for this purpose.
 
 ## Migration
@@ -51,7 +52,7 @@ configure script:
 Once that's done, you can use [Composer](http://getcomposer.org) to add the module
 to your SilverStripe project:
 
-    #> composer require phptek/staticsiteconnector
+    #> composer require phptek/silverstripe-exodus
 
 Please see the included [Migration](docs/en/migration.md) document, that describes
 exactly how to configure the tool to perform a site-scrape / migration.
@@ -61,12 +62,5 @@ provided which you can import into your DB to get you up and running quickly.
 
 ## License
 
-This code is available under the BSD license, with the exception of the [PHPCrawl](http://cuab.de/)
+This code is available under the BSD license, with the exception of the [PHPCrawl](https://github.com/crispy-computing-machine/phpcrawl/)
 library, bundled with this module which is GPL version 2.
-
-## Authors
-
-* [Sam Minnee](https://github.com/sminnee)
-* [Russell Michell](https://github.com/phptek)
-* [Mike Parkhill](https://github.com/mparkhill)
-* [Stig Lindqvist](https://github.com/stojg)
