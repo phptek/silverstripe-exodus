@@ -1,9 +1,12 @@
 <?php
+
+namespace PhpTek\Exodus\Transform;
+
 /**
  * Encapsulates the result of a transformation.
  * It subclasses {@link TransformResult} to allow dealing-to File objects also
  *
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @author Russell Michell <russell@silverstripe.com>
  * @todo Logic should really exist in external-content module itself.
  */

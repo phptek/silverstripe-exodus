@@ -1,9 +1,12 @@
 <?php
+
+namespace PhpTek\Exodus\Model;
+
 /**
  * Caches some metadata for each import. Allows imports to have a DataObject-like functionality.
  * 
  * @author Russell Michell <russ@silverstripe.com>
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @see {@link StaticSiteImporter}
  */
 class StaticSiteImportDataObject extends DataObject {

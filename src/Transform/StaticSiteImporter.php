@@ -1,9 +1,12 @@
 <?php
+
+namespace PhpTek\Exodus\Transform;
+
 /**
  * Physically brings content into SilverStripe as defined by URLs fetched 
  * at the crawl stage, and utilises StaticSitePageTransformer and StaticSiteFileTransformer.
  * 
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
  * @author Russell Michell <russell@silverstripe.com>
  * @see {@link ExternalContentImporter}

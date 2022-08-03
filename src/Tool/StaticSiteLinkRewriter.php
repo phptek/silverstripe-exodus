@@ -1,4 +1,7 @@
 <?php
+
+namespace PhpTek\Exodus\Tool;
+
 /**
  *
  * Helper class for rewriting links using phpQuery.
@@ -6,7 +9,7 @@
  * @author Sam Minnee <sam@silverstripe.com>
  * @author Russell Michell <russ@silverstripe.com>
  * @author Michael Parkhill <mike@silverstripe.com>
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @see {@link StaticSiteRewriteLinksTask}
  */
 

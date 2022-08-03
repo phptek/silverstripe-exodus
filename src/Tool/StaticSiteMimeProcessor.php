@@ -1,10 +1,13 @@
 <?php
+
+namespace PhpTek\Exodus\Tool;
+
 /**
  * 
  * Utility class for Mime-Type processing.
  *
  * @author Russell Michell <russell@silverstripe.com>
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  */
 class StaticSiteMimeProcessor {
 

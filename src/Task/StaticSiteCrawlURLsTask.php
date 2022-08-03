@@ -1,8 +1,11 @@
 <?php
+
+namespace PhpTek\Exodus\Task;
+
 /**
  * 
  * @author Sam Minnee <sam@silverstripe.com>
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  */
 class StaticSiteCrawlURLsTask extends BuildTask {
 

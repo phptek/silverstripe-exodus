@@ -1,8 +1,11 @@
 <?php
+
+namespace PhpTek\Exodus\Tool;
+
 /**
  * Basic class for utility methods unsuited to any other class.
  * 
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @author Russell Michell <russell@silverstripe.com>
  * @todo Should these methods all be statics?
  */

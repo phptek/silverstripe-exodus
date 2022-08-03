@@ -1,4 +1,7 @@
 <?php
+
+namespace PhpTek\Exodus\Task;
+
 /**
  * Rewrites content-links found in <img> "src" and <a> "href"
  * HTML tag-attributes, which were originally imported via {@link StaticSiteImporter}.
@@ -21,7 +24,7 @@
  * @author Sam Minnee <sam@silverstripe.com>
  * @author Russell Michell <russ@silverstripe.com>
  * @author Michael Parkhill <mike@silverstripe.com>
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  */
 class StaticSiteRewriteLinksTask extends BuildTask {
 

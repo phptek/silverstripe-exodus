@@ -1,4 +1,7 @@
 <?php
+
+namespace PhpTek\Exodus\Transform;
+
 /**
  * Base content transformer. Comprises logic common to all types of legacy/scraped text
  * and binary content for import into native SilverStripe DataObjects.
@@ -8,9 +11,9 @@
  * Hint: You'll need to use the returned object from getContentFieldsAndSelectors() if the dataType
  * you wish to work with is not 'File' or 'SiteTree'.
  * 
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
- * @author Science Ninjas <scienceninjas@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @see {@link StaticSitePageTransformer}
  * @see {@link StaticSiteFileTransformer}
  */

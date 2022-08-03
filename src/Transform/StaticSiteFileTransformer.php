@@ -1,4 +1,7 @@
 <?php
+
+namespace PhpTek\Exodus\Transform;
+
 /**
  * URL transformer specific to SilverStripe's `File` class for use with the module's
  * import content feature. It will re-create all available data of the scraped file into SilverStripe's
@@ -8,9 +11,9 @@
  * 
  * @todo write unit-test for unwritable assets dir.
  *
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
- * @author Science Ninjas <scienceninjas@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @see {@link StaticSiteDataTypeTransformer}
  */
 class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer {

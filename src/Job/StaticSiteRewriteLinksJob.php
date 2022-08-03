@@ -1,12 +1,16 @@
 <?php
+
+namespace PhpTek\Exodus\Job;
+
 /**
  * 
  * A Queued jobs wrapper for StaticSiteRewriteLinksTask.
  * 
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
- * @author Science Ninjas <scienceninjas@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  */
+
 if(!class_exists('AbstractQueuedJob')) {
 	return;
 }

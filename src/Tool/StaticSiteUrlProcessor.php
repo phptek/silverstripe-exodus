@@ -1,4 +1,7 @@
 <?php
+
+namespace PhpTek\Exodus\Tool;
+
 /**
  * Interface for building URL processing plug-ins for StaticSiteUrlList.
  *
@@ -14,7 +17,7 @@
  * 
  * @author Sam Minee <sam@silverstripe.com>
  * @author Russell Michell <russ@silverstripe.com>
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  */
 interface StaticSiteUrlProcessor {
 

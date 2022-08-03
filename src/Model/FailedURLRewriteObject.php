@@ -1,11 +1,14 @@
 <?php
+
+namespace PhpTek\Exodus\Model;
+
 /**
  * A model object that represents a single failed link-rewrite during the 
  * running of the StaticSiteRewriteLinksTask. This data is then used to power the 
  * {@link FailedURLRewriteReport}.
  * 
  * @author Russell Michell <russ@silverstripe.com>
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @see {@link StaticSiteLinkRewriteTask}
  */
 class FailedURLRewriteObject extends DataObject {

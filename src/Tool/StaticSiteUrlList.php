@@ -1,12 +1,15 @@
 <?php
+
+namespace PhpTek\Exodus\Tool;
+
 /**
  * Represents a set of URLs parsed from a site.
  *
  * Makes use of PHPCrawl to prepare a list of URLs on the site
  * 
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
- * @author Science Ninjas <scienceninjas@silverstripe.com> 
+ * @author Russell Michell <russ@theruss.com> 
  */
 
 // We need PHPCrawl

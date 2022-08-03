@@ -1,12 +1,15 @@
 <?php
+
+namespace PhpTek\Exodus\Transform;
+
 /**
  * URL transformer specific to SilverStripe's `SiteTree` class for use with the module's
  * import content feature.
  * If enabled in the CMS UI, links to imported pages will be automatically re-written.
  *
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
- * @author Science Ninjas <scienceninjas@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @see {@link StaticSiteDataTypeTransformer}
  */
 class StaticSitePageTransformer extends StaticSiteDataTypeTransformer {

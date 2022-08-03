@@ -1,9 +1,12 @@
 <?php
+
+namespace PhpTek\Exodus\Report;
+
 /**
  * A CMS report for URLs that failed to be re-written.
  *
  * @author Russell Michell <russ@silverstripe.com>
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @see {@link FailedURLRewriteObject}
  * @see {@link FailedURLRewriteSummary}
  * @see {@link StaticSiteRewriteLinksTask}

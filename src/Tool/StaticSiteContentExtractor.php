@@ -1,5 +1,7 @@
 <?php
 
+namespace PhpTek\Exodus\Tool;
+
 // We need PHPQuery
 require_once(BASE_PATH . '/vendor/electrolinux/phpquery/phpQuery/phpQuery.php');
 
@@ -13,9 +15,9 @@ require_once(BASE_PATH . '/vendor/electrolinux/phpquery/phpQuery/phpQuery.php');
  * If the URL represents a file-based Mime-Type, a File object is created and the 
  * physical file it represents can then be post-processed and saved to the SS DB and F/S.
  * 
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
- * @author Science Ninjas <scienceninjas@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  */
 class StaticSiteContentExtractor extends Object {
 

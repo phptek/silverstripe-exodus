@@ -1,10 +1,13 @@
 <?php
+
+namespace PhpTek\Exodus\Model;
+
 /**
  * Define the overarching content-sources, schemas etc.
  * 
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
- * @author Science Ninjas <scienceninjas@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  */
 class StaticSiteContentSource extends ExternalContentSource {
 

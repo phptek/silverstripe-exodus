@@ -1,10 +1,13 @@
 <?php
+
+namespace PhpTek\Exodus\Model;
+
 /**
  * Deals-to transforming imported SiteTree and File objects
  * 
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
- * @author Science Ninjas <scienceninjas@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  */
 class StaticSiteContentItem extends ExternalContentItem {
 
