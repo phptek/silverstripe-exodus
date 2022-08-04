@@ -2,6 +2,9 @@
 
 namespace PhpTek\Exodus\Model;
 
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ArrayList;
+
 /**
  * A model object that represents a single failed link-rewrite during the
  * running of the StaticSiteRewriteLinksTask. This data is then used to power the
@@ -67,7 +70,7 @@ class FailedURLRewriteObject extends DataObject
      */
     public function getBadImportData($importID, $badLinkType = null)
     {
-        $default = new ArrayList();
+        $default = ArrayList::create();
 
         $badLinks = DataObject::get(__CLASS__)
                 ->filter('ImportID', $importID)

@@ -2,6 +2,17 @@
 
 namespace PhpTek\Exodus\Report;
 
+use SilverStripe\Reports\Report;
+use SilverStripe\GraphQL\Controller;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\HeaderField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+
 /**
  * A CMS report for URLs that failed to be re-written.
  *
@@ -11,7 +22,7 @@ namespace PhpTek\Exodus\Report;
  * @see {@link FailedURLRewriteSummary}
  * @see {@link StaticSiteRewriteLinksTask}
  */
-class FailedURLRewriteReport extends SS_Report
+class FailedURLRewriteReport extends Report
 {
     /**
      *
@@ -33,7 +44,7 @@ TXT;
 
     /**
      *
-     * @return \ArrayList
+     * @return ArrayList
      * @todo refactor this and use another, generic method to deal with repeated (similar) conditionals.
      */
     public function SourceRecords()
@@ -41,7 +52,7 @@ TXT;
         $reqVars = Controller::curr()->request->requestVars();
         $importID = !empty($reqVars['filters']) ? $reqVars['filters']['ImportID'] : 1;
         $list = singleton('FailedURLRewriteObject')->getBadImportData($importID);
-        $_list = new ArrayList();
+        $_list = ArrayList::create();
         $countNotImported = $countJunk = $countThirdParty = $countBadScheme = [];
         foreach ($list as $badLink) {
             if ($badLink->BadLinkType == 'NotImported') {
@@ -115,27 +126,27 @@ TXT;
             'ThirdPartyTotal' => [
                 'title' => '# 3rd Party Urls',
                 'formatting' => '".$ThirdPartyTotal."'
-            ),
+            ],
             'BadSchemeTotal' => [
                 'title' => '# Urls w/bad-scheme',
                 'formatting' => '".$BadSchemeTotal."'
-            ),
+            ],
             'NotImportedTotal' => [
                 'title' => '# Unimported Urls',
                 'formatting' => '".$NotImportedTotal."'
-            ),
+            ],
             'JunkTotal' => [
                 'title' => '# Junk Urls',
                 'formatting' => '".$JunkTotal."'
-            ),
+            ],
             'Created' => [
                 'title' => 'Task run date',
                 'casting' => 'SS_Datetime->Nice24'
-            ),
+            ],
             'Import.Created' => [
                 'title' => 'Import date',
                 'casting' => 'SS_Datetime->Nice24'
-            )
+            ]
         ];
     }
 
@@ -168,13 +179,13 @@ TXT;
      */
     public function parameterFields()
     {
-        $fields = new FieldList();
+        $fields = FieldList::create();
         $reqVars = Controller::curr()->request->requestVars();
         $importID = !empty($reqVars['filters']) ? $reqVars['filters']['ImportID'] : 1;
 
         if ($summary = $this->getSummary($importID)) {
-            $fields->push(new HeaderField('SummaryHead', 'Summary', 4));
-            $fields->push(new LiteralField('SummaryBody', $summary));
+            $fields->push(HeaderField::create('SummaryHead', 'Summary', 4));
+            $fields->push(LiteralField::create('SummaryBody', $summary));
         }
 
         $source = DataObject::get('StaticSiteImportDataObject');
@@ -184,9 +195,9 @@ TXT;
             $_source[$import->ID] = $date . ' (Import #' . $import->ID . ')';
         }
 
-        $importDropdown = new LiteralField('ImportID', '<p>No imports found.</p>');
+        $importDropdown = LiteralField::create('ImportID', '<p>No imports found.</p>');
         if ($_source) {
-            $importDropdown = new DropdownField('ImportID', 'Import selection', $_source);
+            $importDropdown = DropdownField::create('ImportID', 'Import selection', $_source);
         }
 
         $fields->push($importDropdown);
@@ -203,7 +214,7 @@ TXT;
         $gridField = parent::getReportField();
         $gridField->setModelClass('FailedURLRewriteObject');
         $config = $gridField->getConfig();
-        $config->addComponent(new GridFieldDeleteAction());
+        $config->addComponent(GridFieldDeleteAction::create());
         return $gridField;
     }
 }

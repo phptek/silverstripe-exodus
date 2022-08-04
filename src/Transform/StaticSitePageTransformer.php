@@ -18,7 +18,7 @@ class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
      *
      * @var string
      */
-    public static $import_root = 'import-home';
+    private static $import_root = 'import-home';
 
     /**
      * Default value to pass to usleep() to reduce load on the remote server

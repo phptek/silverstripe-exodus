@@ -2,6 +2,13 @@
 
 namespace PhpTek\Exodus\Extension;
 
+use SilverStripe\Core\Extension;
+use SilverStripe\View\Requirements;
+use \ExternalContent;
+use \ExternalContentSource;
+use SilverStripe\Control\Session;
+use SilverStripe\ORM\DataObject;
+
 /**
  * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
@@ -13,7 +20,7 @@ class StaticSiteExternalContentAdminExtension extends Extension
      *
      * @var array
      */
-    public static $allowed_actions = [
+    private static $allowed_actions = [
         "crawlsite",
         "clearimports",
     ];
@@ -43,7 +50,7 @@ class StaticSiteExternalContentAdminExtension extends Extension
         } else {
             $source = ExternalContent::getDataObjectFor($selected);
             if (!($source instanceof ExternalContentSource)) {
-                throw new Exception('ExternalContent is not instance of ExternalContentSource.');
+                throw new \Exception('ExternalContent is not instance of ExternalContentSource.');
             }
 
             $messageType = 'good';
@@ -51,7 +58,7 @@ class StaticSiteExternalContentAdminExtension extends Extension
 
             try {
                 $source->crawl();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $messageType = 'bad';
                 $message = "Error crawling: " . $e->getMessage();
             }

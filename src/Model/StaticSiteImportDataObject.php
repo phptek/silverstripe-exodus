@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Model;
 
+use SilverStripe\ORM\DataObject;
+
 /**
  * Caches some metadata for each import. Allows imports to have a DataObject-like functionality.
  *

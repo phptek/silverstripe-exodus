@@ -2,6 +2,16 @@
 
 namespace PhpTek\Exodus\Task;
 
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\Control\Director;
+use SilverStripe\GraphQL\Controller;
+use PhpTek\Exodus\Tool\StaticSiteLinkRewriter;
+use SilverStripe\ORM\DataObject;
+use PhpTek\Exodus\Model\FailedURLRewriteObject;
+use PhpTek\Exodus\Model\FailedURLRewriteSummary;
+use PhpTek\Exodus\Model\StaticSiteContentSource;
+use PhpTek\Exodus\Model\StaticSiteImportDataObject;
+
 /**
  * Rewrites content-links found in <img> "src" and <a> "href"
  * HTML tag-attributes, which were originally imported via {@link StaticSiteImporter}.
@@ -34,7 +44,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
      * @see http://en.wikipedia.org/wiki/URI_scheme
      * @var array
      */
-    public static $non_http_uri_schemes = [
+    private static $non_http_uri_schemes = [
         'mailto',
         'tel',
         'htp',
@@ -50,7 +60,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
      *
      * @var string The prefix to use for the log-file summary.
      */
-    public static $summary_prefix = 'Import No.';
+    private static $summary_prefix = 'Import No.';
 
     /**
      * @var string

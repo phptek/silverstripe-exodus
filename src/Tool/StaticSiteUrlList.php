@@ -21,7 +21,7 @@ class StaticSiteUrlList
      *
      * @var string
      */
-    public static $undefined_mime_type = 'unknown';
+    private static $undefined_mime_type = 'unknown';
 
     /**
      *

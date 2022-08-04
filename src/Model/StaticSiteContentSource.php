@@ -2,6 +2,14 @@
 
 namespace PhpTek\Exodus\Model;
 
+use \ExternalContentSource;
+use SilverStripe\Forms\HeaderField;
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Convert;
+use SilverStripe\ORM\DataObject;
+use PhpTek\Exodus\Transform\StaticSiteImporter;
+use SilverStripe\ORM\ArrayList;
+
 /**
  * Define the overarching content-sources, schemas etc.
  *
@@ -38,7 +46,7 @@ class StaticSiteContentSource extends ExternalContentSource
      *
      * @var array
      */
-    public static $export_columns = [
+    private static $export_columns = [
         "StaticSiteContentSource_ImportSchema.DataType",
         "StaticSiteContentSource_ImportSchema.Order",
         "StaticSiteContentSource_ImportSchema.AppliesTo",
@@ -93,7 +101,7 @@ class StaticSiteContentSource extends ExternalContentSource
         $fields->removeFieldFromTab("Root", "Files");
         $fields->removeFieldFromTab("Root", "ShowContentInMenu");
 
-        $fields->insertBefore(new HeaderField('CrawlConfigHeader', 'Crawl config'), 'BaseUrl');
+        $fields->insertBefore(HeaderField::create('CrawlConfigHeader', 'Crawl config'), 'BaseUrl');
 
         // Processing Option
         $processingOptions = ['' => "No pre-processing"];
@@ -379,10 +387,10 @@ class StaticSiteContentSource extends ExternalContentSource
     public function stageChildren($showAll = false)
     {
         if (!$this->urlList()->hasCrawled()) {
-            return new ArrayList();
+            return ArrayList::create();
         }
 
-        return new ArrayList(array(
+        return ArrayList::create(array(
             $this->getObject("/")
         ));
     }
@@ -390,7 +398,7 @@ class StaticSiteContentSource extends ExternalContentSource
     /**
      *
      * @param $target
-     * @return \StaticSiteImporter
+     * @return StaticSiteImporter
      */
     public function getContentImporter($target = null)
     {
@@ -411,20 +419,20 @@ class StaticSiteContentSource extends ExternalContentSource
 
     /**
      *
-     * @param \Member $member
+     * @param Member $member
      * @return boolean
      */
-    public function canImport($member = null)
+    public function canImport($member = NULL, $context = [])
     {
         return $this->isValid();
     }
 
     /**
      *
-     * @param \Member $member
+     * @param Member $member
      * @return boolean
      */
-    public function canCreate($member = null)
+    public function canCreate($member = NULL, $context = [])
     {
         return true;
     }
@@ -440,7 +448,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
      *
      * @var string
      */
-    public static $default_applies_to = '.*';
+    private static $default_applies_to = '.*';
 
     /**
      *
@@ -458,7 +466,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
      *
      * @var array
      */
-    public static $summary_fields = [
+    private static $summary_fields = [
         "AppliesTo",
         "DataType",
         "Order",
@@ -468,7 +476,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
      *
      * @var array
      */
-    public static $field_labels = [
+    private static $field_labels = [
         "AppliesTo" => "URL Pattern",
         "DataType" => "Data type",
         "Order" => "Priority",
@@ -698,7 +706,7 @@ class StaticSiteContentSource_ImportRule extends DataObject
      *
      * @var array
      */
-    public static $summary_fields = [
+    private static $summary_fields = [
         "FieldName",
         "CSSSelector",
         "Attribute",
@@ -710,7 +718,7 @@ class StaticSiteContentSource_ImportRule extends DataObject
      *
      * @var array
      */
-    public static $field_labels = [
+    private static $field_labels = [
         "FieldName" => "Field Name",
         "CSSSelector" => "CSS Selector",
         "Attribute" => "Element attribute",

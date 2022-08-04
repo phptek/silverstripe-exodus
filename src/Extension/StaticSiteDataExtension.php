@@ -2,6 +2,11 @@
 
 namespace PhpTek\Exodus\Extension;
 
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Forms\FieldList;
+
 /**
  * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
@@ -35,8 +40,8 @@ class StaticSiteDataExtension extends DataExtension
     public function updateCMSFields(FieldList $fields)
     {
         if ($this->owner->StaticSiteContentSourceID && $this->owner->StaticSiteURL) {
-            $fields->addFieldToTab('Root.Main', new ReadonlyField('StaticSiteURL', 'Imported URL'), 'MenuTitle');
-            $fields->addFieldToTab('Root.Main', $importField = new ReadonlyField('StaticSiteImportID', 'Import ID'), 'MenuTitle');
+            $fields->addFieldToTab('Root.Main', ReadonlyField::create('StaticSiteURL', 'Imported URL'), 'MenuTitle');
+            $fields->addFieldToTab('Root.Main', $importField = ReadonlyField::create('StaticSiteImportID', 'Import ID'), 'MenuTitle');
             $importField->setDescription('Use this number to pass as the \'ImportID\' parameter to the StaticSiteRewriteLinksTask.');
         }
     }

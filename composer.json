@@ -24,10 +24,10 @@
     "phptek/staticsiteconnector": "*"
   },
   "require": {
-    "silverstripe/framework": "^4.10",
-    "silverstripe/external-content": "dev-master",
+    "silverstripe/cms": "^4.10",
     "brittainmedia/phpcrawl": "^0.9",
-    "electrolinux/phpquery": "dev-master"
+    "electrolinux/phpquery": "dev-master",
+    "silverstripe/reports": "^4"
   },
   "extra": {
     "installer-name": "exodus"

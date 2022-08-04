@@ -2,6 +2,13 @@
 
 namespace PhpTek\Exodus\Model;
 
+use \ExternalContentItem;
+use SilverStripe\ORM\ArrayList;
+use PhpTek\Exodus\Transform\StaticSiteFileTransformer;
+use PhpTek\Exodus\Transform\StaticSitePageTransformer;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\View\Requirements;
+
 /**
  * Deals-to transforming imported SiteTree and File objects
  *
@@ -43,17 +50,17 @@ class StaticSiteContentItem extends ExternalContentItem
     /**
      *
      * @param boolean $showAll
-     * @return \ArrayList
+     * @return ArrayList
      */
     public function stageChildren($showAll = false)
     {
         if (!$this->source->urlList()->hasCrawled()) {
-            return new ArrayList();
+            return ArrayList::create();
         }
 
         $childrenURLs = $this->source->urlList()->getChildren($this->externalId);
 
-        $children = new ArrayList();
+        $children = ArrayList::create();
         foreach ($childrenURLs as $child) {
             $children->push($this->source->getObject($child));
         }
@@ -119,7 +126,7 @@ class StaticSiteContentItem extends ExternalContentItem
         // Add the preview fields here, including rules used
         $t = $this->getTransformer();
 
-        $urlField = new ReadonlyField(
+        $urlField = ReadonlyField::create(
             "PreviewSourceURL",
             "Imported from",
             "<a href=\"$this->AbsoluteURL\">" . Convert::raw2xml($this->AbsoluteURL) . "</a>"
@@ -134,7 +141,7 @@ class StaticSiteContentItem extends ExternalContentItem
             return $fields;
         }
         foreach ($content as $k => $v) {
-            $readonlyField = new ReadonlyField("Preview$k", "$k<br>\n<em>" . $v['selector'] . "</em>", $v['content']);
+            $readonlyField = ReadonlyField::create("Preview$k", "$k<br>\n<em>" . $v['selector'] . "</em>", $v['content']);
             $readonlyField->addExtraClass('readonly-click-toggle');
             $fields->addFieldToTab("Root.Preview", $readonlyField);
         }
@@ -156,6 +163,7 @@ class StaticSiteContentItem extends ExternalContentItem
         if (!$type || $this->getType() != strtolower($type)) {
             return false;
         }
+
         return true;
     }
 }

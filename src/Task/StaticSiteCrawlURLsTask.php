@@ -2,6 +2,9 @@
 
 namespace PhpTek\Exodus\Task;
 
+use SilverStripe\Dev\BuildTask;
+use PhpTek\Exodus\Model\StaticSiteContentSource;
+
 /**
  *
  * @author Sam Minnee <sam@silverstripe.com>

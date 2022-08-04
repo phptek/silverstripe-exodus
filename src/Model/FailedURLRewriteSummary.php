@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Model;
 
+use SilverStripe\ORM\DataObject;
+
 /**
  * A model object that represents a single failed link-rewrite summary. This data is displayed
  * at the top of the {@link FailedURLRewriteReport}.
@@ -17,7 +19,7 @@ class FailedURLRewriteSummary extends DataObject
      */
     private static $db = [
         'Text' => 'Text',
-        'ImportID' => 'Int'.
+        'ImportID' => 'Int',
     ];
 
     /**
