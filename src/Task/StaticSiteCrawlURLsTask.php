@@ -3,27 +3,27 @@
 namespace PhpTek\Exodus\Task;
 
 /**
- * 
+ *
  * @author Sam Minnee <sam@silverstripe.com>
  * @package phptek/silverstripe-exodus
  */
-class StaticSiteCrawlURLsTask extends BuildTask {
+class StaticSiteCrawlURLsTask extends BuildTask
+{
+    /**
+     *
+     * @param SS_HTTPRequest $request
+     * @return null
+     */
+    public function run($request)
+    {
+        $id = $request->getVar('ID');
+        if (!is_numeric($id) || !$id) {
+            echo "<p>Specify ?ID=(number)</p>";
+            return;
+        }
 
-	/**
-	 * 
-	 * @param SS_HTTPRequest $request
-	 * @return null
-	 */
-	public function run($request) {
-		$id = $request->getVar('ID');
-		if(!is_numeric($id) || !$id) {
-			echo "<p>Specify ?ID=(number)</p>";
-			return;
-		}
-		
-		// Find all pages
-		$contentSource = StaticSiteContentSource::get()->byID($id);
-		$contentSource->urllist()->crawl(false, true);
-	}
-
+        // Find all pages
+        $contentSource = StaticSiteContentSource::get()->byID($id);
+        $contentSource->urllist()->crawl(false, true);
+    }
 }

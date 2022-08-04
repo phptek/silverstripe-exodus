@@ -10,49 +10,50 @@ namespace PhpTek\Exodus\Transform;
  * @author Russell Michell <russell@silverstripe.com>
  * @todo Logic should really exist in external-content module itself.
  */
-class StaticSiteTransformResult extends TransformResult {
-	
-	/**
-	 * 
-	 * @var File
-	 */
-	public $file;
-	
-	/**
-	 * 
-	 * @var SiteTree
-	 */
-	public $page;
-	
-	/**
-	 * 
-	 * @var array
-	 */
-	public $children;
+class StaticSiteTransformResult extends TransformResult
+{
+    /**
+     *
+     * @var File
+     */
+    public $file;
 
-	/**
-	 * 
-	 * @param SiteTree $object
-	 * @param SS_List $children
-	 * @return void
-	 */
-	public function __construct($object, $children) {
-		parent::__construct($object, $children);
-		
-		$instanceOfSiteTree = ($object instanceof SiteTree);
-		$instanceOfFile = ($object instanceof File);
-		if(!$instanceOfSiteTree && !$instanceOfFile) {
-			user_error("Incorrect type passed to class constructor.");
-			exit;
-		}
+    /**
+     *
+     * @var SiteTree
+     */
+    public $page;
 
-		if($instanceOfSiteTree) {
-			$this->page = $object;
-		}
-		if($instanceOfFile) {
-			$this->file = $object;
-		}
+    /**
+     *
+     * @var array
+     */
+    public $children;
 
-		$this->children = $children;
-	}
+    /**
+     *
+     * @param SiteTree $object
+     * @param SS_List $children
+     * @return void
+     */
+    public function __construct($object, $children)
+    {
+        parent::__construct($object, $children);
+
+        $instanceOfSiteTree = ($object instanceof SiteTree);
+        $instanceOfFile = ($object instanceof File);
+        if (!$instanceOfSiteTree && !$instanceOfFile) {
+            user_error("Incorrect type passed to class constructor.");
+            exit;
+        }
+
+        if ($instanceOfSiteTree) {
+            $this->page = $object;
+        }
+        if ($instanceOfFile) {
+            $this->file = $object;
+        }
+
+        $this->children = $children;
+    }
 }

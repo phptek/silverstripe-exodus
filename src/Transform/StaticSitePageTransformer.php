@@ -12,112 +12,113 @@ namespace PhpTek\Exodus\Transform;
  * @author Russell Michell <russ@theruss.com>
  * @see {@link StaticSiteDataTypeTransformer}
  */
-class StaticSitePageTransformer extends StaticSiteDataTypeTransformer {
-	
-	/**
-	 * 
-	 * @var string
-	 */
-	public static $import_root = 'import-home';
-	
-	/**
-	 * Default value to pass to usleep() to reduce load on the remote server
-	 * 
-	 * @var number 
-	 */
-	private static $sleep_multiplier = 100;
-	
-	/**
-	 * 
-	 * @return void
-	 */
-	public function __construct() {
-		parent::__construct();
-		$this->setParentId(1);
-	}
+class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
+{
+    /**
+     *
+     * @var string
+     */
+    public static $import_root = 'import-home';
 
-	/**
-	 * Generic function called by \ExternalContentImporter
-	 * 
-	 * @inheritdoc
-	 */
-	public function transform($item, $parentObject, $strategy) {
+    /**
+     * Default value to pass to usleep() to reduce load on the remote server
+     *
+     * @var number
+     */
+    private static $sleep_multiplier = 100;
 
-		$this->utils->log("START page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+    /**
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setParentId(1);
+    }
 
-		if(!$item->checkIsType('sitetree')) {
-			$this->utils->log(" - Item not of type \'sitetree\'. for: ", $item->AbsoluteURL, $item->ProcessedMIME);
-			$this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
-			return false;
-		}
+    /**
+     * Generic function called by \ExternalContentImporter
+     *
+     * @inheritdoc
+     */
+    public function transform($item, $parentObject, $strategy)
+    {
+        $this->utils->log("START page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
 
-		$source = $item->getSource();
+        if (!$item->checkIsType('sitetree')) {
+            $this->utils->log(" - Item not of type \'sitetree\'. for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+            $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+            return false;
+        }
 
-		// Sleep for Xms to reduce load on the remote server
-		usleep((int)self::$sleep_multiplier*1000);
+        $source = $item->getSource();
 
-		// Extract content from the page
-		$contentFields = $this->getContentFieldsAndSelectors($item, 'SiteTree');
+        // Sleep for Xms to reduce load on the remote server
+        usleep((int)self::$sleep_multiplier*1000);
 
-		// Default value for Title
-		if(empty($contentFields['Title'])) {
-			$contentFields['Title'] = array('content' => $item->Name);
-		}
+        // Extract content from the page
+        $contentFields = $this->getContentFieldsAndSelectors($item, 'SiteTree');
 
-		// Default value for URLSegment
-		if(empty($contentFields['URLSegment'])) {
-			// $item->Name comes from StaticSiteContentItem::init() and is a URL
-			$name = ($item->Name == '/' ? self::$import_root : $item->Name);
-			$urlSegment = preg_replace('#\.[^.]*$#', '', $name); // Lose file-extensions e.g .html
-			$contentFields['URLSegment'] = array('content' => $urlSegment);	
-		}
+        // Default value for Title
+        if (empty($contentFields['Title'])) {
+            $contentFields['Title'] = array('content' => $item->Name);
+        }
 
-		// Default value for Content (Useful for during unit-testing)
-		if(empty($contentFields['Content'])) {
-			$contentFields['Content'] = array('content' => 'No content found');
-			$this->utils->log(" - No content found for 'Content' field.", $item->AbsoluteURL, $item->ProcessedMIME);
-		}
+        // Default value for URLSegment
+        if (empty($contentFields['URLSegment'])) {
+            // $item->Name comes from StaticSiteContentItem::init() and is a URL
+            $name = ($item->Name == '/' ? self::$import_root : $item->Name);
+            $urlSegment = preg_replace('#\.[^.]*$#', '', $name); // Lose file-extensions e.g .html
+            $contentFields['URLSegment'] = array('content' => $urlSegment);
+        }
 
-		// Get a user-defined schema suited to this URL and Mime
-		$schema = $source->getSchemaForURL($item->AbsoluteURL, $item->ProcessedMIME);
-		if(!$schema) {
-			$this->utils->log(" - Couldn't find an import schema for: ", $item->AbsoluteURL, $item->ProcessedMIME);
-			$this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
-			return false;
-		}
+        // Default value for Content (Useful for during unit-testing)
+        if (empty($contentFields['Content'])) {
+            $contentFields['Content'] = array('content' => 'No content found');
+            $this->utils->log(" - No content found for 'Content' field.", $item->AbsoluteURL, $item->ProcessedMIME);
+        }
 
-		$dataType = $schema->DataType;
+        // Get a user-defined schema suited to this URL and Mime
+        $schema = $source->getSchemaForURL($item->AbsoluteURL, $item->ProcessedMIME);
+        if (!$schema) {
+            $this->utils->log(" - Couldn't find an import schema for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+            $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+            return false;
+        }
 
-		if(!$dataType) {
-			$this->utils->log(" - DataType for migration schema is empty for: ", $item->AbsoluteURL, $item->ProcessedMIME);
-			$this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
-			throw new Exception('DataType for migration schema is empty!');
-		}
-		
-		// Process incoming according to user-selected duplication strategy
-		if(!$page = $this->duplicationStrategy($dataType, $item, $source->BaseUrl, $strategy, $parentObject)) {
-			$this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
-			return false;
-		}
-		
-		$page->StaticSiteContentSourceID = $source->ID;
-		$page->StaticSiteURL = $item->AbsoluteURL;
-		$page->StaticSiteImportID = $this->getCurrentImportID();
-		$page->Status = 'Published';
-		
-		foreach($contentFields as $property => $map) {
-			// Don't write anything new, if we have nothing new to write (useful during unit-testing)
-			if(!empty($map['content'])) {
-				$page->$property = $map['content'];
-			}
-		}
-		
-		Versioned::reading_stage('Stage');
-		$page->write();
-		$page->publish('Stage', 'Live');
+        $dataType = $schema->DataType;
 
-		$this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+        if (!$dataType) {
+            $this->utils->log(" - DataType for migration schema is empty for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+            $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+            throw new Exception('DataType for migration schema is empty!');
+        }
 
-		return new StaticSiteTransformResult($page, $item->stageChildren());
-	}
+        // Process incoming according to user-selected duplication strategy
+        if (!$page = $this->duplicationStrategy($dataType, $item, $source->BaseUrl, $strategy, $parentObject)) {
+            $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+            return false;
+        }
+
+        $page->StaticSiteContentSourceID = $source->ID;
+        $page->StaticSiteURL = $item->AbsoluteURL;
+        $page->StaticSiteImportID = $this->getCurrentImportID();
+        $page->Status = 'Published';
+
+        foreach ($contentFields as $property => $map) {
+            // Don't write anything new, if we have nothing new to write (useful during unit-testing)
+            if (!empty($map['content'])) {
+                $page->$property = $map['content'];
+            }
+        }
+
+        Versioned::reading_stage('Stage');
+        $page->write();
+        $page->publish('Stage', 'Live');
+
+        $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+
+        return new StaticSiteTransformResult($page, $item->stageChildren());
+    }
 }
