@@ -67,7 +67,7 @@ class StaticSiteUrlList
      *
      * @var array
      */
-    protected $excludePatterns = array();
+    protected $excludePatterns = [];
 
     /**
      * The StaticSiteContentSource object
@@ -221,8 +221,8 @@ class StaticSiteUrlList
             return null;
         }
 
-        $_regular = array();
-        $_inferred = array();
+        $_regular = [];
+        $_inferred = [];
         foreach ($urls['regular'] as $key => $urlData) {
             array_push($_regular, $urlData['url']);
         }
@@ -244,21 +244,21 @@ class StaticSiteUrlList
                 $this->loadUrls();
             }
 
-            $_regular = array();
+            $_regular = [];
             $_inferred = null;
 
             foreach ($this->urls['regular'] as $key => $urlData) {
                 $_regular[$key] = $urlData['url'];
             }
             if ($this->urls['inferred']) {
-                $_inferred = array();
+                $_inferred = [];
                 foreach ($this->urls['inferred'] as $key => $urlData) {
                     $_inferred[$key] = $urlData['url'];
                 }
             }
             return array_merge(
                 $_regular,
-                $_inferred ? array_combine($_inferred, $_inferred) : array()
+                $_inferred ? array_combine($_inferred, $_inferred) : []
             );
         }
     }
@@ -288,7 +288,10 @@ class StaticSiteUrlList
             $this->urls = unserialize(file_get_contents($this->cacheDir . 'urls'));
             // Clear out obsolete format
             if (!isset($this->urls['regular']) || !isset($this->urls['inferred'])) {
-                $this->urls = array('regular' => array(), 'inferred' => array());
+                $this->urls = [
+                    'regular' => [],
+                    'inferred' => [],
+                ];
             }
         } elseif ($this->autoCrawl) {
             $this->crawl();
@@ -312,7 +315,7 @@ class StaticSiteUrlList
         }
 
         // Clear out all inferred URLs; these will be added
-        $this->urls['inferred'] = array();
+        $this->urls['inferred'] = [];
 
         // Reprocess URLs, in case the processing has changed since the last crawl
         foreach ($this->urls['regular'] as $url => $urlData) {
@@ -362,7 +365,10 @@ class StaticSiteUrlList
             if (file_exists($this->cacheDir . 'urls')) {
                 $this->urls = unserialize(file_get_contents($this->cacheDir . 'urls'));
             } else {
-                $this->urls = array('regular' => array(), 'inferred' => array());
+                $this->urls = [
+                    'regular' => [],
+                    'inferred' => [],
+                ];
             }
 
             $crawlerID = file_get_contents($this->cacheDir . 'crawlerid');
@@ -370,7 +376,10 @@ class StaticSiteUrlList
         } else {
             $crawlerID = $crawler->getCrawlerId();
             file_put_contents($this->cacheDir . '/crawlerid', $crawlerID);
-            $this->urls = array('regular' => array(), 'inferred' => array());
+            $this->urls = [
+                'regular' => [],
+                'inferred' => [],
+            ];
         }
 
         $crawler->setURL($this->baseURL);
@@ -433,10 +442,10 @@ class StaticSiteUrlList
         }
 
         // Generate and save the processed URLs
-        $urlData = array(
-            'url'	=> $url,
-            'mime'	=> $contentType
-        );
+        $urlData = [
+            'url' => $url,
+            'mime' => $contentType,
+        ];
 
         $this->urls['regular'][$url] = $this->generateProcessedURL($urlData);
 
@@ -543,10 +552,10 @@ class StaticSiteUrlList
         }
 
         $default = function ($fragment) use ($mime) {
-            return array(
+            return [
                 'url' => $fragment,
-                'mime' => $mime
-            );
+                'mime' => $mime,
+            ];
         };
 
         if ($processedURL == "/") {
@@ -564,10 +573,10 @@ class StaticSiteUrlList
         // Get parent URL
         $parentProcessedURL = substr($processedURL, 0, $breakpoint);
 
-        $processedURLData = array(
-            'url'	=> $parentProcessedURL,
-            'mime'	=> $mime
-        );
+        $processedURLData = [
+            'url' => $parentProcessedURL,
+            'mime' => $mime,
+        ];
 
         // If an intermediary URL doesn't exist, create it
         if (!$this->hasProcessedURL($parentProcessedURL)) {
@@ -596,10 +605,10 @@ class StaticSiteUrlList
             $this->loadUrls();
         }
 
-        $urlData = array(
-            'url'	=> $url,
-            'mime'	=> $mime
-        );
+        $urlData = [
+            'url' => $url,
+            'mime' => $mime,
+        ];
 
         if (isset($this->urls['regular'][$url])) {
             // Generate it if missing
@@ -658,7 +667,7 @@ class StaticSiteUrlList
             $regEx = '#^' . preg_quote($processedURL, '#') . '[/?][^/?]+$#';
         }
 
-        $children = array();
+        $children = [];
         foreach ($this->urls['regular'] as $urlKey => $potentialProcessedChild) {
             $potentialProcessedChild = $urlKey;
             if (preg_match($regEx, $potentialProcessedChild)) {

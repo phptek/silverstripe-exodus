@@ -78,11 +78,11 @@ class StaticSiteImporter extends ExternalContentImporter
 
         if ($sourceID && $autoRun) {
             $task = TaskRunner::create();
-            $getVars = array(
+            $getVars = [
                 'SourceID' => $sourceID,
                 'ImportID' => $importID,
                 'SilentRun' => 1
-            );
+            ];
 
             // Skip TaskRunner. Too few docs available on its use
             $request = new SS_HTTPRequest('GET', '/dev/tasks/StaticSiteRewriteLinksTask', $getVars);

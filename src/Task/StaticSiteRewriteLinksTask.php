@@ -34,7 +34,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
      * @see http://en.wikipedia.org/wiki/URI_scheme
      * @var array
      */
-    public static $non_http_uri_schemes = array(
+    public static $non_http_uri_schemes = [
         'mailto',
         'tel',
         'htp',
@@ -43,8 +43,8 @@ class StaticSiteRewriteLinksTask extends BuildTask
         'skype',
         'ssh',
         'telnet',
-        'gopher'
-    );
+        'gopher',
+    ];
 
     /**
      *
@@ -68,7 +68,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
      *
      * @var array
      */
-    public $listFailedRewrites = array();
+    public $listFailedRewrites = [];
 
     /**
      * The ID number of the StaticSiteContentSource which has the links to be rewritten
@@ -223,7 +223,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
 
             // Get the schema that matches the page's legacy url
             if ($schema = $this->contentSource->getSchemaForURL($url, 'text/html')) {
-                $fields = array();
+                $fields = [];
                 foreach ($schema->ImportRules() as $rule) {
                     if (!$rule->PlainText) {
                         $fields[] = $rule->FieldName;
@@ -240,7 +240,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
                 $task->printMessage("START Rewriter for links in: '$url'");
                 $newContent = $rewriter->rewriteInContent($page->$field);
                 // Square-brackets are converted upstream, so change them back.
-                $fieldContent = str_replace(array('%5B', '%5D'), array('[', ']'), $newContent);
+                $fieldContent = str_replace(array('%5B', '%5D'), ['[', ']'], $newContent);
 
                 // If rewrite succeeded, then the content returned should differ from the original
                 if ($fieldContent != $page->$field) {
@@ -308,7 +308,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
     public function writeFailedRewrites()
     {
         $importID = 0;
-        $postProcessed = array();
+        $postProcessed = [];
         $uniq = ($this->listFailedRewrites);
         foreach ($uniq as $failure) {
             $importID = $failure['ImportID']; // Will be the same value each time
@@ -380,14 +380,14 @@ class StaticSiteRewriteLinksTask extends BuildTask
                 ++$countUnknown;
             }
         }
-        return array(
-            'Total failed link rewrites'	=> array('count' => count($rawData), 'desc' => ''),
-            'ThirdParty'		=> array('count' => $countThirdParty, 'desc' => '(Links to external websites)'),
-            'BadScheme'			=> array('count' => $countBadScheme, 'desc' => '(Links with bad/unimportable scheme)'),
-            'NotImported'		=> array('count' => $countNotImported, 'desc' => '(Links to pages or assets that were not imported)'),
-            'Junk'				=> array('count' => $countJunk, 'desc' => '(Junk links)'),
-            'Unknown'			=> array('count' => $countUnknown, 'desc' => '(Not categorisable)')
-        );
+        return [
+            'Total failed link rewrites'	=> ['count' => count($rawData), 'desc' => ''],
+            'ThirdParty'		=> ['count' => $countThirdParty, 'desc' => '(Links to external websites)'],
+            'BadScheme'			=> ['count' => $countBadScheme, 'desc' => '(Links with bad/unimportable scheme)'],
+            'NotImported'		=> ['count' => $countNotImported, 'desc' => '(Links to pages or assets that were not imported)'],
+            'Junk'                      => ['count' => $countJunk, 'desc' => '(Junk links)'],
+            'Unknown'			=> ['count' => $countUnknown, 'desc' => '(Not categorisable)'],
+        ];
     }
 
     /**
@@ -594,11 +594,11 @@ class StaticSiteRewriteLinksTask extends BuildTask
      */
     protected function pushFailedRewrite($obj, $link)
     {
-        array_push($obj->listFailedRewrites, array(
+        array_push($obj->listFailedRewrites, [
             'OrigUrl' => $link,
             'ImportID' => $obj->contentImportID,
             'ContainedInID' => $obj->currentPageID,
-            'BadLinkType' => $obj->badLinkType($link)
-        ));
+            'BadLinkType' => $obj->badLinkType($link),
+        ]);
     }
 }

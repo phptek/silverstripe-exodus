@@ -88,19 +88,19 @@ class StaticSiteURLProcessor_DropExtensions implements StaticSiteUrlProcessor
             $qs = $matches[2];
             $url = preg_replace("#\.[^./?]*$#", "$1", $url);
             $url = $this->postProcessUrl($url);
-            return array(
-                'url'=>"$url?$qs",
-                'mime'=>$urlData['mime']
-            );
+            return [
+                'url' => "$url?$qs",
+                'mime' => $urlData['mime'],
+            ];
         }
         // No query string
         else {
             $url = $urlData['url'];
             $url = preg_replace("#\.[^./?]*$#", "$1", $url);
-            return array(
-                'url'=>$this->postProcessUrl($url),
-                'mime'=>$urlData['mime']
-            );
+            return [
+                'url' => $this->postProcessUrl($url),
+                'mime' => $urlData['mime'],
+            ];
         }
     }
 
@@ -159,10 +159,10 @@ class StaticSiteMOSSURLProcessor extends StaticSiteURLProcessor_DropExtensions i
         }
 
         $url = str_ireplace('/Pages/', '/', $urlData['url']);
-        $urlData = array(
-            'url'	=> $url,
-            'mime'	=> $urlData['mime']
-        );
+        $urlData = [
+            'url' => $url,
+            'mime' => $urlData['mime'],
+        ];
         return parent::processURL($urlData);
     }
 }

@@ -17,19 +17,19 @@ class FailedURLRewriteObject extends DataObject
      *
      * @var array
      */
-    private static $db = array(
+    private static $db = [
         "BadLinkType" => "Enum('ThirdParty, BadScheme, NotImported, Junk, Unknown', 'Unknown')",
-        "OrigUrl" => "Varchar(255)"
-    );
+        "OrigUrl" => "Varchar(255)",
+    ];
 
     /**
      *
      * @var array
      */
-    private static $has_one = array(
+    private static $has_one = [
         'Import' => 'StaticSiteImportDataObject',
-        'ContainedIn' => 'SiteTree'
-    );
+        'ContainedIn' => 'SiteTree',
+    ];
 
     /**
      * Customise the output of the FailedURLRewriteReport CSV export.
@@ -38,14 +38,14 @@ class FailedURLRewriteObject extends DataObject
      */
     public function summaryFields()
     {
-        return array(
+        return [
             'ContainedIn.Title' => 'Imported page',
             'Import.Created' => 'Import date',
             'ThirdPartyTotal' => 'No. 3rd Party Urls',
             'BadSchemeTotal' => 'No. Urls with bad-scheme',
             'NotImportedTotal' => 'No. Unimported Urls',
-            'JunkTotal' => 'No. Junk Urls'
-        );
+            'JunkTotal' => 'No. Junk Urls',
+        ];
     }
 
     /**

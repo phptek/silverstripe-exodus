@@ -13,18 +13,18 @@ class StaticSiteDataExtension extends DataExtension
      *
      * @var array
      */
-    private static $has_one = array(
+    private static $has_one = [
         "StaticSiteContentSource" => "StaticSiteContentSource",
-    );
+    ];
 
     /**
      *
      * @var array
      */
-    private static $db = array(
+    private static $db = [
         "StaticSiteURL" => "Varchar(255)",
-        "StaticSiteImportID" => "Int"
-    );
+        "StaticSiteImportID" => "Int,"
+    ];
 
     /**
      * Show readonly fields of Import "Meta data"

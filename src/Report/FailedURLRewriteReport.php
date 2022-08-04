@@ -42,7 +42,7 @@ TXT;
         $importID = !empty($reqVars['filters']) ? $reqVars['filters']['ImportID'] : 1;
         $list = singleton('FailedURLRewriteObject')->getBadImportData($importID);
         $_list = new ArrayList();
-        $countNotImported = $countJunk = $countThirdParty = $countBadScheme = array();
+        $countNotImported = $countJunk = $countThirdParty = $countBadScheme = [];
         foreach ($list as $badLink) {
             if ($badLink->BadLinkType == 'NotImported') {
                 // Prevent same page showing in the report and "sum" the totals
@@ -101,8 +101,8 @@ TXT;
      */
     public function columns()
     {
-        return array(
-            'Title' => array(
+        return [
+            'Title' => [
                 'title' => 'Imported page',
                 'formatting' => function ($value, $item) {
                     return sprintf(
@@ -111,32 +111,32 @@ TXT;
                         $item->Title()
                     );
                 }
-            ),
-            'ThirdPartyTotal' => array(
+            ],
+            'ThirdPartyTotal' => [
                 'title' => '# 3rd Party Urls',
                 'formatting' => '".$ThirdPartyTotal."'
             ),
-            'BadSchemeTotal' => array(
+            'BadSchemeTotal' => [
                 'title' => '# Urls w/bad-scheme',
                 'formatting' => '".$BadSchemeTotal."'
             ),
-            'NotImportedTotal' => array(
+            'NotImportedTotal' => [
                 'title' => '# Unimported Urls',
                 'formatting' => '".$NotImportedTotal."'
             ),
-            'JunkTotal' => array(
+            'JunkTotal' => [
                 'title' => '# Junk Urls',
                 'formatting' => '".$JunkTotal."'
             ),
-            'Created' => array(
+            'Created' => [
                 'title' => 'Task run date',
                 'casting' => 'SS_Datetime->Nice24'
             ),
-            'Import.Created' => array(
+            'Import.Created' => [
                 'title' => 'Import date',
                 'casting' => 'SS_Datetime->Nice24'
             )
-        );
+        ];
     }
 
     /**
@@ -178,7 +178,7 @@ TXT;
         }
 
         $source = DataObject::get('StaticSiteImportDataObject');
-        $_source = array();
+        $_source = [];
         foreach ($source as $import) {
             $date = DBField::create_field('SS_Datetime', $import->Created)->Nice24();
             $_source[$import->ID] = $date . ' (Import #' . $import->ID . ')';

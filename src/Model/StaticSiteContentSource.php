@@ -15,35 +15,35 @@ class StaticSiteContentSource extends ExternalContentSource
      *
      * @var array
      */
-    private static $db = array(
+    private static $db = [
         'BaseUrl' => 'Varchar(255)',
         'UrlProcessor' => 'Varchar(255)',
         'ExtraCrawlUrls' => 'Text',
         'UrlExcludePatterns' => 'Text',
         'ParseCSS' => 'Boolean',
-        'AutoRunTask' => 'Boolean'
-    );
+        'AutoRunTask' => 'Boolean',
+    ];
 
     /**
      *
      * @var array
      */
-    private static $has_many = array(
+    private static $has_many = [
         "Schemas" => "StaticSiteContentSource_ImportSchema",
         "Pages" => "SiteTree",
-        "Files" => "File"
-    );
+        "Files" => "File",
+    ];
 
     /**
      *
      * @var array
      */
-    public static $export_columns = array(
+    public static $export_columns = [
         "StaticSiteContentSource_ImportSchema.DataType",
         "StaticSiteContentSource_ImportSchema.Order",
         "StaticSiteContentSource_ImportSchema.AppliesTo",
-        "StaticSiteContentSource_ImportSchema.MimeTypes"
-    );
+        "StaticSiteContentSource_ImportSchema.MimeTypes",
+    ];
 
     /**
      *
@@ -96,7 +96,7 @@ class StaticSiteContentSource extends ExternalContentSource
         $fields->insertBefore(new HeaderField('CrawlConfigHeader', 'Crawl config'), 'BaseUrl');
 
         // Processing Option
-        $processingOptions = array("" => "No pre-processing");
+        $processingOptions = ['' => "No pre-processing"];
         foreach (ClassInfo::implementorsOf('StaticSiteUrlProcessor') as $processor) {
             $processorObj = new $processor();
             $processingOptions[$processor] = "<strong>" . Convert::raw2xml($processorObj->getName())
@@ -147,17 +147,16 @@ class StaticSiteContentSource extends ExternalContentSource
             $crawlButton->setDisabled(true);
         }
 
-        $fields->addFieldsToTab('Root.Crawl', array(
+        $fields->addFieldsToTab('Root.Crawl', [
             new ReadonlyField("CrawlStatus", "Crawling Status", $this->urlList()->getSpiderStatus()),
             new ReadonlyField("NumURLs", "Number of URLs", $this->urlList()->getNumURLs()),
-
             new LiteralField(
                 'CrawlActions',
                 "<p>Before importing this content, all URLs on the site must be crawled (like a search engine does)."
                 . " $crawlMsg</p>"
                 . "<div class='Actions'>{$crawlButton->forTemplate()}</div>"
             )
-        ));
+        ]);
 
         /*
          * @todo use customise() and arrange this using an includes .ss template fragment
@@ -165,7 +164,7 @@ class StaticSiteContentSource extends ExternalContentSource
         if ($this->urlList()->getSpiderStatus() == "Complete") {
             $urlsAsUL = "<ul>";
             $processedUrls = $this->urlList()->getProcessedURLs();
-            $processed = ($processedUrls ? $processedUrls : array());
+            $processed = ($processedUrls ? $processedUrls : []);
             $list = array_unique($processed);
 
             foreach ($list as $raw => $processed) {
@@ -191,7 +190,7 @@ class StaticSiteContentSource extends ExternalContentSource
             ->setTitle('Excluded URLs');
 
         $hasImports = DataObject::get('StaticSiteImportDataObject');
-        $_source = array();
+        $_source = [];
         foreach ($hasImports as $import) {
             $date = DBField::create_field('SS_Datetime', $import->Created)->Nice24();
             $_source[$import->ID] = $date . ' (Import #' . $import->ID . ')';
@@ -202,13 +201,13 @@ class StaticSiteContentSource extends ExternalContentSource
                 ->setAttribute('data-icon', 'arrow-circle-double')
                 ->setUseButtonTag(true);
 
-            $clearImportField = ToggleCompositeField::create('ClearImports', 'Clear import meta-data', array(
+            $clearImportField = ToggleCompositeField::create('ClearImports', 'Clear import meta-data', [
                 LiteralField::create('ImportCountText', '<p>Each time an import is run, some meta information is stored such as an import identifier and failed-link records.<br/><br/></p>'),
                 LiteralField::create('ImportCount', '<p><strong>Total imports: </strong><span>' . $importCount . '</span></p>'),
                 ListboxField::create('ShowImports', 'Select import(s) to clear:', $_source, '', null, true),
                 CheckboxField::create('ClearAllImports', 'Clear all import meta-data', 0),
                 LiteralField::create('ImportActions', "<div class='Actions'>{$clearImportButton->forTemplate()}</div>")
-            ))->addExtraClass('clear-imports');
+            ])->addExtraClass('clear-imports');
             $fields->addFieldToTab('Root.Import', $clearImportField);
         }
 
@@ -365,10 +364,10 @@ class StaticSiteContentSource extends ExternalContentSource
      */
     public function allowedImportTargets()
     {
-        return array(
+        return [
             'sitetree'	=> true,
-            'file'		=> true
-        );
+            'file' => true,
+        ];
     }
 
     /**
@@ -447,34 +446,34 @@ class StaticSiteContentSource_ImportSchema extends DataObject
      *
      * @var array
      */
-    private static $db = array(
+    private static $db = [
         "DataType" => "Varchar",
         "Order" => "Int",
         "AppliesTo" => "Varchar(255)",
         "MimeTypes" => "Text",
-        "Notes" => "Text"	// Purely informational. Not used in imports.
-    );
+        "Notes" => "Text",	// Purely informational. Not used in imports.
+    ];
 
     /**
      *
      * @var array
      */
-    public static $summary_fields = array(
+    public static $summary_fields = [
         "AppliesTo",
         "DataType",
-        "Order"
-    );
+        "Order",
+    ];
 
     /**
      *
      * @var array
      */
-    public static $field_labels = array(
+    public static $field_labels = [
         "AppliesTo" => "URL Pattern",
         "DataType" => "Data type",
         "Order" => "Priority",
-        "MimeTypes"	=> "Mime-types"
-    );
+        "MimeTypes"	=> "Mime-types",
+    ];
 
     /**
      *
@@ -486,17 +485,17 @@ class StaticSiteContentSource_ImportSchema extends DataObject
      *
      * @var array
      */
-    private static $has_one = array(
+    private static $has_one = [
         "ContentSource" => "StaticSiteContentSource",
-    );
+    ];
 
     /**
      *
      * @var array
      */
-    private static $has_many = array(
+    private static $has_many = [
         "ImportRules" => "StaticSiteContentSource_ImportRule",
-    );
+    ];
 
     /**
      *
@@ -578,23 +577,23 @@ class StaticSiteContentSource_ImportSchema extends DataObject
     /**
      * Return the import rules in a format suitable for configuring StaticSiteContentExtractor.
      *
-     * @return array $output. A map of field name => array(CSS selector, CSS selector, ...)
+     * @return array $output. A map of field name => [CSS selector, CSS selector, ...]
      */
     public function getImportRules()
     {
-        $output = array();
+        $output = [];
 
         foreach ($this->ImportRules() as $rule) {
             if (!isset($output[$rule->FieldName])) {
-                $output[$rule->FieldName] = array();
+                $output[$rule->FieldName] = [];
             }
-            $ruleArray = array(
+            $ruleArray = [
                 'selector' => $rule->CSSSelector,
                 'attribute' => $rule->Attribute,
                 'plaintext' => $rule->PlainText,
                 'excludeselectors' => preg_split('/\s+/', trim($rule->ExcludeCSSSelector)),
-                'outerhtml' => $rule->OuterHTML
-            );
+                'outerhtml' => $rule->OuterHTML,
+            ];
             $output[$rule->FieldName][] = $ruleArray;
         }
 
@@ -652,7 +651,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
         }
 
         $mimesForSSType = StaticSiteMimeProcessor::get_mime_for_ss_type($type);
-        $mimes = $mimesForSSType ? $mimesForSSType : array();
+        $mimes = $mimesForSSType ? $mimesForSSType : [];
         foreach ($mimes as $mime) {
             if (!in_array($mime, $mimesForSSType)) {
                 return $mime;
@@ -686,46 +685,46 @@ class StaticSiteContentSource_ImportRule extends DataObject
      *
      * @var array
      */
-    private static $db = array(
+    private static $db = [
         "FieldName" => "Varchar",
         "CSSSelector" => "Text",
         "ExcludeCSSSelector" => "Text",
         "Attribute" => "Varchar",
         "PlainText" => "Boolean",
-        "OuterHTML" => "Boolean"
-    );
+        "OuterHTML" => "Boolean",
+    ];
 
     /**
      *
      * @var array
      */
-    public static $summary_fields = array(
+    public static $summary_fields = [
         "FieldName",
         "CSSSelector",
         "Attribute",
         "PlainText",
-        "OuterHTML"
-    );
+        "OuterHTML",
+    ];
 
     /**
      *
      * @var array
      */
-    public static $field_labels = array(
+    public static $field_labels = [
         "FieldName" => "Field Name",
         "CSSSelector" => "CSS Selector",
         "Attribute" => "Element attribute",
         "PlainText" => "Convert to plain text",
-        "OuterHTML" => "Use the outer HTML"
-    );
+        "OuterHTML" => "Use the outer HTML",
+    ];
 
     /**
      *
      * @var array
      */
-    private static $has_one = array(
+    private static $has_one = [
         "Schema" => "StaticSiteContentSource_ImportSchema",
-    );
+    ];
 
     /**
      *

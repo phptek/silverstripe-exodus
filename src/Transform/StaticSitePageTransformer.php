@@ -62,7 +62,7 @@ class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
 
         // Default value for Title
         if (empty($contentFields['Title'])) {
-            $contentFields['Title'] = array('content' => $item->Name);
+            $contentFields['Title'] = ['content' => $item->Name];
         }
 
         // Default value for URLSegment
@@ -70,12 +70,12 @@ class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
             // $item->Name comes from StaticSiteContentItem::init() and is a URL
             $name = ($item->Name == '/' ? self::$import_root : $item->Name);
             $urlSegment = preg_replace('#\.[^.]*$#', '', $name); // Lose file-extensions e.g .html
-            $contentFields['URLSegment'] = array('content' => $urlSegment);
+            $contentFields['URLSegment'] = ['content' => $urlSegment];
         }
 
         // Default value for Content (Useful for during unit-testing)
         if (empty($contentFields['Content'])) {
-            $contentFields['Content'] = array('content' => 'No content found');
+            $contentFields['Content'] = ['content' => 'No content found'];
             $this->utils->log(" - No content found for 'Content' field.", $item->AbsoluteURL, $item->ProcessedMIME);
         }
 

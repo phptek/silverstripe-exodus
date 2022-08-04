@@ -13,10 +13,10 @@ class StaticSiteExternalContentAdminExtension extends Extension
      *
      * @var array
      */
-    public static $allowed_actions = array(
+    public static $allowed_actions = [
         "crawlsite",
-        "clearimports"
-    );
+        "clearimports",
+    ];
 
     /**
      * Load module-wide CSS

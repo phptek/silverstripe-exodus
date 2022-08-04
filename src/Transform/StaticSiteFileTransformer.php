@@ -50,7 +50,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
 
         // Default value for Title
         if (empty($contentFields['Filename'])) {
-            $contentFields['Filename'] = array('content' => $item->externalId);
+            $contentFields['Filename'] = ['content' => $item->externalId];
         }
 
         $schema = $source->getSchemaForURL($item->AbsoluteURL, $item->ProcessedMIME);
@@ -248,7 +248,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $replaceUnused = preg_replace("#https?://(www.)?[^/]+#", '', $absoluteUrl);
         $fragments = explode('/', $replaceUnused);
         $filename = pathinfo($absoluteUrl, PATHINFO_FILENAME);
-        $path = array();
+        $path = [];
         foreach ($fragments as $fragment) {
             $dontUse = (!strlen($fragment) || preg_match("#(http|$filename|www\.)+#", $fragment));
             if ($dontUse) {

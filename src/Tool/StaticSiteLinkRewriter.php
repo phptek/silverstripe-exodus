@@ -23,10 +23,10 @@ class StaticSiteLinkRewriter
      *
      * @var array
      */
-    protected $tagMap = array(
+    protected $tagMap = [
         'a' => 'href',
         'img' => 'src',
-    );
+    ];
 
     /**
      * The callback function to run over each link.

@@ -15,17 +15,17 @@ class StaticSiteImportDataObject extends DataObject
      *
      * @var array
      */
-    private static $db = array(
-        'Ended' => 'SS_Datetime'
-    );
+    private static $db = [
+        'Ended' => 'SS_Datetime',
+    ];
 
     /**
      *
      * @var array
      */
-    private static $has_one = array(
-        'User' => 'Member'
-    );
+    private static $has_one = [
+        'User' => 'Member',
+    ];
 
     /**
      * Get the most recently started/run import.

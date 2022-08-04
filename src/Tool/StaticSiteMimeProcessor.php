@@ -47,11 +47,11 @@ class StaticSiteMimeProcessor
         }
         $ssTypeMimeMap = self::ss_type_to_suffix_map();
 
-        $mimes = array(
-            'sitetree' => array(),
-            'file' => array(),
-            'image' => array(),
-        );
+        $mimes = [
+            'sitetree' => [],
+            'file' => [],
+            'image' => [],
+        ];
 
         // Only support specific classes
         if ($SSType && !in_array(strtolower($SSType), array_keys($mimes))) {
@@ -103,7 +103,7 @@ class StaticSiteMimeProcessor
          */
 
         // Get SilverStripe supported SiteTree-ish mime categories
-        $mimeKeysForSiteTree = array('html', 'htm', 'xhtml');
+        $mimeKeysForSiteTree = ['html', 'htm', 'xhtml'];
 
         // Get SilverStripe supported File-ish mime categories
         // File contains values of $mimeKeysForSiteTree which we don't want
@@ -114,11 +114,11 @@ class StaticSiteMimeProcessor
 
         // Get SilverStripe supported Image-ish mime categories
         $mimeKeysForImage = $mimeCategories['image'];
-        $map = array(
+        $map = [
             'sitetree'	=> $mimeKeysForSiteTree,
             'file'		=> $mimeKeysForFile,
             'image'		=> $mimeKeysForImage
-        );
+        ];
 
         if ($SSType) {
             $SSType = strtolower($SSType);
@@ -150,7 +150,7 @@ class StaticSiteMimeProcessor
     {
         $httpMimeTypes = Config::inst()->get('HTTP', 'MimeTypes');
         $mimeCategories = singleton('File')->config()->app_categories;
-        list($ext, $mime) = array(strtolower($ext), strtolower($mime));
+        list($ext, $mime) = [strtolower($ext), strtolower($mime)];
 
         $notAuthoratative = !isset($httpMimeTypes[$ext]);					// We've found ourselves a weird extension
         $notMatch = (!$notAuthoratative && $httpMimeTypes[$ext] !== $mime);	// No match found for passed extension in our ext=>mime mapping from config
@@ -187,7 +187,7 @@ class StaticSiteMimeProcessor
     public static function get_mimetypes_from_text($mimeTypes)
     {
         $mimes = preg_split("#[\r\n\s,]+#", trim($mimeTypes));
-        $_mimes = array();
+        $_mimes = [];
         foreach ($mimes as $mimeType) {
             // clean 'em up a little
             $_mimes[] = self::cleanse($mimeType);
@@ -218,7 +218,7 @@ class StaticSiteMimeProcessor
     public function isOfImage($mimeTypes)
     {
         if (!is_array($mimeTypes)) {
-            $mimeTypes = array(self::cleanse($mimeTypes));
+            $mimeTypes = [self::cleanse($mimeTypes)];
         }
         foreach ($mimeTypes as $mime) {
             $imgMime = self::get_mime_for_ss_type('image');
@@ -238,7 +238,7 @@ class StaticSiteMimeProcessor
     public function isOfFile($mimeTypes)
     {
         if (!is_array($mimeTypes)) {
-            $mimeTypes = array(self::cleanse($mimeTypes));
+            $mimeTypes = [self::cleanse($mimeTypes)];
         }
         foreach ($mimeTypes as $mime) {
             $fileMime = self::get_mime_for_ss_type('file');
@@ -258,7 +258,7 @@ class StaticSiteMimeProcessor
     public function isOfHtml($mimeTypes)
     {
         if (!is_array($mimeTypes)) {
-            $mimeTypes = array(self::cleanse($mimeTypes));
+            $mimeTypes = [self::cleanse($mimeTypes)];
         }
         foreach ($mimeTypes as $mime) {
             $htmlMime = self::get_mime_for_ss_type('sitetree');
@@ -278,7 +278,7 @@ class StaticSiteMimeProcessor
     public function isOfFileOrImage($mimeTypes)
     {
         if (!is_array($mimeTypes)) {
-            $mimeTypes = array(self::cleanse($mimeTypes));
+            $mimeTypes = [self::cleanse($mimeTypes)];
         }
         if ($this->isOfFile($mimeTypes) || $this->isOfImage($mimeTypes)) {
             return true;

@@ -159,7 +159,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
     public function getSSExtensions()
     {
         $extensions = singleton('File')->config()->app_categories;
-        $exts = array();
+        $exts = [];
         foreach ($extensions as $category => $extArray) {
             foreach ($extArray as $ext) {
                 $exts[] = $ext;

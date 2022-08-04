@@ -105,7 +105,7 @@ class StaticSiteContentExtractor extends Object
      *
      * @param  array $selectorMap A map of field name => css-selector
      * @param  StaticSiteContentItem $item The item to extract
-     * @return array Map of field name=>array('selector' => selector, 'content' => field content)
+     * @return array Map of field name = >['selector' => selector, 'content' => field content]
      */
     public function extractMapAndSelectors($selectorMap, $item)
     {
@@ -113,17 +113,17 @@ class StaticSiteContentExtractor extends Object
             $this->fetchContent();
         }
 
-        $output = array();
+        $output = [];
         foreach ($selectorMap as $fieldName => $extractionRules) {
             if (!is_array($extractionRules)) {
-                $extractionRules = array($extractionRules);
+                $extractionRules = [$extractionRules];
             }
 
             foreach ($extractionRules as $extractionRule) {
                 $content = null;
 
                 if (!is_array($extractionRule)) {
-                    $extractionRule = array('selector' => $extractionRule);
+                    $extractionRule = ['selector' => $extractionRule];
                 }
 
                 if ($this->isMimeHTML()) {
@@ -289,7 +289,7 @@ class StaticSiteContentExtractor extends Object
      * @return boolean | \SS_HTTPResponse
      * @todo Add checks when fetching multi Mb images to ignore anything over 2Mb??
      */
-    protected function curlRequest($url, $method, $data = null, $headers = null, $curlOptions = array())
+    protected function curlRequest($url, $method, $data = null, $headers = null, $curlOptions = [])
     {
         $this->utils->log(" - CURL START: {$this->url} ({$this->mime})");
 
