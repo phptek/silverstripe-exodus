@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Tool;
 
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  *
  * Helper class for rewriting links using phpQuery.
@@ -18,6 +20,8 @@ require_once(BASE_PATH . '/vendor/electrolinux/phpquery/phpQuery/phpQuery.php');
 
 class StaticSiteLinkRewriter
 {
+    use Injectable;
+
     /**
      * Simple map of tags to count as "linkable"
      *

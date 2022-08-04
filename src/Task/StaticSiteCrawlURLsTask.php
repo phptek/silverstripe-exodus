@@ -4,6 +4,7 @@ namespace PhpTek\Exodus\Task;
 
 use SilverStripe\Dev\BuildTask;
 use PhpTek\Exodus\Model\StaticSiteContentSource;
+use SilverStripe\Core\Injector\Injectable;
 
 /**
  *
@@ -12,6 +13,8 @@ use PhpTek\Exodus\Model\StaticSiteContentSource;
  */
 class StaticSiteCrawlURLsTask extends BuildTask
 {
+    use Injectable;
+
     /**
      *
      * @param SS_HTTPRequest $request

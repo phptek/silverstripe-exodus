@@ -2,6 +2,16 @@
 
 namespace PhpTek\Exodus\Transform;
 
+use \ExternalContentTransformer;
+use SilverStripe\Core\Injector\Injector;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
+use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
+use PhpTek\Exodus\Tool\StaticSiteContentExtractor;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Core\ClassInfo;
+use PhpTek\Exodus\Model\StaticSiteImportDataObject;
+use SilverStripe\Assets\File;
+
 /**
  * Base content transformer. Comprises logic common to all types of legacy/scraped text
  * and binary content for import into native SilverStripe DataObjects.
@@ -47,8 +57,8 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
      */
     public function __construct()
     {
-        $this->utils = Injector::inst()->get('StaticSiteUtils', true);
-        $this->mimeProcessor = Injector::inst()->get('StaticSiteMimeProcessor', true);
+        $this->utils = Injector::inst()->get(StaticSiteUtils::class, true);
+        $this->mimeProcessor = Injector::inst()->get(StaticSiteMimeProcessor::class, true);
     }
 
     /**
@@ -147,6 +157,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
         if (!$import = StaticSiteImportDataObject::current()) {
             return 1;
         }
+
         return $import->ID;
     }
 
@@ -158,7 +169,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
      */
     public function getSSExtensions()
     {
-        $extensions = singleton('File')->config()->app_categories;
+        $extensions = singleton(File::class)->config()->app_categories;
         $exts = [];
         foreach ($extensions as $category => $extArray) {
             foreach ($extArray as $ext) {

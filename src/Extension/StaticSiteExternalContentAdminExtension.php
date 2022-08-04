@@ -7,6 +7,7 @@ use SilverStripe\View\Requirements;
 use \ExternalContent;
 use \ExternalContentSource;
 use SilverStripe\Control\Session;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 
 /**
@@ -16,6 +17,8 @@ use SilverStripe\ORM\DataObject;
  */
 class StaticSiteExternalContentAdminExtension extends Extension
 {
+    use Injectable;
+
     /**
      *
      * @var array

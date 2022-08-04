@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Transform;
 
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  * URL transformer specific to SilverStripe's `File` class for use with the module's
  * import content feature. It will re-create all available data of the scraped file into SilverStripe's
@@ -18,6 +20,8 @@ namespace PhpTek\Exodus\Transform;
  */
 class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
 {
+    use Injectable;
+
     /**
      * Default value to pass to usleep() to reduce load on the remote server
      *

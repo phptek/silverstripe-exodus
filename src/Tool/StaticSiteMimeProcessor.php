@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Tool;
 
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  *
  * Utility class for Mime-Type processing.
@@ -11,6 +13,8 @@ namespace PhpTek\Exodus\Tool;
  */
 class StaticSiteMimeProcessor
 {
+    use Injectable;
+
     /**
      *
      * @var array internal "cache" of mime-types

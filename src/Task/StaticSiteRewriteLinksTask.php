@@ -11,6 +11,7 @@ use PhpTek\Exodus\Model\FailedURLRewriteObject;
 use PhpTek\Exodus\Model\FailedURLRewriteSummary;
 use PhpTek\Exodus\Model\StaticSiteContentSource;
 use PhpTek\Exodus\Model\StaticSiteImportDataObject;
+use SilverStripe\Core\Injector\Injectable;
 
 /**
  * Rewrites content-links found in <img> "src" and <a> "href"
@@ -38,6 +39,8 @@ use PhpTek\Exodus\Model\StaticSiteImportDataObject;
  */
 class StaticSiteRewriteLinksTask extends BuildTask
 {
+    use Injectable;
+
     /**
      * An inexhaustive list of non http(s) URI schemes which we don't want to try to normalise.
      *

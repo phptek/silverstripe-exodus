@@ -2,6 +2,7 @@
 
 namespace PhpTek\Exodus\Report;
 
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Reports\Report;
 use SilverStripe\GraphQL\Controller;
 use SilverStripe\ORM\ArrayList;
@@ -24,6 +25,8 @@ use SilverStripe\Forms\GridField\GridFieldDeleteAction;
  */
 class FailedURLRewriteReport extends Report
 {
+    use Injectable;
+
     /**
      *
      * @var string

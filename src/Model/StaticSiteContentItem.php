@@ -6,6 +6,7 @@ use \ExternalContentItem;
 use SilverStripe\ORM\ArrayList;
 use PhpTek\Exodus\Transform\StaticSiteFileTransformer;
 use PhpTek\Exodus\Transform\StaticSitePageTransformer;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\View\Requirements;
 
@@ -18,6 +19,8 @@ use SilverStripe\View\Requirements;
  */
 class StaticSiteContentItem extends ExternalContentItem
 {
+    use Injectable;
+
     /**
      * Default Content type, either 'sitetree', 'file' or false to disable the default
      *

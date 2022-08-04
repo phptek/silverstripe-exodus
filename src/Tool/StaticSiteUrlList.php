@@ -2,6 +2,12 @@
 
 namespace PhpTek\Exodus\Tool;
 
+use PhpTek\Exodus\Model\StaticSiteContentSource;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  * Represents a set of URLs parsed from a site.
  *
@@ -12,11 +18,10 @@ namespace PhpTek\Exodus\Tool;
  * @author Russell Michell <russ@theruss.com>
  */
 
-// We need PHPCrawl
-require_once(BASE_PATH . '/vendor/cuab/phpcrawl/libs/PHPCrawler.class.php');
-
 class StaticSiteUrlList
 {
+    use Injectable;
+
     /**
      *
      * @var string
@@ -78,7 +83,7 @@ class StaticSiteUrlList
 
     /**
      * Create a new URL List
-     * @param \StaticSiteContentSource $source
+     * @param StaticSiteContentSource $source
      * @param string $cacheDir The local path to cache data into
      * @return void
      */
@@ -297,7 +302,7 @@ class StaticSiteUrlList
             $this->crawl();
         } else {
             // This happens if you move a cache-file out of the way during debugging...
-            throw new LogicException("Crawl hasn't been executed yet, and autoCrawl is set to false. Maybe a cache file has been moved?");
+            throw new \LogicException("Crawl hasn't been executed yet, and autoCrawl is set to false. Maybe a cache file has been moved?");
         }
     }
 
@@ -348,7 +353,7 @@ class StaticSiteUrlList
 
         $crawler = new StaticSiteCrawler($this, $limit, $verbose);
         $crawler->enableResumption();
-        $crawler->setUrlCacheType(PHPCrawlerUrlCacheTypes::URLCACHE_SQLITE);
+        $crawler->setUrlCacheType(2); // "2" is the original value of PHPCrawlerUrlCacheTypes::URLCACHE_SQLITE which no longer exists
         $crawler->setWorkingDirectory($this->cacheDir);
         // Find links in externally-linked CSS files
         if ($this->source->ParseCSS) {
@@ -356,7 +361,7 @@ class StaticSiteUrlList
         }
 
         // Set some proxy options for phpCrawler
-        singleton('StaticSiteUtils')->defineProxyOpts(!Director::isDev(), $crawler);
+        singleton(StaticSiteUtils::class)->defineProxyOpts(!Director::isDev(), $crawler);
 
         // Allow for resuming an incomplete crawl
         if (file_exists($this->cacheDir . 'crawlerid')) {
@@ -422,7 +427,7 @@ class StaticSiteUrlList
         if (substr($simplifiedURL, 0, strlen($simplifiedBase)) == $simplifiedBase) {
             $relURL = preg_replace("#https?://(www.)?[^/]+#", '', $url);
         } else {
-            throw new InvalidArgumentException("URL $url is not from the site $this->baseURL");
+            throw new \InvalidArgumentException("URL $url is not from the site $this->baseURL");
         }
 
         $this->addURL($relURL, $content_type);
@@ -496,7 +501,7 @@ class StaticSiteUrlList
             if (substr($simpifiedURL, 0, strlen($simpifiedBase)) == $simpifiedBase) {
                 $url = substr($simpifiedURL, strlen($simpifiedBase));
             } else {
-                throw new InvalidArgumentException("URL $url is not from the site $this->baseURL");
+                throw new \InvalidArgumentException("URL $url is not from the site $this->baseURL");
             }
         }
 
@@ -526,7 +531,8 @@ class StaticSiteUrlList
             $this->loadUrls();
         }
 
-        return in_array($processedURL, array_keys($this->urls['regular'])) || in_array($processedURL, array_keys($this->urls['inferred']));
+        return in_array($processedURL, array_keys($this->urls['regular'])) ||
+               in_array($processedURL, array_keys($this->urls['inferred']));
     }
 
     /**
@@ -634,13 +640,13 @@ class StaticSiteUrlList
     {
         $urlIsEmpty = (!$urlData || !isset($urlData['url']));
         if ($urlIsEmpty) {
-            throw new LogicException("Can't pass a blank URL to generateProcessedURL");
+            throw new \LogicException("Can't pass a blank URL to generateProcessedURL");
         }
         if ($this->urlProcessor) {
             $urlData = $this->urlProcessor->processURL($urlData);
         }
         if (!$urlData) {
-            throw new LogicException(get_class($this->urlProcessor) . " returned a blank URL.");
+            throw new \LogicException(get_class($this->urlProcessor) . " returned a blank URL.");
         }
         return $urlData;
     }
@@ -718,10 +724,13 @@ class StaticSiteUrlList
     }
 }
 
+use PHPCrawl\PHPCrawler;
+use PHPCrawl\PHPCrawlerDocumentInfo;
+
 /**
  * Extends PHPCrawler essentially to override its handleDocumentInfo() method.
  *
- * @see {@link \PHPCrawler}
+ * @see {@link PHPCrawler}
  */
 class StaticSiteCrawler extends PHPCrawler
 {
@@ -772,20 +781,21 @@ class StaticSiteCrawler extends PHPCrawler
         if ($limit) {
             $this->setPageLimit($limit);
         }
-        $this->utils = singleton('StaticSiteUtils');
+        $this->utils = singleton(StaticSiteUtils::class);
     }
 
     /**
      * After checking raw status codes out of PHPCrawler we continue to save each URL to our cache file
      *
-     * @param \PHPCrawlerDocumentInfo $info
+     * @param PHPCrawlerDocumentInfo $info
      * @return mixed null | void
      * @todo Can we make use of PHPCrawlerDocumentInfo#error_occured instead of manually checking server codes??
      * @todo The comments below state that badly formatted URLs never make it to our caching logic. Wrong.
      *	- Pass the preg_replace() call for "fixing" $mossBracketRegex into StaticSiteUrlProcessor#postProcessUrl()
      */
-    public function handleDocumentInfo(PHPCrawlerDocumentInfo $info)
+    public function handleDocumentInfo(PHPCrawlerDocumentInfo $PageInfo): int
     {
+        $info = $PageInfo; // upgraded phpcrawler compat
         /*
          * MOSS has many URLs with brackets, e.g. http://www.stuff.co.nz/news/cat-stuck-up-tree/(/
          * These result in a 404 returned from curl requests for it, and won't filter down to our caching or URL Processor logic.
@@ -804,7 +814,7 @@ class StaticSiteCrawler extends PHPCrawler
         if ($badStatusCode && !$isRecoverableUrl) {
             $message = $info->url . " Skipped. We got a {$info->http_status_code} and URL was irrecoverable" . PHP_EOL;
             $this->utils->log($message);
-            return;
+            return 1;
         }
 
         // Continue building our cache
@@ -822,7 +832,7 @@ class StaticSiteCrawler extends PHPCrawler
      * @return void
      * @throws \InvalidArgumentException
      */
-    protected function initCrawlerProcess()
+    protected function initCrawlerProcess(): void
     {
         parent::initCrawlerProcess();
 
@@ -839,7 +849,7 @@ class StaticSiteCrawler extends PHPCrawler
             foreach ($excludePatterns as $pattern) {
                 $validRegExp = $this->addURLFilterRule('|' . str_replace('|', '\|', $pattern) . '|');
                 if (!$validRegExp) {
-                    throw new InvalidArgumentException('Exclude url pattern "' . $pattern . '" is not a valid regular expression.');
+                    throw new \InvalidArgumentException('Exclude url pattern "' . $pattern . '" is not a valid regular expression.');
                 }
             }
         }

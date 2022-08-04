@@ -2,6 +2,15 @@
 
 namespace PhpTek\Exodus\Transform;
 
+use \ExternalContentImporter;
+use PhpTek\Exodus\Transform\StaticSitePageTransformer;
+use PhpTek\Exodus\Model\StaticSiteImportDataObject;
+use SilverStripe\Control\Controller;
+use SilverStripe\Dev\TaskRunner;
+use SilverStripe\Control\HTTPRequest;
+use PhpTek\Exodus\Task\StaticSiteRewriteLinksTask;
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  * Physically brings content into SilverStripe as defined by URLs fetched
  * at the crawl stage, and utilises StaticSitePageTransformer and StaticSiteFileTransformer.
@@ -14,6 +23,8 @@ namespace PhpTek\Exodus\Transform;
  */
 class StaticSiteImporter extends ExternalContentImporter
 {
+    use Injectable;
+
     /**
      *
      * @return void
@@ -85,8 +96,8 @@ class StaticSiteImporter extends ExternalContentImporter
             ];
 
             // Skip TaskRunner. Too few docs available on its use
-            $request = new SS_HTTPRequest('GET', '/dev/tasks/StaticSiteRewriteLinksTask', $getVars);
-            $inst = Injector::inst()->create('StaticSiteRewriteLinksTask');
+            $request = HTTPRequest::create('GET', '/dev/tasks/StaticSiteRewriteLinksTask', $getVars);
+            $inst = Injector::inst()->create(StaticSiteRewriteLinksTask::class);
             $inst->run($request);
         }
     }

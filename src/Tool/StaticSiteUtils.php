@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Tool;
 
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  * Basic class for utility methods unsuited to any other class.
  *
@@ -11,6 +13,8 @@ namespace PhpTek\Exodus\Tool;
  */
 class StaticSiteUtils
 {
+    use Injectable;
+
     /**
      * Log a message if the logging has been setup according to docs
      *

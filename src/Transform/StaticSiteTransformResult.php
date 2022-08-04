@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Transform;
 
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  * Encapsulates the result of a transformation.
  * It subclasses {@link TransformResult} to allow dealing-to File objects also
@@ -12,6 +14,8 @@ namespace PhpTek\Exodus\Transform;
  */
 class StaticSiteTransformResult extends TransformResult
 {
+    use Injectable;
+
     /**
      *
      * @var File

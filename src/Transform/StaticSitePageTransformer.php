@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Transform;
 
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  * URL transformer specific to SilverStripe's `SiteTree` class for use with the module's
  * import content feature.
@@ -14,6 +16,8 @@ namespace PhpTek\Exodus\Transform;
  */
 class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
 {
+    use Injectable;
+
     /**
      *
      * @var string

@@ -2,6 +2,7 @@
 
 namespace PhpTek\Exodus\Extension;
 
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
@@ -14,6 +15,8 @@ use SilverStripe\Forms\FieldList;
  */
 class StaticSiteDataExtension extends DataExtension
 {
+    use Injectable;
+
     /**
      *
      * @var array

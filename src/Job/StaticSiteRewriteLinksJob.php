@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Job;
 
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  *
  * A Queued jobs wrapper for StaticSiteRewriteLinksTask.
@@ -17,6 +19,8 @@ if (!class_exists('AbstractQueuedJob')) {
 
 class StaticSiteRewriteLinksJob extends AbstractQueuedJob implements QueuedJob
 {
+    use Injectable;
+
     /**
      * The ID number of the StaticSiteContentSource which has the links to be rewritten
      *

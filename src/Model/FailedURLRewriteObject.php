@@ -2,6 +2,7 @@
 
 namespace PhpTek\Exodus\Model;
 
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ArrayList;
 
@@ -16,6 +17,8 @@ use SilverStripe\ORM\ArrayList;
  */
 class FailedURLRewriteObject extends DataObject
 {
+    use Injectable;
+
     /**
      *
      * @var array

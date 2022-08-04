@@ -2,8 +2,8 @@
 
 namespace PhpTek\Exodus\Tool;
 
-// We need PHPQuery
-require_once(BASE_PATH . '/vendor/electrolinux/phpquery/phpQuery/phpQuery.php');
+use \phpQuery;
+use SilverStripe\Core\Injector\Injectable;
 
 /**
  * This tool uses a combination of cURL and phpQuery to extract content from a URL.
@@ -12,15 +12,17 @@ require_once(BASE_PATH . '/vendor/electrolinux/phpquery/phpQuery/phpQuery.php');
  * Given a set of fieldnames and CSS selectors corresponding to them, a map of content
  * fields will be returned.
  *
- * If the URL represents a file-based Mime-Type, a File object is created and the
- * physical file it represents can then be post-processed and saved to the SS DB and F/S.
+ * If the URL represents a file-based Mime-Type, a Silverstripe `File` object is created and the
+ * physical file it represents can then be post-processed and saved to the dstabase and F/S.
  *
  * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
  * @author Russell Michell <russ@theruss.com>
  */
-class StaticSiteContentExtractor extends Object
+class StaticSiteContentExtractor
 {
+    use Injectable;
+
     /**
      *
      * @var string

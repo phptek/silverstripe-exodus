@@ -8,6 +8,7 @@ use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
 use PhpTek\Exodus\Transform\StaticSiteImporter;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\ArrayList;
 
 /**
@@ -443,6 +444,8 @@ class StaticSiteContentSource extends ExternalContentSource
  */
 class StaticSiteContentSource_ImportSchema extends DataObject
 {
+    use Injectable;
+
     /**
      * Default
      *
