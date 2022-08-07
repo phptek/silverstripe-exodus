@@ -12,7 +12,7 @@ use SilverStripe\Core\Injector\Injectable;
  * @author Russell Michell <russell@silverstripe.com>
  * @todo Logic should really exist in external-content module itself.
  */
-class StaticSiteTransformResult extends TransformResult
+class StaticSiteTransformResult extends \TransformResult
 {
     use Injectable;
 

@@ -27,7 +27,8 @@
     "silverstripe/cms": "^4.10",
     "brittainmedia/phpcrawl": "^0.9",
     "electrolinux/phpquery": "dev-master",
-    "silverstripe/reports": "^4"
+    "silverstripe/reports": "^4",
+    "symbiote/queuedjobs": "^4"
   },
   "extra": {
     "installer-name": "exodus"
