@@ -1,9 +1,15 @@
+---
+Name: exodus-extensions
+---
+
 ExternalContentAdmin:
   extensions:
-    - StaticSiteExternalContentAdminExtension
-SiteTree:
+    - PhpTek\Exodus\Extension\StaticSiteExternalContentAdminExtension
+
+SilverStripe\CMS\Model\SiteTree:
   extensions:
-    - StaticSiteDataExtension
-File:
+    - PhpTek\Exodus\Extension\StaticSiteDataExtension
+
+SilverStripe\Assets\File:
   extensions:
-    - StaticSiteDataExtension
+    - PhpTek\Exodus\Extension\StaticSiteDataExtension

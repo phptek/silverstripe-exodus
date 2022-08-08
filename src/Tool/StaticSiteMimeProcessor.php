@@ -3,6 +3,7 @@
 namespace PhpTek\Exodus\Tool;
 
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Assets\File;
 
 /**
  *
@@ -98,7 +99,7 @@ class StaticSiteMimeProcessor
      */
     public static function ss_type_to_suffix_map($SSType = null)
     {
-        $mimeCategories = singleton('File')->config()->app_categories;
+        $mimeCategories = File::config()->get('app_categories');
 
         /*
          * Imported files and images are going to be passed through to Upload#load()
@@ -153,7 +154,7 @@ class StaticSiteMimeProcessor
     public static function ext_to_mime_compare($ext, $mime, $fix = false)
     {
         $httpMimeTypes = Config::inst()->get('HTTP', 'MimeTypes');
-        $mimeCategories = singleton('File')->config()->app_categories;
+        $mimeCategories = File::config()->get('app_categories');
         list($ext, $mime) = [strtolower($ext), strtolower($mime)];
 
         $notAuthoratative = !isset($httpMimeTypes[$ext]);					// We've found ourselves a weird extension

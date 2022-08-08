@@ -12,6 +12,8 @@ use PhpTek\Exodus\Model\FailedURLRewriteSummary;
 use PhpTek\Exodus\Model\StaticSiteContentSource;
 use PhpTek\Exodus\Model\StaticSiteImportDataObject;
 use SilverStripe\Core\Injector\Injectable;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
+use PhpTek\Exodus\Report\FailedURLRewriteReport;
 
 /**
  * Rewrites content-links found in <img> "src" and <a> "href"
@@ -279,7 +281,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
         $this->printMessage("Amended $changedFields content fields for {$pages->count()} pages and {$files->count()} files processed.");
 
         $msgNextSteps = " - Not all links will get fixed. It's recommended to also run a 3rd party link-checker over your imported content.";
-        $msgSeeReport = " - Check the CMS \"".singleton('FailedURLRewriteReport')->title()."\" report for a summary of failed link-rewrites.";
+        $msgSeeReport = " - Check the CMS \"".singleton(FailedURLRewriteReport::class)->title()."\" report for a summary of failed link-rewrites.";
 
         $this->printMessage("Tips:");
         $this->printMessage("{$newLine}$msgNextSteps");
@@ -298,7 +300,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
      */
     public function printMessage($message, $level = null, $url = null)
     {
-        singleton('StaticSiteUtils')->log("$level$message$url", null, null, __CLASS__);
+        singleton(StaticSiteUtils::class)->log("$level$message$url", null, null, __CLASS__);
         if ($this->silentRun) {
             return;
         }

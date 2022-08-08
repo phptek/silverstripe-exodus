@@ -1,11 +1,16 @@
 ---
-Name: staticsiteconnectorconfig
-After: 'framework/*','cms/*'
+Name: exodus-config
+#After:
+#  - 'framework/*'
+#  - 'cms/*'
 ---
-StaticSiteRewriteLinksTask:
+
+PhpTek\Exodus\Task\StaticSiteRewriteLinksTask:
   log_file: '/var/tmp/failed-rewrite.log'
-StaticSiteContentExtractor:
+
+PhpTek\Exodus\Tool\StaticSiteContentExtractor:
   log_file: '/var/tmp/crawl-and-import.log'
+
 # Prevent File::updateFileSystem() messing with the connector's own versioning
-File:
+SilverStripe\Assets\File:
   update_filesystem: false

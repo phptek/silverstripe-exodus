@@ -10,6 +10,28 @@ use SilverStripe\ORM\DataObject;
 use PhpTek\Exodus\Transform\StaticSiteImporter;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\ArrayList;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\OptionsetField;
+use SilverStripe\Forms\ListboxField;
+use PhpTek\Exodus\Tool\StaticSiteUrlList;
+use SilverStripe\Forms\GridField\GridFieldAddNewButton;
+use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
+use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
+use SilverStripe\ORM\FieldType\DBInt;
+use SilverStripe\ORM\FieldType\DBText;
+use SilverStripe\ORM\FieldType\DBVarchar;
+use SilverStripe\Forms\ToggleCompositeField;
+use SilverStripe\Forms\DatetimeField;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Forms\TextareaField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\ORM\ValidationResult;
+use SilverStripe\Dev\Debug;
+use SilverStripe\ORM\FieldType\DBBoolean;
 
 /**
  * Define the overarching content-sources, schemas etc.
@@ -86,7 +108,7 @@ class StaticSiteContentSource extends ExternalContentSource
     {
         parent::__construct($record, $isSingleton, $model);
         $this->staticSiteCacheDir = "static-site-{$this->ID}";
-        $this->utils = singleton('StaticSiteUtils');
+        $this->utils = singleton(StaticSiteUtils::class);
     }
 
     /**
@@ -120,8 +142,8 @@ class StaticSiteContentSource extends ExternalContentSource
         // Schemas Gridfield
         $fields->addFieldToTab('Root.Main', new HeaderField('ImportConfigHeader', 'Import config'));
         $importRules = $fields->dataFieldByName('Schemas');
-        $importRules->getConfig()->removeComponentsByType('GridFieldAddExistingAutocompleter');
-        $importRules->getConfig()->removeComponentsByType('GridFieldAddNewButton');
+        $importRules->getConfig()->removeComponentsByType(GridFieldAddExistingAutocompleter::class);
+        $importRules->getConfig()->removeComponentsByType(GridFieldAddNewButton::class);
         $addNewButton = new GridFieldAddNewButton('after');
         $addNewButton->setButtonName("Add Schema");
         $importRules->getConfig()->addComponent($addNewButton);
@@ -142,7 +164,7 @@ class StaticSiteContentSource extends ExternalContentSource
                 $crawlButtonText = _t('StaticSiteContentSource.RECRAWL_SITE', 'Re-crawl site');
                 break;
             default:
-                throw new LogicException("Invalid getSpiderStatus() value '".$this->urlList()->getSpiderStatus().";");
+                throw new \LogicException("Invalid getSpiderStatus() value '".$this->urlList()->getSpiderStatus().";");
         }
 
         $crawlButton = FormAction::create('crawlsite', $crawlButtonText)
@@ -201,7 +223,7 @@ class StaticSiteContentSource extends ExternalContentSource
         $hasImports = DataObject::get('StaticSiteImportDataObject');
         $_source = [];
         foreach ($hasImports as $import) {
-            $date = DBField::create_field('SS_Datetime', $import->Created)->Nice24();
+            $date = DBField::create_field(DatetimeField::class, $import->Created)->Nice24();
             $_source[$import->ID] = $date . ' (Import #' . $import->ID . ')';
         }
 
@@ -246,7 +268,7 @@ class StaticSiteContentSource extends ExternalContentSource
 
     /**
      *
-     * @return \StaticSiteUrlList
+     * @return StaticSiteUrlList
      */
     public function urlList()
     {
@@ -272,13 +294,13 @@ class StaticSiteContentSource extends ExternalContentSource
      *
      * @param boolean $limit
      * @param boolean $verbose
-     * @return \StaticSiteCrawler
+     * @return StaticSiteCrawler
      * @throws LogicException
      */
     public function crawl($limit=false, $verbose=false)
     {
         if (!$this->BaseUrl) {
-            throw new LogicException("Can't crawl a site until Base URL is set.");
+            throw new \LogicException("Can't crawl a site until Base URL is set.");
         }
         return $this->urlList()->crawl($limit, $verbose);
     }
@@ -289,7 +311,7 @@ class StaticSiteContentSource extends ExternalContentSource
      *
      * @param string $absoluteURL
      * @param string $mimeType (Optional)
-     * @return mixed \StaticSiteContentSource_ImportSchema $schema or boolean false if no schema matches are found
+     * @return mixed StaticSiteContentSource_ImportSchema $schema or boolean false if no schema matches are found
      */
     public function getSchemaForURL($absoluteURL, $mimeType = null)
     {
@@ -343,14 +365,14 @@ class StaticSiteContentSource extends ExternalContentSource
      * Relative URLs are used as the unique identifiers by this importer
      *
      * @param string $id The URL, relative to BaseURL, starting with "/".
-     * @return \StaticSiteContentItem
+     * @return StaticSiteContentItem
      */
     public function getObject($id)
     {
         if ($id[0] != "/") {
             $id = $this->decodeId($id);
             if ($id[0] != "/") {
-                throw new InvalidArgumentException("\$id must start with /");
+                throw new \InvalidArgumentException("\$id must start with /");
             }
         }
 
@@ -359,7 +381,7 @@ class StaticSiteContentSource extends ExternalContentSource
 
     /**
      *
-     * @return \StaticSiteContentItem
+     * @return StaticSiteContentItem
      */
     public function getRoot()
     {
@@ -458,11 +480,11 @@ class StaticSiteContentSource_ImportSchema extends DataObject
      * @var array
      */
     private static $db = [
-        "DataType" => "Varchar",
-        "Order" => "Int",
-        "AppliesTo" => "Varchar(255)",
-        "MimeTypes" => "Text",
-        "Notes" => "Text",	// Purely informational. Not used in imports.
+        "DataType" => DBVarchar::class,
+        "Order" => DBInt::class,
+        "AppliesTo" => DBVarchar::class,
+        "MimeTypes" => DBText::class,
+        "Notes" => DBText::class,	// Purely informational. Not used in imports.
     ];
 
     /**
@@ -497,7 +519,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
      * @var array
      */
     private static $has_one = [
-        "ContentSource" => "StaticSiteContentSource",
+        "ContentSource" => StaticSiteContentSource::class,
     ];
 
     /**
@@ -505,7 +527,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
      * @var array
      */
     private static $has_many = [
-        "ImportRules" => "StaticSiteContentSource_ImportRule",
+        "ImportRules" => StaticSiteContentSource_ImportRule::class,
     ];
 
     /**
@@ -697,12 +719,12 @@ class StaticSiteContentSource_ImportRule extends DataObject
      * @var array
      */
     private static $db = [
-        "FieldName" => "Varchar",
-        "CSSSelector" => "Text",
-        "ExcludeCSSSelector" => "Text",
-        "Attribute" => "Varchar",
-        "PlainText" => "Boolean",
-        "OuterHTML" => "Boolean",
+        "FieldName" => DBVarchar::class,
+        "CSSSelector" => DBText::class,
+        "ExcludeCSSSelector" => DBText::class,
+        "Attribute" => DBVarchar::class,
+        "PlainText" => DBBoolean::class,
+        "OuterHTML" => DBBoolean::class,
     ];
 
     /**
@@ -734,7 +756,7 @@ class StaticSiteContentSource_ImportRule extends DataObject
      * @var array
      */
     private static $has_one = [
-        "Schema" => "StaticSiteContentSource_ImportSchema",
+        "Schema" => StaticSiteContentSource_ImportSchema::class,
     ];
 
     /**

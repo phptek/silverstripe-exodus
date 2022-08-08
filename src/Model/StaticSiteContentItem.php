@@ -9,6 +9,8 @@ use PhpTek\Exodus\Transform\StaticSitePageTransformer;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\View\Requirements;
+use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
 
 /**
  * Deals-to transforming imported SiteTree and File objects
@@ -91,7 +93,7 @@ class StaticSiteContentItem extends ExternalContentItem
      */
     public function getType()
     {
-        $mimeTypeProcessor = singleton('StaticSiteMimeProcessor');
+        $mimeTypeProcessor = singleton(StaticSiteMimeProcessor::class);
         if ($mimeTypeProcessor->isOfFileOrImage($this->ProcessedMIME)) {
             return "file";
         }
@@ -99,7 +101,7 @@ class StaticSiteContentItem extends ExternalContentItem
             return "sitetree";
         }
         // Log everything that doesn't fit:
-        singleton('StaticSiteUtils')->log('UNKNOWN Schema not configured for Mime & URL:', $this->AbsoluteURL, $this->ProcessedMIME);
+        singleton(StaticSiteUtils::class)->log('UNKNOWN Schema not configured for Mime & URL:', $this->AbsoluteURL, $this->ProcessedMIME);
         return $this->default_content_type;
     }
 

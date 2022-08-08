@@ -1,7 +1,8 @@
 ---
-Name: staticsiteconnector-routes
+Name: exodus-routes
 After: '#external-content-routes'
 ---
-Director:
+
+SilverStripe\Control\Director:
   rules:
-    'clearimports': 'StaticSiteExternalContentAdminExtension'
+    'clearimports': 'PhpTek\Exodus\Extension\StaticSiteExternalContentAdminExtension'

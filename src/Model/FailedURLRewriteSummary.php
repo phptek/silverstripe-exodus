@@ -4,6 +4,8 @@ namespace PhpTek\Exodus\Model;
 
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBInt;
+use SilverStripe\ORM\FieldType\DBText;
 
 /**
  * A model object that represents a single failed link-rewrite summary. This data is displayed
@@ -21,8 +23,8 @@ class FailedURLRewriteSummary extends DataObject
      * @var array
      */
     private static $db = [
-        'Text' => 'Text',
-        'ImportID' => 'Int',
+        'Text' => DBText::class,
+        'ImportID' => DBInt::class,
     ];
 
     /**

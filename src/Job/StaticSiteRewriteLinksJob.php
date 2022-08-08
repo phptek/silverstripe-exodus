@@ -3,6 +3,9 @@
 namespace PhpTek\Exodus\Job;
 
 use SilverStripe\Core\Injector\Injectable;
+use Symbiote\QueuedJobs\Jobs\AbstractQueuedJob;
+use Symbiote\QueuedJobs\Jobs\QueuedJob;
+use PhpTek\Exodus\Task\StaticSiteRewriteLinksTask;
 
 /**
  *
@@ -13,7 +16,7 @@ use SilverStripe\Core\Injector\Injectable;
  * @author Russell Michell <russ@theruss.com>
  */
 
-if (!class_exists('AbstractQueuedJob')) {
+if (!class_exists(AbstractQueuedJob::class)) {
     return;
 }
 
@@ -58,7 +61,7 @@ class StaticSiteRewriteLinksJob extends AbstractQueuedJob implements QueuedJob
      */
     public function process()
     {
-        $task = singleton('StaticSiteRewriteLinksTask');
+        $task = singleton(StaticSiteRewriteLinksTask::class);
         $task->setContentSourceID($this->contentSourceID);
         $task->process();
         $this->currentStep = 1;

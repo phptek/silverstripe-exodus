@@ -13,6 +13,7 @@ use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+use PhpTek\Exodus\Model\FailedURLRewriteObject;
 
 /**
  * A CMS report for URLs that failed to be re-written.
@@ -54,7 +55,7 @@ TXT;
     {
         $reqVars = Controller::curr()->request->requestVars();
         $importID = !empty($reqVars['filters']) ? $reqVars['filters']['ImportID'] : 1;
-        $list = singleton('FailedURLRewriteObject')->getBadImportData($importID);
+        $list = singleton(FailedURLRewriteObject::class)->getBadImportData($importID);
         $_list = ArrayList::create();
         $countNotImported = $countJunk = $countThirdParty = $countBadScheme = [];
         foreach ($list as $badLink) {

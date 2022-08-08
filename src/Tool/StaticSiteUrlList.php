@@ -4,6 +4,7 @@ namespace PhpTek\Exodus\Tool;
 
 use PhpTek\Exodus\Model\StaticSiteContentSource;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
+use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Injector\Injectable;
@@ -552,7 +553,7 @@ class StaticSiteUrlList
              * If $processedURLData['url'] is not HTML, it's unlikely its parent
              * is anything useful (Prob just a directory)
              */
-            $sng = singleton('StaticSiteMimeProcessor');
+            $sng = singleton(StaticSiteMimeProcessor::class);
             $mime = $sng->IsOfHtml($processedURLData['mime']) ? $processedURLData['mime'] : self::$undefined_mime_type;
             $processedURL = $processedURLData['url'];
         }

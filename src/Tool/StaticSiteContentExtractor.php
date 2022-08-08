@@ -4,6 +4,8 @@ namespace PhpTek\Exodus\Tool;
 
 use \phpQuery;
 use SilverStripe\Core\Injector\Injectable;
+use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
 
 /**
  * This tool uses a combination of cURL and phpQuery to extract content from a URL.
@@ -94,11 +96,11 @@ class StaticSiteContentExtractor
         $this->url = $url;
         $this->mime = $mime;
         $this->content = $content;
-        $this->mimeProcessor = singleton('StaticSiteMimeProcessor');
-        $this->utils = singleton('StaticSiteUtils');
+        $this->mimeProcessor = singleton(StaticSiteMimeProcessor::class);
+        $this->utils = singleton(StaticSiteUtils::class);
 
-        if (!class_exists('phpQuery')) {
-            throw new Exception("The third-party library 'phpQuery' is required.");
+        if (!class_exists(phpQuery::class)) {
+            throw new \Exception("The third-party library 'phpQuery' is required.");
         }
     }
 
@@ -265,7 +267,7 @@ class StaticSiteContentExtractor
         $this->utils->log(" - Fetching {$this->url} ({$this->mime})");
 
         // Set some proxy options for phpCrawler
-        $curlOpts = singleton('StaticSiteUtils')->defineProxyOpts(!Director::isDev());
+        $curlOpts = singleton(StaticSiteUtils::class)->defineProxyOpts(!Director::isDev());
         $response = $this->curlRequest($this->url, "GET", null, null, $curlOpts);
 
         if ($response == 'file') {
