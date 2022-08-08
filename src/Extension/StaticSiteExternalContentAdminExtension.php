@@ -2,10 +2,10 @@
 
 namespace PhpTek\Exodus\Extension;
 
-use SilverStripe\Core\Extension;
-use SilverStripe\View\Requirements;
 use \ExternalContent;
 use \ExternalContentSource;
+use SilverStripe\Core\Extension;
+use SilverStripe\View\Requirements;
 use SilverStripe\Control\Session;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
@@ -84,9 +84,9 @@ class StaticSiteExternalContentAdminExtension extends Extension
     public function clearimports($request)
     {
         if (!empty($request['ClearAllImports'])) {
-            $imports = DataObject::get('StaticSiteImportDataObject');
+            $imports = DataObject::get(StaticSiteImportDataObject::class);
         } elseif ($selectedImports = $request['ShowImports']) {
-            $imports = DataObject::get('StaticSiteImportDataObject')->byIDs($selectedImports);
+            $imports = DataObject::get(StaticSiteImportDataObject::class)->byIDs($selectedImports);
         } else {
             $imports = null;
         }

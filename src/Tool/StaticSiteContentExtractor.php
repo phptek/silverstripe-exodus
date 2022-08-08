@@ -3,9 +3,13 @@
 namespace PhpTek\Exodus\Tool;
 
 use \phpQuery;
-use SilverStripe\Core\Injector\Injectable;
+use \DOMDocument;
+use \DOMElement;
 use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
+use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Convert;
 
 /**
  * This tool uses a combination of cURL and phpQuery to extract content from a URL.

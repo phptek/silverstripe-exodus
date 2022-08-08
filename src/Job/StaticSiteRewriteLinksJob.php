@@ -2,10 +2,10 @@
 
 namespace PhpTek\Exodus\Job;
 
+use PhpTek\Exodus\Task\StaticSiteRewriteLinksTask;
 use SilverStripe\Core\Injector\Injectable;
 use Symbiote\QueuedJobs\Jobs\AbstractQueuedJob;
 use Symbiote\QueuedJobs\Jobs\QueuedJob;
-use PhpTek\Exodus\Task\StaticSiteRewriteLinksTask;
 
 /**
  *

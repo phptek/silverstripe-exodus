@@ -2,6 +2,9 @@
 
 namespace PhpTek\Exodus\Report;
 
+use PhpTek\Exodus\Model\FailedURLRewriteObject;
+use PhpTek\Exodus\Model\FailedURLRewriteSummary;
+use PhpTek\Exodus\Model\StaticSiteImportDataObject;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Reports\Report;
 use SilverStripe\GraphQL\Controller;
@@ -13,8 +16,6 @@ use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
-use PhpTek\Exodus\Model\FailedURLRewriteObject;
-use PhpTek\Exodus\Model\FailedURLRewriteSummary;
 
 /**
  * A CMS report for URLs that failed to be re-written.
@@ -193,7 +194,7 @@ TXT;
             $fields->push(LiteralField::create('SummaryBody', $summary));
         }
 
-        $source = DataObject::get('StaticSiteImportDataObject');
+        $source = DataObject::get(StaticSiteImportDataObject::class);
         $_source = [];
         foreach ($source as $import) {
             $date = DBField::create_field(DBDatetime::class, $import->Created)->Time24();

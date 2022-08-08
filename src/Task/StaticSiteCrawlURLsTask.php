@@ -2,8 +2,8 @@
 
 namespace PhpTek\Exodus\Task;
 
-use SilverStripe\Dev\BuildTask;
 use PhpTek\Exodus\Model\StaticSiteContentSource;
+use SilverStripe\Dev\BuildTask;
 use SilverStripe\Core\Injector\Injectable;
 
 /**

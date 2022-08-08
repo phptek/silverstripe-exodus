@@ -2,18 +2,21 @@
 
 namespace PhpTek\Exodus\Task;
 
-use SilverStripe\Dev\BuildTask;
-use SilverStripe\Control\Director;
-use SilverStripe\GraphQL\Controller;
-use PhpTek\Exodus\Tool\StaticSiteLinkRewriter;
-use SilverStripe\ORM\DataObject;
 use PhpTek\Exodus\Model\FailedURLRewriteObject;
 use PhpTek\Exodus\Model\FailedURLRewriteSummary;
 use PhpTek\Exodus\Model\StaticSiteContentSource;
 use PhpTek\Exodus\Model\StaticSiteImportDataObject;
-use SilverStripe\Core\Injector\Injectable;
+use PhpTek\Exodus\Tool\StaticSiteLinkRewriter;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
 use PhpTek\Exodus\Report\FailedURLRewriteReport;
+use SilverStripe\Assets\File;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\Control\Director;
+use SilverStripe\GraphQL\Controller;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Versioned\Versioned;
+use SilverStripe\Forms\FormField;
 
 /**
  * Rewrites content-links found in <img> "src" and <a> "href"
@@ -54,11 +57,13 @@ class StaticSiteRewriteLinksTask extends BuildTask
         'tel',
         'htp',
         'ftp',
+        'ftps',
         'res',
         'skype',
         'ssh',
         'telnet',
         'gopher',
+        'rtsp',
     ];
 
     /**
@@ -165,6 +170,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
             }
         }
 
+        // TODO: Remove.
         if ($request->getVar('DIE')) {
             return;
         }
@@ -216,7 +222,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
             }
             // Rewrite Asset links by replacing phpQuery processed URLs with appropriate filename.
             elseif (isset($fileLookup[$fileMapKey]) && $fileID = $fileLookup[$fileMapKey]) {
-                if ($file = DataObject::get_by_id('File', $fileID)) {
+                if ($file = DataObject::get_by_id(File::class, $fileID)) {
                     $output = $file->RelativeLink();
                     $task->printMessage("\tFound: File ID#" . $fileID, null, $output);
                     return $output;
@@ -270,7 +276,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
             }
 
             if ($modified) {
-                Versioned::reading_stage('Stage');
+                Versioned::reading_mode('Stage');
                 $page->write();
                 $page->publish('Stage', 'Live');
             }
@@ -332,7 +338,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
              * Prevent the same bad-link (for the same Import & container page)
              * being written.
              */
-            $failureExists = DataObject::get('FailedURLRewriteObject')->filter(array(
+            $failureExists = DataObject::get(FailedURLRewriteObject::class)->filter(array(
                 'ImportID' => $importID,
                 'OrigUrl' => $failure['OrigUrl'],
                 'ContainedInID' => $failure['ContainedInID']
@@ -550,6 +556,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
     {
         $hasSid = ($this->contentSourceID && is_numeric($this->contentSourceID));
         $hasIid = ($this->contentImportID && is_numeric($this->contentImportID));
+
         if (!$hasSid || !$hasIid) {
             $this->printTaskInfo();
             return false;

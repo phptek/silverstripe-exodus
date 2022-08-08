@@ -2,12 +2,13 @@
 
 namespace PhpTek\Exodus\Extension;
 
+use PhpTek\Exodus\Model\FailedURLRewriteObject;
+use PhpTek\Exodus\Model\StaticSiteContentSource;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Forms\FieldList;
-use PhpTek\Exodus\Model\StaticSiteContentSource;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBVarchar;
 
@@ -24,17 +25,17 @@ class StaticSiteDataExtension extends DataExtension
      *
      * @var array
      */
-    private static $has_one = [
-        "StaticSiteContentSource" => StaticSiteContentSource::class,
+    private static $db = [
+        "StaticSiteURL" => DBVarchar::class,
+        "StaticSiteImportID" => DBInt::class,
     ];
 
     /**
      *
      * @var array
      */
-    private static $db = [
-        "StaticSiteURL" => DBVarchar::class,
-        "StaticSiteImportID" => DBInt::class,
+    private static $has_one = [
+        "StaticSiteContentSource" => StaticSiteContentSource::class,
     ];
 
     /**
@@ -61,7 +62,7 @@ class StaticSiteDataExtension extends DataExtension
     public function onAfterDelete()
     {
         parent::onAfterDelete();
-        if ($failedRewriteObjects = DataObject::get('FailedURLRewriteObject')->filter('ContainedInID', $this->owner->ID)) {
+        if ($failedRewriteObjects = DataObject::get(FailedURLRewriteObject::class)->filter('ContainedInID', $this->owner->ID)) {
             $failedRewriteObjects->each(function ($item) {
                 $item->delete();
             });

@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Model;
 
+use PhpTek\Exodus\Model\FailedURLRewriteObject;
+use PhpTek\Exodus\Model\FailedURLRewriteSummary;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
@@ -94,11 +96,14 @@ class StaticSiteImportDataObject extends DataObject
     public function onAfterDelete()
     {
         parent::onAfterDelete();
-        $relatedFailedRewriteObjects = DataObject::get('FailedURLRewriteObject')->filter('ImportID', $this->ID);
-        $relatedFailedRewriteSummaries = DataObject::get('FailedURLRewriteSummary')->filter('ImportID', $this->ID);
+
+        $relatedFailedRewriteObjects = DataObject::get(FailedURLRewriteObject::class)->filter('ImportID', $this->ID);
+        $relatedFailedRewriteSummaries = DataObject::get(FailedURLRewriteSummary::class)->filter('ImportID', $this->ID);
+
         $relatedFailedRewriteObjects->each(function ($item) {
             $item->delete();
         });
+
         $relatedFailedRewriteSummaries->each(function ($item) {
             $item->delete();
         });

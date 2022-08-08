@@ -2,7 +2,9 @@
 
 namespace PhpTek\Exodus\Transform;
 
+use SilverStripe\Assets\File;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Control\Controller;
 
 /**
  * URL transformer specific to SilverStripe's `File` class for use with the module's
@@ -245,7 +247,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $parentDir = '';
         $postVars = Controller::curr()->request->postVars();
         if (!empty($postVars['FileMigrationTarget'])) {
-            $parentDirData = DataObject::get_by_id('File', $postVars['FileMigrationTarget']);
+            $parentDirData = DataObject::get_by_id(File::class, $postVars['FileMigrationTarget']);
             $parentDir = $parentDirData->Title;
         }
 

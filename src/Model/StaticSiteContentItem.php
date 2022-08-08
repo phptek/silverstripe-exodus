@@ -3,14 +3,14 @@
 namespace PhpTek\Exodus\Model;
 
 use \ExternalContentItem;
-use SilverStripe\ORM\ArrayList;
 use PhpTek\Exodus\Transform\StaticSiteFileTransformer;
 use PhpTek\Exodus\Transform\StaticSitePageTransformer;
+use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\View\Requirements;
-use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
-use PhpTek\Exodus\Tool\StaticSiteUtils;
 
 /**
  * Deals-to transforming imported SiteTree and File objects

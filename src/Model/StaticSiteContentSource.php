@@ -3,24 +3,24 @@
 namespace PhpTek\Exodus\Model;
 
 use \ExternalContentSource;
+use PhpTek\Exodus\Transform\StaticSiteImporter;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
+use PhpTek\Exodus\Tool\StaticSiteUrlList;
+use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
-use PhpTek\Exodus\Transform\StaticSiteImporter;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\ArrayList;
-use PhpTek\Exodus\Tool\StaticSiteUtils;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\ListboxField;
-use PhpTek\Exodus\Tool\StaticSiteUrlList;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
-use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use SilverStripe\Assets\File;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\FieldType\DBInt;
@@ -228,7 +228,7 @@ class StaticSiteContentSource extends ExternalContentSource
             ->setDescription("URLs that should be excluded. (Supports regular expressions e.g. '/about/.*'). One per URL")
             ->setTitle('Excluded URLs');
 
-        $hasImports = DataObject::get('StaticSiteImportDataObject');
+        $hasImports = DataObject::get(StaticSiteImportDataObject::class);
         $_source = [];
         foreach ($hasImports as $import) {
             $date = DBField::create_field(DBDatetime::class, $import->Created)->Time24();
