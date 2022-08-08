@@ -4,6 +4,9 @@ namespace PhpTek\Exodus\Model;
 
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
 
 /**
  * Caches some metadata for each import. Allows imports to have a DataObject-like functionality.
@@ -17,11 +20,16 @@ class StaticSiteImportDataObject extends DataObject
     use Injectable;
 
     /**
+     * @var string
+     */
+    private static $table_name = 'StaticSiteImportDataObject';
+
+    /**
      *
      * @var array
      */
     private static $db = [
-        'Ended' => 'SS_Datetime',
+        'Ended' => DBDatetime::class,
     ];
 
     /**
@@ -29,7 +37,7 @@ class StaticSiteImportDataObject extends DataObject
      * @var array
      */
     private static $has_one = [
-        'User' => 'Member',
+        'User' => Member::class,
     ];
 
     /**
@@ -58,8 +66,9 @@ class StaticSiteImportDataObject extends DataObject
      */
     public function start()
     {
-        $this->UserID = Member::currentUserID();
+        $this->UserID = Security::getCurrentUser()->getField('ID');
         $this->write();
+
         return $this;
     }
 
@@ -70,8 +79,9 @@ class StaticSiteImportDataObject extends DataObject
      */
     public function end()
     {
-        $this->Ended = SS_Datetime::now()->getValue();
+        $this->Ended = DBDatetime::now()->getValue();
         $this->write();
+
         return $this;
     }
 

@@ -21,17 +21,19 @@ use PhpTek\Exodus\Tool\StaticSiteUrlList;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
 use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
+use SilverStripe\Assets\File;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBText;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\Forms\ToggleCompositeField;
-use SilverStripe\Forms\DatetimeField;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Dev\Debug;
 use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBDatetime;
 
 /**
  * Define the overarching content-sources, schemas etc.
@@ -42,17 +44,23 @@ use SilverStripe\ORM\FieldType\DBBoolean;
  */
 class StaticSiteContentSource extends ExternalContentSource
 {
+
+    /**
+     * @var string
+     */
+    private static $table_name = 'StaticSiteContentSource';
+
     /**
      *
      * @var array
      */
     private static $db = [
-        'BaseUrl' => 'Varchar(255)',
-        'UrlProcessor' => 'Varchar(255)',
-        'ExtraCrawlUrls' => 'Text',
-        'UrlExcludePatterns' => 'Text',
-        'ParseCSS' => 'Boolean',
-        'AutoRunTask' => 'Boolean',
+        'BaseUrl' => DBVarchar::class,
+        'UrlProcessor' => DBVarchar::class,
+        'ExtraCrawlUrls' => DBText::class,
+        'UrlExcludePatterns' => DBText::class,
+        'ParseCSS' => DBBoolean::class,
+        'AutoRunTask' => DBBoolean::class,
     ];
 
     /**
@@ -60,9 +68,9 @@ class StaticSiteContentSource extends ExternalContentSource
      * @var array
      */
     private static $has_many = [
-        "Schemas" => "StaticSiteContentSource_ImportSchema",
-        "Pages" => "SiteTree",
-        "Files" => "File",
+        "Schemas" => StaticSiteContentSource_ImportSchema::class,
+        "Pages" => SiteTree::class,
+        "Files" => File::class,
     ];
 
     /**
@@ -223,7 +231,7 @@ class StaticSiteContentSource extends ExternalContentSource
         $hasImports = DataObject::get('StaticSiteImportDataObject');
         $_source = [];
         foreach ($hasImports as $import) {
-            $date = DBField::create_field(DatetimeField::class, $import->Created)->Nice24();
+            $date = DBField::create_field(DBDatetime::class, $import->Created)->Time24();
             $_source[$import->ID] = $date . ' (Import #' . $import->ID . ')';
         }
 

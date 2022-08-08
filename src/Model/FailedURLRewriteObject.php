@@ -2,9 +2,11 @@
 
 namespace PhpTek\Exodus\Model;
 
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\FieldType\DBVarchar;
 
 /**
  * A model object that represents a single failed link-rewrite during the
@@ -20,12 +22,17 @@ class FailedURLRewriteObject extends DataObject
     use Injectable;
 
     /**
+     * @var string
+     */
+    private static $table_name = 'FailedURLRewriteObject';
+
+    /**
      *
      * @var array
      */
     private static $db = [
         "BadLinkType" => "Enum('ThirdParty, BadScheme, NotImported, Junk, Unknown', 'Unknown')",
-        "OrigUrl" => "Varchar(255)",
+        "OrigUrl" => DBVarchar::class,
     ];
 
     /**
@@ -33,8 +40,8 @@ class FailedURLRewriteObject extends DataObject
      * @var array
      */
     private static $has_one = [
-        'Import' => 'StaticSiteImportDataObject',
-        'ContainedIn' => 'SiteTree',
+        'Import' => StaticSiteImportDataObject::class,
+        'ContainedIn' => SiteTree::class,
     ];
 
     /**

@@ -14,6 +14,7 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use PhpTek\Exodus\Model\FailedURLRewriteObject;
+use PhpTek\Exodus\Model\FailedURLRewriteSummary;
 
 /**
  * A CMS report for URLs that failed to be re-written.
@@ -145,11 +146,11 @@ TXT;
             ],
             'Created' => [
                 'title' => 'Task run date',
-                'casting' => 'SS_Datetime->Nice24'
+                'casting' => 'DBDatetime->Time24'
             ],
             'Import.Created' => [
                 'title' => 'Import date',
-                'casting' => 'SS_Datetime->Nice24'
+                'casting' => 'DBDatetime->Time24'
             ]
         ];
     }
@@ -163,7 +164,7 @@ TXT;
      */
     protected function getSummary($importID)
     {
-        if (!$text = DataObject::get_one('FailedURLRewriteSummary', "\"ImportID\" = '$importID'")) {
+        if (!$text = DataObject::get_one(FailedURLRewriteSummary::class, "\"ImportID\" = '$importID'")) {
             return;
         }
 
@@ -195,7 +196,7 @@ TXT;
         $source = DataObject::get('StaticSiteImportDataObject');
         $_source = [];
         foreach ($source as $import) {
-            $date = DBField::create_field('SS_Datetime', $import->Created)->Nice24();
+            $date = DBField::create_field(DBDatetime::class, $import->Created)->Time24();
             $_source[$import->ID] = $date . ' (Import #' . $import->ID . ')';
         }
 

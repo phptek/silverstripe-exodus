@@ -32,6 +32,7 @@ class StaticSiteExternalContentAdminExtension extends Extension
      * Load module-wide CSS
      *
      * @return void
+     * @todo Is this needed?
      */
     public function init()
     {

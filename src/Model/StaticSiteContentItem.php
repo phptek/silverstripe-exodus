@@ -24,6 +24,11 @@ class StaticSiteContentItem extends ExternalContentItem
     use Injectable;
 
     /**
+     * @var string
+     */
+    private static $table_name = 'StaticSiteContentItem';
+
+    /**
      * Default Content type, either 'sitetree', 'file' or false to disable the default
      *
      * @var mixed (string | boolean)

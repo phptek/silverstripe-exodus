@@ -7,6 +7,9 @@ use SilverStripe\ORM\DataExtension;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Forms\FieldList;
+use PhpTek\Exodus\Model\StaticSiteContentSource;
+use SilverStripe\ORM\FieldType\DBInt;
+use SilverStripe\ORM\FieldType\DBVarchar;
 
 /**
  * @package phptek/silverstripe-exodus
@@ -22,7 +25,7 @@ class StaticSiteDataExtension extends DataExtension
      * @var array
      */
     private static $has_one = [
-        "StaticSiteContentSource" => "StaticSiteContentSource",
+        "StaticSiteContentSource" => StaticSiteContentSource::class,
     ];
 
     /**
@@ -30,8 +33,8 @@ class StaticSiteDataExtension extends DataExtension
      * @var array
      */
     private static $db = [
-        "StaticSiteURL" => "Varchar(255)",
-        "StaticSiteImportID" => "Int,"
+        "StaticSiteURL" => DBVarchar::class,
+        "StaticSiteImportID" => DBInt::class,
     ];
 
     /**

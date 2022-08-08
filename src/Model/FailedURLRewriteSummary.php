@@ -19,6 +19,11 @@ class FailedURLRewriteSummary extends DataObject
     use Injectable;
 
     /**
+     * @var string
+     */
+    private static $table_name = 'FailedURLRewriteSummary';
+
+    /**
      *
      * @var array
      */
