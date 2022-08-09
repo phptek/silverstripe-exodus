@@ -13,7 +13,7 @@ use SilverStripe\Forms\OptionsetField;
 class ExternalContentHtmlEditorExtension extends Extension {
 
 	public function updateLinkForm(Form $form) {
-		Requirements::javascript(ExternalContentAdmin::$directory . "/javascript/external_tiny_mce_improvements.js");
+		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external_tiny_mce_improvements.js');
 
 		$fields = $form->Fields();
 		$fields->replaceField('LinkType', $options = new OptionsetField(

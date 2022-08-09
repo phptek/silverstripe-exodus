@@ -1,7 +1,7 @@
 <div id="form_actions_right" class="ajaxActions">
 </div>
 
-<% if EditForm %>
+<% if $EditForm %>
 	$EditForm
 <% else %>
 	<form id="Form_EditForm" action="admin/assets/?executeForm=EditForm" method="post" enctype="multipart/form-data">

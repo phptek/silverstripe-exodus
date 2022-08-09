@@ -36,7 +36,7 @@ class StaticSiteExternalContentAdminExtension extends Extension
      */
     public function init()
     {
-        Requirements::css('staticsiteconnector/css/StaticSiteConnector.css');
+        //Requirements::css('phptek/silverstripe-exodus:/css/StaticSiteConnector.css');
     }
 
     /**

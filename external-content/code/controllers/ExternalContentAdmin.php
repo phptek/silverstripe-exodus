@@ -77,11 +77,10 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 	public function init(){
 		parent::init();
-		Requirements::css(CMS_DIR . '/css/screen.css');
 		Requirements::customCSS($this->generatePageIconsCss());
-		Requirements::css(self::$directory . '/css/external-content-admin.css');
-		Requirements::javascript(self::$directory . '/javascript/external-content-admin.js');
-		Requirements::javascript(self::$directory . '/javascript/external-content-reload.js');
+		//Requirements::css('phptek/silverstripe-exodus:external-content/css/external-content-admin.css');
+		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external-content-admin.js');
+		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external-content-reload.js');
 	}
 
 
@@ -137,9 +136,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			return $this->getRequest()->requestVar('ID');
 		} elseif (isset($this->urlParams['ID']) && preg_match(ExternalContent::ID_FORMAT, $this->urlParams['ID'])) {
 			return $this->urlParams['ID'];
-		} elseif(Session::get($this->sessionNamespace() . ".currentPage")) {
-			return Session::get($this->sessionNamespace() . ".currentPage");
-		} else {
+		}
+	//       	elseif(Session::get($this->sessionNamespace() . ".currentPage")) {
+	//		return Session::get($this->sessionNamespace() . ".currentPage");
+		//	} 
+		else {
 			return null;
 		}
 	}
@@ -261,7 +262,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 * @see cms/code/LeftAndMain#EditForm()
 	 */
 	public function EditForm($request = null) {
-		HtmlEditorField::include_js();
+		//HTMLEditorField::include_js();
 
 		$cur = $this->getCurrentPageID();
 		if ($cur) {

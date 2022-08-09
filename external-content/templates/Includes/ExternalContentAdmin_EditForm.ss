@@ -1,7 +1,6 @@
 <form $FormAttributes data-layout-type="border">
-
 	<div class="cms-content-fields center">
-		<% if Message %>
+		<% if $Message %>
 		<p id="{$FormName}_error" class="message $MessageType">$Message</p>
 		<% else %>
 		<p id="{$FormName}_error" class="message $MessageType" style="display: none"></p>
@@ -9,7 +8,7 @@
 
 		<fieldset>
 			<% if Legend %><legend>$Legend</legend><% end_if %>
-			<% loop Fields %>
+			<% loop $Fields %>
 				$FieldHolder
 			<% end_loop %>
 			<div class="clear"><!-- --></div>
@@ -17,9 +16,9 @@
 	</div>
 
 	<div class="cms-content-actions south">
-		<% if Actions %>
+		<% if $Actions %>
 		<div class="Actions">
-			<% loop Actions %>
+			<% loop $Actions %>
 				$Field
 			<% end_loop %>
 		</div>

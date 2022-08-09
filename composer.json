@@ -36,6 +36,11 @@
     "symbiote/silverstripe-queuedjobs": "^4"
   },
   "extra": {
-    "installer-name": "exodus"
+    "installer-name": "exodus",
+    "expose": [
+      "external-content/javascript",
+      "external-content/css",
+      "js"
+    ]
   }
 }
