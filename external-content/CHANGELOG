@@ -1,0 +1,108 @@
+2013-04-02 v2.0.0
+-----------------
+
+* Fixed issue with getTreeTitle not working if Name property doesn't exist
+* Removed Save button for now as it doesn't work
+
+2012-11-05 v2.0.0
+-----------------
+
+* Various updates and bug fixes for SS 3.0 support
+
+2012-05-02 v0.5.1
+-----------------
+
+* Fix issue where 0 repeat time was being interpreted as meaning to create
+  a scheduled import
+
+2012-04-12 v0.5.0
+-----------------
+
+* Added ability to repeatedly import from an external content source on a 
+  schedule
+
+2011-09-29 v0.4.0
+-----------------
+
+* Added ability to save external content items. Relies on the specific
+  external content adapter to implement the actual write back though
+
+2011-05-11 v0.3.0
+-----------------
+
+* Changed to using an extension for updating form fields in a less obtrusive
+  manner
+
+2011-02-14 v0.2.7
+-----------------
+
+* Added default template for viewing an external content item
+* Added Children() methods to external content sources that use stageChildren
+
+
+2011-02-01 v0.2.6
+-----------------
+
+(ajshort)
+
+* Added a canCreate() check for Content Sources
+* Pass params through to QueuedImport jobs
+
+2011-01-31 v0.2.5
+-----------------
+
+(ajshort)
+
+* Small updates to the way import capability is detected and exposed for
+  connectors. 
+* Importers are now passed through the request parameters used when importing
+
+2011-01-18 v0.2.4
+-----------------
+
+* Fixed invalid JS reference for SS 2.4.4
+
+2010-12-15 v0.2.3 
+-----------------
+
+* Fixed small issue with some JS changes in 2.4.3
+
+2010-08-26 v0.2.1
+-----------------
+
+* Fixed cache bug in WebApiClient where URL replacements were being done after 
+  was generated
+* Added method to retrieve the external content source via the external
+  content item. Useful for importing content
+
+2010-07-19 v0.2.0
+-----------------
+
+* Added the ability to run imports as a queuedjob if you have the queuedjobs 
+  module installed. 
+* Further bugfixes
+
+2009-11-26 v0.1.0 RC2
+---------------------
+
+* Better handling of errors when a connector fails when building the tree in the CMS
+* Added "callUrl" method to underlying webclient API to better support some
+  CMIS refactorings
+* WebApiClient can have authentication details bound directly to it
+
+
+2009-11-16 v0.1.0 RC1
+---------------------
+
+Initial release candidate of External Content module
+* Provides underlying infrastructure for various remote content connectors
+* Makes available a new "External Content" section that lists all different
+external content connectors configured in the system
+* Adds a new "External Content" option in the Insert Link toolbar
+* Adds a new ExternalDropdownField form field that can be used to select
+a value for a metadata field
+* Adds an "ExternalContentPage" type that allows for selecting an external 
+content item to appear in the page hierarchy as an entry point for browsing
+external content
+* Adds hooks for being able to theme external content items when viewed on the
+frontend. 

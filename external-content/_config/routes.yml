@@ -1,0 +1,9 @@
+---
+Name: external-content-routes
+After: '#modelascontrollerroutes'
+---
+
+SilverStripe\Control\Director:
+  rules:
+    'extadmin': '\ExternalContentAdmin'
+    'extcon': '\ExternalContentPage_Controller'
