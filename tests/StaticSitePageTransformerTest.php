@@ -1,4 +1,9 @@
 <?php
+
+namespace PhpTek\Exodus\Test;
+
+use SilverStripe\Dev\SapphireTest;
+
 /**
  * 
  * @author Russell Michell <russell@silverstripe.com>

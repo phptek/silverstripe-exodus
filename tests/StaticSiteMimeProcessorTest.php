@@ -1,4 +1,9 @@
 <?php
+
+namespace PhpTek\Exodus\Test;
+
+use SilverStripe\Dev\SapphireTest;
+
 /**
  * Tests aspects of Mime-Type pre/post-processing.
  * 
