@@ -285,7 +285,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	/**
 	 * Return the form for editing
 	 */
-	function getEditForm($id = null, $fields = null) {
+	public function getEditForm($id = null, $fields = null) {
 		$record = null;
 
 		if(!$id){
@@ -401,14 +401,14 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 		} else {
 			// Create a dummy form
-			$fields = new FieldList();
-			$form = new Form($this, "EditForm", $fields, new FieldList());
+			$fields = FieldList::create();
+			$form = Form::create($this, "EditForm", $fields, FieldList::create());
 		}
 
 		$form->addExtraClass('cms-edit-form center ss-tabset ' . $this->BaseCSSClasses());
 		$form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
-		$form->setAttribute('data-pjax-fragment', 'CurrentForm');
-		$this->extend('updateEditForm', $form);
+		//$form->setAttribute('data-pjax-fragment', 'CurrentForm');
+		//$this->extend('updateEditForm', $form);
 
 		return $form;
 	}

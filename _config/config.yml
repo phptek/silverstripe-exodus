@@ -1,8 +1,6 @@
 ---
 Name: exodus-config
-#After:
-#  - 'framework/*'
-#  - 'cms/*'
+#After: 'cms/*'
 ---
 
 PhpTek\Exodus\Task\StaticSiteRewriteLinksTask:
