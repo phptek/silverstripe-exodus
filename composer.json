@@ -2,7 +2,7 @@
   "name": "phptek/silverstripe-exodus",
   "description": "An ETL provider for migrating content from any website into a Silverstripe based project.",
   "license": "BSD-3-Clause",
-  "type": "silverstripe-module",
+  "type": "silverstripe-vendormodule",
   "keywords": [
     "silverstripe",
     "migrate",
