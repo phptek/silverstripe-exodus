@@ -3,15 +3,13 @@
 namespace PhpTek\Exodus\Test;
 
 use SilverStripe\Dev\SapphireTest;
+use PHPCrawl\PHPCrawlerDocumentInfo;
 
 /**
  * 
  * @author Russell Michell <russell@silverstripe.com>
  * @package staticsiteconnector
  */
-
-// We need PHPCrawlerDocumentInfo
-require_once(BASE_PATH.'/vendor/cuab/phpcrawl/libs/PHPCrawlerDocumentInfo.class.php');
 
 class StaticSiteUrlListTest extends SapphireTest {
 	

@@ -1,4 +1,7 @@
 <?php
+
+use SilverStripe\Dev\SapphireTest;
+
 /**
 
 Copyright (c) 2009, SilverStripe Australia Limited - www.silverstripe.com.au

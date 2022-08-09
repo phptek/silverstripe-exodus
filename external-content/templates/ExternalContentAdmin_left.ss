@@ -17,7 +17,7 @@
 	</form>-->
 	<% loop CreateProviderForm %>
 		<form class="actionparams" id="$FormName" action="$FormAction">
-			<% loop Fields %>
+			<% loop $Fields %>
 			$FieldHolder
 			<% end_loop %>
 		</form>

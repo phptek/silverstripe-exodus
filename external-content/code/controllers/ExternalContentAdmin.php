@@ -56,7 +56,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	private static $url_segment = 'external-content';
 	private static $url_rule = '$Action//$ID';
 	private static $menu_title = 'External Content';
-	private static $tree_class = 'ExternalContentSource';
+	private static $tree_class = ExternalContentSource::class;
 	private static $allowed_actions = array(
 		'addprovider',
 		'deleteprovider',
@@ -139,7 +139,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		}
 	//       	elseif(Session::get($this->sessionNamespace() . ".currentPage")) {
 	//		return Session::get($this->sessionNamespace() . ".currentPage");
-		//	} 
+		//	}
 		else {
 			return null;
 		}
@@ -233,8 +233,9 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			}
 		}
 
-		Session::set("FormInfo.Form_EditForm.formError.message",$message);
-		Session::set("FormInfo.Form_EditForm.formError.type", $messageType);
+        $session = $this->getRequest()->getSession();
+		$session->set("FormInfo.Form_EditForm.formError.message",$message);
+		$session->set("FormInfo.Form_EditForm.formError.type", $messageType);
 
 		return $this->getResponseNegotiator()->respond($this->request);
 	}
@@ -493,7 +494,9 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			"FormInfo.Form_EditForm.formError.message",
 			sprintf(_t('ExternalContent.SourceAdded', 'Successfully created %s'), $type)
 		);
-		Session::set("FormInfo.Form_EditForm.formError.type", 'good');
+
+        $session = $this->getRequest()->getSession();
+		$session->set("FormInfo.Form_EditForm.formError.type", 'good');
 
 		$msg = "New " . FormField::name_to_label($type) . " created";
 		$this->response->addHeader('X-Status', rawurlencode(_t('ExternalContent.PROVIDERADDED', $msg)));
@@ -699,8 +702,9 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		$type = $record->ClassName;
 		$record->delete();
 
-		Session::set("FormInfo.Form_EditForm.formError.message", "Deleted $type");
-		Session::set("FormInfo.Form_EditForm.formError.type", 'bad');
+        $session = $this->getRequest()->getSession();
+		$session->set("FormInfo.Form_EditForm.formError.message", "Deleted $type");
+		$session->set("FormInfo.Form_EditForm.formError.type", 'bad');
 
 		$this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.DELETED', 'Deleted.')));
 		return $this->getResponseNegotiator()->respond(

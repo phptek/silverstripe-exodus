@@ -9,6 +9,7 @@ use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Convert;
 
 /**

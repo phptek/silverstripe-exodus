@@ -3,9 +3,10 @@
 namespace PhpTek\Exodus\Test;
 
 use SilverStripe\Dev\SapphireTest;
+use PhpTek\Exodus\Tool\StaticSiteContentExtractor;
 
 /**
- * 
+ *
  * @author Russell Michell <russ@silverstripe.com>
  * @package staticsiteconnector
  */
@@ -19,9 +20,10 @@ class StaticSiteContentExtractorTest extends SapphireTest
 		$extractor = new StaticSiteContentExtractor($url, $mime, $badContent);
 		$extractor->prepareContent();
 		$matcher = array('tag' => 'html');
+
 		$this->assertTag($matcher, $extractor->getContent());
 	}
-	
+
 	public function testPrepareContentRootTag()
 	{
 		$goodContent = '<html><head></head><body><p>test.</p></body></html>';
@@ -30,7 +32,8 @@ class StaticSiteContentExtractorTest extends SapphireTest
 		$extractor = new StaticSiteContentExtractor($url, $mime, $goodContent);
 		$extractor->prepareContent();
 		$matcher = array('tag' => 'html');
+
 		$this->assertTag($matcher, $extractor->getContent());
-	}	
+	}
 }
 

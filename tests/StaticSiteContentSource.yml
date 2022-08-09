@@ -1,4 +1,4 @@
-StaticSiteContentSource_ImportRule:
+PhpTek\Exodus\Model\StaticSiteContentSource_ImportRule:
   Title1:
     FieldName: Title
     CSSSelector: h1
@@ -10,7 +10,7 @@ StaticSiteContentSource_ImportRule:
     PlainText: false
     OuterHTML: False
 
-StaticSiteContentSource_ImportSchema:
+PhpTek\Exodus\Model\StaticSiteContentSource_ImportSchema:
   SchemaSiteTree1:
     DataType: Page
     Order: 1
@@ -30,17 +30,17 @@ StaticSiteContentSource_ImportSchema:
     DataType: Page
     Order: 2
     AppliesTo: '/sub-dir/.*'
-    MimeTypes: 'text/html' 
+    MimeTypes: 'text/html'
   SchemaSiteTree5:
     DataType: Page
     Order: 3
     AppliesTo: '/sub-dir/.*'
-    MimeTypes: 'text/html' 
+    MimeTypes: 'text/html'
   SchemaSiteTree6:
     DataType: Page
     Order: 1
     AppliesTo: '/sub-dir/.*'
-    MimeTypes: 'text/html'  
+    MimeTypes: 'text/html'
   SchemaSiteTree7:
     DataType: Page
     Order: 1
@@ -61,7 +61,7 @@ StaticSiteContentSource_ImportSchema:
     DataType: File
     Order: 2
     AppliesTo: '.*'
-    MimeTypes: 'application/pdf'    
+    MimeTypes: 'application/pdf'
   SchemaImage1:
     DataType: Image
     Order: 1
@@ -91,7 +91,7 @@ StaticSiteContentSource_ImportSchema:
     DataType: Image
     Order: 1
     AppliesTo: '/test-graphics/.*'
-    MimeTypes: 'image/jpeg'      
+    MimeTypes: 'image/jpeg'
 
 Page:
   testPage1:
@@ -113,8 +113,8 @@ Page:
     URLSegment: 'test-i-am-page-5'
     Content: 'Some test page content'
     StaticSiteURL: '/test-i-am-page-5'
-    
-File:
+
+SilverStripe\Assets\File:
   testFile1:
     Title: 'Test image 1'
     StaticSiteURL: '/test-1.png'
@@ -126,15 +126,15 @@ File:
     StaticSiteURL: '/test-3.png'
   testFile4:
     Title: 'Test image 4'
-    StaticSiteURL: 'http://localhost/test-graphics/her-image.png'    
+    StaticSiteURL: 'http://localhost/test-graphics/her-image.png'
   testFile5:
     Title: 'Test image 5'
-    StaticSiteURL: 'http://localhost/test-graphics/some-image.png' 
+    StaticSiteURL: 'http://localhost/test-graphics/some-image.png'
   testFile6:
     Title: 'Test image 6'
     StaticSiteURL: 'http://localhost/test-graphics/foo-image.jpg'
 
-StaticSiteContentSource:
+PhpTek\Exodus\Model\StaticSiteContentSource:
   MyContentSourceIsHTML1:
     ID: 1
     BaseUrl: http://localhost
@@ -175,7 +175,7 @@ StaticSiteContentSource:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
     Schemas: =>StaticSiteContentSource_ImportSchema.SchemaSiteTree8
-    Pages: =>Page.testPage5 
+    Pages: =>Page.testPage5
   MyContentSourceIsFile1:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
@@ -189,17 +189,17 @@ StaticSiteContentSource:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
     Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage2,=>StaticSiteContentSource_ImportSchema.SchemaImage1
-    Files: =>File.testFile2    
+    Files: =>File.testFile2
     ID: 44
   MyContentSourceIsImage3:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage1  
-    Files: =>File.testFile3 
+    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage1
+    Files: =>File.testFile3
   MyContentSourceIsImage4:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage1  
+    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage1
     Files: =>File.testFile4
   MyContentSourceIsImage5:
     BaseUrl: http://localhost
@@ -210,4 +210,4 @@ StaticSiteContentSource:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
     Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage6
-    Files: =>File.testFile6    
+    Files: =>File.testFile6

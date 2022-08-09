@@ -6,7 +6,6 @@ use \ExternalContent;
 use \ExternalContentSource;
 use SilverStripe\Core\Extension;
 use SilverStripe\View\Requirements;
-use SilverStripe\Control\Session;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 
@@ -68,8 +67,9 @@ class StaticSiteExternalContentAdminExtension extends Extension
             }
         }
 
-        Session::set("FormInfo.Form_EditForm.formError.message", $message);
-        Session::set("FormInfo.Form_EditForm.formError.type", $messageType);
+        $session = $this->getOwner()->getRequest()->getSession();
+        $session->set("FormInfo.Form_EditForm.formError.message", $message);
+        $session->set("FormInfo.Form_EditForm.formError.type", $messageType);
 
         return $this->owner->getResponseNegotiator()->respond($this->owner->getRequest());
     }
@@ -102,8 +102,9 @@ class StaticSiteExternalContentAdminExtension extends Extension
             $message = _t('StaticSiteConnector.ImportsDeleted', 'No imports were selected to clear.');
         }
 
-        Session::set("FormInfo.Form_EditForm.formError.message", $message);
-        Session::set("FormInfo.Form_EditForm.formError.type", $messageType);
+        $session = $this->getOwner()->getRequest()->getSession();
+        $session->set("FormInfo.Form_EditForm.formError.message", $message);
+        $session->set("FormInfo.Form_EditForm.formError.type", $messageType);
 
         return $this->owner->getResponseNegotiator()->respond($this->owner->getRequest());
     }

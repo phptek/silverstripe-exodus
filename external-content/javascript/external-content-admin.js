@@ -4,7 +4,6 @@
 (function($) {
 
 	$.entwine('ss', function($){
-
 		/**
 		 * Name
 		 */

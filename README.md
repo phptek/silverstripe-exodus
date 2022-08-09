@@ -39,15 +39,8 @@ instruction on migrating a legacy site into SilverStripe using the module.
 
 ## Installation
 
-This module requires the [PHP Sempahore](http://php.net/manual/en/book.sem.php)
-functions to work. These are installed by default on Debian and some OS/X PHP
-distributions, but if you're using Macports you'll need to add the `+ipc` flag
-when installing `php5`.
-
-If compiling PHP from source you need to pass three additional flags to PHP's
-configure script:
-
-	./configure <usual flags> '--enable-sysvsem' '--enable-sysvshm' '--enable-sysvmsg'
+This module requires the [PHP Sempahore](https://www.php.net/manual/en/sem.installation.php)
+functions to work.
 
 Once that's done, you can use [Composer](http://getcomposer.org) to add the module
 to your SilverStripe project:
