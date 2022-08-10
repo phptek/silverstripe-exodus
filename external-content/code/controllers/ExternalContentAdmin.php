@@ -6,7 +6,6 @@ use SilverStripe\Security\PermissionProvider;
 use SilverStripe\View\Requirements;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
-use SilverStripe\Control\Session;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
@@ -109,10 +108,10 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	public function getCurrentPageID() {
 		if(!$id = $this->currentPageID()) {
 			// Try an id from an ExternalContentSource Subclass
-			$defaultSources = ClassInfo::getValidSubClasses('ExternalContentSource');
+			$defaultSources = ClassInfo::getValidSubClasses(ExternalContentSource::class);
 			array_shift($defaultSources);
 			// Use one if defined in config, otherwise use first one found through reflection
-			$defaultSourceConfig = Config::inst()->get('ExternalContentSource', 'default_source');
+			$defaultSourceConfig = Config::inst()->get(ExternalContentSource::class, 'default_source');
 			if($defaultSourceConfig) {
 				$class = $defaultSourceConfig;
 			}
@@ -132,14 +131,14 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	}
 
     public function currentPageID() {
+		$session = $this->getRequest()->getSession();
 		if($this->getRequest()->requestVar('ID') && preg_match(ExternalContent::ID_FORMAT, $this->getRequest()->requestVar('ID')))	{
 			return $this->getRequest()->requestVar('ID');
 		} elseif (isset($this->urlParams['ID']) && preg_match(ExternalContent::ID_FORMAT, $this->urlParams['ID'])) {
 			return $this->urlParams['ID'];
+		} elseif($session->get($this->sessionNamespace() . ".currentPage")) {
+			return $session->get($this->sessionNamespace() . ".currentPage");
 		}
-	//       	elseif(Session::get($this->sessionNamespace() . ".currentPage")) {
-	//		return Session::get($this->sessionNamespace() . ".currentPage");
-		//	}
 		else {
 			return null;
 		}
@@ -407,8 +406,8 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 		$form->addExtraClass('cms-edit-form center ss-tabset ' . $this->BaseCSSClasses());
 		$form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
-		//$form->setAttribute('data-pjax-fragment', 'CurrentForm');
-		//$this->extend('updateEditForm', $form);
+		$form->setAttribute('data-pjax-fragment', 'CurrentForm');
+		$this->extend('updateEditForm', $form);
 
 		return $form;
 	}
@@ -489,13 +488,13 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		}
 
 		singleton('CMSPageEditController')->setCurrentPageID($record->ID);
+		$session = $this->getRequest()->getSession();
 
-		Session::set(
+		$session->set(
 			"FormInfo.Form_EditForm.formError.message",
 			sprintf(_t('ExternalContent.SourceAdded', 'Successfully created %s'), $type)
 		);
 
-        $session = $this->getRequest()->getSession();
 		$session->set("FormInfo.Form_EditForm.formError.type", 'good');
 
 		$msg = "New " . FormField::name_to_label($type) . " created";
@@ -568,9 +567,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		return 'Connectors';
 	}
 
-	public function LinkTreeView() {
-		return $this->Link('treeview');
-	}
+    public function LinkTreeView()
+    {
+        // Tree view is just default link to main pages section (no /treeview suffix)
+        return 'admin/externa-content';
+    }
 
 
 	/**

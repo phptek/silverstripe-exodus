@@ -15,7 +15,7 @@
 		<input class="action" type="submit" value="<% _t('GO','Go') %>" />
 		</div>
 	</form>-->
-	<% loop CreateProviderForm %>
+	<% loop $CreateProviderForm %>
 		<form class="actionparams" id="$FormName" action="$FormAction">
 			<% loop $Fields %>
 			$FieldHolder

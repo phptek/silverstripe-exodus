@@ -156,8 +156,8 @@ class StaticSiteContentItem extends ExternalContentItem
             $fields->addFieldToTab("Root.Preview", $readonlyField);
         }
 
-        Requirements::javascript('staticsiteconnector/js/StaticSiteContentItem.js');
-        Requirements::css('staticsiteconnector/css/StaticSiteConnector.css');
+        Requirements::javascript('phptek/silverstripe-exodus:js/StaticSiteContentItem.js');
+        Requirements::css('phptek/silverstripe-exodus:css/StaticSiteConnector.css');
 
         return $fields;
     }

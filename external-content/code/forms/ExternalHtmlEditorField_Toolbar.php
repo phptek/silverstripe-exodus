@@ -38,8 +38,8 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 	 * @return Form
 	 */
 	function LinkForm() {
-		Requirements::javascript(THIRDPARTY_DIR . "/behaviour.js");
-		Requirements::javascript(ExternalContentAdmin::$directory . "/javascript/external_tiny_mce_improvements.js");
+		//Requirements::javascript(THIRDPARTY_DIR . "/behaviour.js");
+		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external_tiny_mce_improvements.js');
 
 		$form = new Form(
 			$this->controller,
@@ -86,12 +86,12 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 	 * @return Form
 	 */
 	function ImageForm() {
-		Requirements::javascript(THIRDPARTY_DIR . "/behaviour.js");
-		Requirements::javascript(EXTERNALCONTENT . "/javascript/external_tiny_mce_improvements.js");
-		Requirements::css('cms/css/TinyMCEImageEnhancement.css');
-		Requirements::javascript('cms/javascript/TinyMCEImageEnhancement.js');
-		Requirements::javascript(THIRDPARTY_DIR . '/SWFUpload/SWFUpload.js');
-		Requirements::javascript(CMS_DIR . '/javascript/Upload.js');
+		//Requirements::javascript(THIRDPARTY_DIR . "/behaviour.js");
+		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external_tiny_mce_improvements.js');
+		//Requirements::css('cms/css/TinyMCEImageEnhancement.css');
+		//Requirements::javascript('cms/javascript/TinyMCEImageEnhancement.js');
+		//Requirements::javascript(THIRDPARTY_DIR . '/SWFUpload/SWFUpload.js');
+		//Requirements::javascript(CMS_DIR . '/javascript/Upload.js');
 
 		$form = new Form(
 			$this->controller,
@@ -143,10 +143,10 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 	}
 
 	function FlashForm() {
-		Requirements::javascript(THIRDPARTY_DIR . "/behaviour.js");
-		Requirements::javascript(EXTERNALCONTENT . "/javascript/external_tiny_mce_improvements.js");
-		Requirements::javascript(THIRDPARTY_DIR . '/SWFUpload/SWFUpload.js');
-		Requirements::javascript(CMS_DIR . '/javascript/Upload.js');
+		//Requirements::javascript(THIRDPARTY_DIR . "/behaviour.js");
+		Requirements::javascript("phptek/silverstripe-exodus:external-content/javascript/external_tiny_mce_improvements.js");
+		//Requirements::javascript(THIRDPARTY_DIR . '/SWFUpload/SWFUpload.js');
+		//Requirements::javascript(CMS_DIR . '/javascript/Upload.js');
 
 		$form = new Form(
 			$this->controller,
