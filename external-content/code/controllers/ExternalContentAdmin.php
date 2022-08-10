@@ -1,6 +1,7 @@
 <?php
 
-use SilverStripe\Admin\LeftAndMain;
+use SilverStripe\CMS\Controllers\CMSMain;
+use SilverStripe\CMS\Controllers\CMSPageEditController;
 use SilverStripe\CMS\Model\CurrentPageIdentifier;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\View\Requirements;
@@ -8,7 +9,6 @@ use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Forms\HTMLEditor\HTMLEditorField;
 use SilverStripe\Security\Security;
 use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\Forms\CheckboxField;
@@ -25,6 +25,7 @@ use SilverStripe\Forms\DropdownField;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\Core\Convert;
+use SilverStripe\Core\Injector\Injectable;
 
 /**
  * Backend administration pages for the external content module
@@ -32,9 +33,10 @@ use SilverStripe\Core\Convert;
  * @author Marcus Nyeholt <marcus@silverstripe.com.au>
  * @license BSD License http://silverstripe.org/bsd-license
  */
-class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier, PermissionProvider {
+class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, PermissionProvider {
 
     use Configurable;
+    use Injectable;
 
 	/**
 	 * The URL format to get directly to this controller
@@ -77,11 +79,10 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	public function init(){
 		parent::init();
 		Requirements::customCSS($this->generatePageIconsCss());
-		//Requirements::css('phptek/silverstripe-exodus:external-content/css/external-content-admin.css');
+		Requirements::css('phptek/silverstripe-exodus:external-content/css/external-content-admin.css');
 		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external-content-admin.js');
 		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external-content-reload.js');
 	}
-
 
 	/**
 	 * Overridden to properly output a value and end, instead of
@@ -213,7 +214,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 			if (isset($request['Repeat']) && $request['Repeat'] > 0) {
 				$job = new ScheduledExternalImportJob($request['Repeat'], $from, $target, $includeSelected, $includeChildren, $targetType, $duplicates, $request);
-				singleton('QueuedJobService')->queueJob($job);
+				singleton(QueuedJobService::class)->queueJob($job);
 
 				$messageType = 'good';
 				$message = _t('ExternalContent.CONTENTMIGRATEQUEUED', 'Import job queued.');
@@ -248,7 +249,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 * @param  string $id The ID
 	 * @return Dataobject The relevant object
 	 */
-	public function getRecord($id) {
+	public function getRecord($id, $versionID = null) {
 		if(is_numeric($id)) {
 			return parent::getRecord($id);
 		} else {
@@ -464,7 +465,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		$providerClasses = ClassInfo::subclassesFor(self::$tree_class);
 
 		if (!in_array($type, $providerClasses)) {
-			throw new Exception("Invalid connector type");
+			throw new \Exception("Invalid connector type");
 		}
 
 		$parentObj = null;
@@ -487,7 +488,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			return $this->getResponseNegotiator()->respond($this->request);
 		}
 
-		singleton('CMSPageEditController')->setCurrentPageID($record->ID);
+		singleton(CMSPageEditController::class)->setCurrentPageID($record->ID);
 		$session = $this->getRequest()->getSession();
 
 		$session->set(
@@ -562,22 +563,14 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		echo $script;
 	}
 
-
 	public function getCMSTreeTitle(){
 		return 'Connectors';
 	}
 
-    public function LinkTreeView()
-    {
-        // Tree view is just default link to main pages section (no /treeview suffix)
-        return 'admin/externa-content';
-    }
-
-
 	/**
 	 * @return String HTML
 	 */
-	public function treeview($request) {
+	public function treeview() {
 		return $this->renderWith($this->getTemplatesWithSuffix('_TreeView'));
 	}
 
@@ -593,7 +586,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 */
 	public function getsubtree($request) {
 		$html = $this->getSiteTreeFor(
-			'ExternalContentItem',
+			ExternalContentItem::class,
 			$request->getVar('ID'),
 			null,
 			'NumChildren',
@@ -618,13 +611,13 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	public function generatePageIconsCss() {
 		$css = '';
 
-		$sourceClasses 	= ClassInfo::subclassesFor('ExternalContentSource');
-		$itemClasses 	= ClassInfo::subclassesFor('ExternalContentItem');
+		$sourceClasses 	= ClassInfo::subclassesFor(ExternalContentSource::class);
+		$itemClasses 	= ClassInfo::subclassesFor(ExternalContentItem::class);
 		$classes 		= array_merge($sourceClasses, $itemClasses);
 
 		foreach($classes as $class) {
 			$obj = singleton($class);
-			$iconSpec = $obj->stat('icon');
+			$iconSpec = $obj->config()->get('icon');
 
 			if(!$iconSpec) continue;
 
@@ -695,7 +688,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 * Delete the content source/item.
 	 */
 	public function delete($data, $form) {
-		$className = $this->stat('tree_class');
+		$className = $this->config->get('tree_class');
 
 		$record = DataObject::get_by_id($className, Convert::raw2sql($data['ID']));
 		if($record && !$record->canDelete()) return Security::permissionFailure();
@@ -720,7 +713,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 */
 	public function updateSources() {
 
-		$HTML = $this->treeview($this->request)->value;
+		$HTML = $this->treeview()->value;
 		return preg_replace('/^\s+|\n|\r|\s+$/m', '', $HTML);
 	}
 

@@ -2,10 +2,12 @@
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Control\Controller;
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\Core\Convert;
+use SilverStripe\Core\Extensible;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\ReadonlyField;
-use SilverStripe\ORM\Hierarchy\Hierarchy;
 
 /**
  * Parent class for all ExternalContentItems.
@@ -19,19 +21,18 @@ use SilverStripe\ORM\Hierarchy\Hierarchy;
  * storing things, with __get and __set magic methods for retrieving values.
  * Some implementations may choose to store the data in a separate object (for
  * example, the AlfrescoContentItem implementation simply stores things in its
- * contained CMIS object and maps back and forward from that).
+ * contained CMS object and maps back and forward from that).
  *
  * @author Marcus Nyeholt <marcus@silverstripe.com.au>
  * @license BSD License http://silverstripe.org/bsd-license
  */
-class ExternalContentItem extends DataObject {
+class ExternalContentItem extends DataObject
+{
+    use Configurable;
+    use Injectable;
+    use Extensible;
 
-	private static $db = array(
-	);
-	private static $extensions = array(
-		Hierarchy::class,
-	);
-
+	private static $db = [];
 
 	/**
 	 * @var string - icon for cms tree
@@ -110,7 +111,7 @@ class ExternalContentItem extends DataObject {
 	 * @return String
 	 */
 	public function getType() {
-		throw new Exception("Please implement " . get_class($this) . "::getType()");
+		throw new \Exception("Please implement " . get_class($this) . "::getType()");
 	}
 
 	/**
@@ -214,7 +215,7 @@ class ExternalContentItem extends DataObject {
 	 *
 	 */
 	public function streamContent() {
-		throw new Exception("This object cannot be streamed");
+		throw new \Exception("This object cannot be streamed");
 	}
 
 	/**
@@ -285,20 +286,20 @@ class ExternalContentItem extends DataObject {
 					}
 				} else if(!is_object($value) && !is_array($value)){
 					$value = (string) $value;
-					$field = new ReadonlyField($name, _t('ExternalContentItem.' . $name, $name), $value);
+					$field = ReadonlyField::create($name, _t('ExternalContentItem.' . $name, $name), $value);
 					$fields->addFieldToTab('Root.Main', $field);
 				} else if(is_object($value) || is_array($value)){
 					foreach($value as $childName => $childValue) {
 						if(is_object($childValue)) {
 							foreach($childValue as $childChildName => $childChildValue) {
 								$childChildValue = is_object($childChildValue) || is_array($childChildValue) ? json_encode($childChildValue) : (string) $childChildValue;
-								$field = new ReadonlyField("{$childName}{$childChildName}", "{$childName}: {$childChildName}", $childChildValue);
+								$field = ReadonlyField::create("{$childName}{$childChildName}", "{$childName}: {$childChildName}", $childChildValue);
 								$fields->addFieldToTab('Root.Main', $field);
 							}
 						}
 						else {
 							$childValue =  is_object($childValue) || is_array($childValue) ? json_encode($childValue) : (string) $childValue;
-							$field = new ReadonlyField("{$childName}{$childValue}", $name . ':' . $childName, $childValue);
+							$field = ReadonlyField::create("{$childName}{$childValue}", $name . ':' . $childName, $childValue);
 							$fields->addFieldToTab('Root.Main', $field);
 						}
 					}

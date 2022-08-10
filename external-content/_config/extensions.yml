@@ -1,0 +1,3 @@
+ExternalContentItem:
+  extensions:
+    - SilverStripe\ORM\Hierarchy\Hierarchy

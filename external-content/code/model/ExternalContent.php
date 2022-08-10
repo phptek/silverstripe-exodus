@@ -29,7 +29,7 @@ class ExternalContent {
 	const ID_FORMAT = "/(\d+)(\_.*)?/";
 
 
-	const DEFAULT_CLASS = 'ExternalContentSource';
+	const DEFAULT_CLASS = ExternalContentSource::class;
 
 
 

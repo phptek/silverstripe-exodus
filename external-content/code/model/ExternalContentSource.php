@@ -9,7 +9,6 @@ use SilverStripe\Core\Convert;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBText;
-use SilverStripe\ORM\Hierarchy\Hierarchy;
 
 /**
  * A class that represents any kind of an external content source where the
@@ -36,10 +35,6 @@ class ExternalContentSource extends DataObject {
 	private static $defaults = array(
 		'ParentID' => '0'
 	);
-	private static $extensions = array(
-		Hierarchy::class,
-	);
-
 
 	/**
 	 * @var string - icon for cms tree
@@ -51,7 +46,6 @@ class ExternalContentSource extends DataObject {
 	 * @var ArrayList - children
 	 **/
 	private $children;
-
 
 	/**
 	 * Get the object represented by an external ID

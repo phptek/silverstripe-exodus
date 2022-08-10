@@ -16,7 +16,7 @@ class ExternalContentHtmlEditorExtension extends Extension {
 		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external_tiny_mce_improvements.js');
 
 		$fields = $form->Fields();
-		$fields->replaceField('LinkType', $options = new OptionsetField(
+		$fields->replaceField('LinkType', $options = OptionsetField::create(
 					'LinkType',
 					_t('HtmlEditorField.LINKTO', 'Link to'),
 					array(
@@ -29,10 +29,10 @@ class ExternalContentHtmlEditorExtension extends Extension {
 					)
 				));
 		$fields->insertAfter(
-			$tree = new ExternalTreeDropdownField(
+			$tree = ExternalTreeDropdownField::create(
 				'externalcontent',
 				_t('ExternalHtmlEditorField.EXTERNAL_CONTENT', 'External Content'),
-				'ExternalContentSource',
+				ExternalContentSource::class,
 				'Link()'
 			),
 			'file'
