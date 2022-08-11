@@ -30,11 +30,12 @@ class ExternalContentItem extends DataObject
 {
 	private static $db = [];
 
+    private static $table_name = 'ExternalContentItem';
+
 	/**
 	 * @var string - icon for cms tree
 	 **/
 	private static $icon = null;
-
 
 	protected $ownerId;
 
@@ -233,7 +234,7 @@ class ExternalContentItem extends DataObject
 	 */
 	public function stageChildren($showAll = false) {
 		if ($this->Title != 'Content Root' && $this->source) {
-			$children = new ArrayList();
+			$children = ArrayList::create();
 			$item = ExternalContentItem::create($this->source, $this->Title . '1');
 			$item->Title = $this->Title . '1';
 			$item->MenuTitle = $item->Title;
@@ -248,7 +249,7 @@ class ExternalContentItem extends DataObject
 	 */
 	public function Children() {
 		if (!$this->children) {
-			$this->children = new ArrayList();
+			$this->children = ArrayList::create();
 			$kids = $this->stageChildren();
 			if ($kids) {
 				foreach ($kids as $child) {

@@ -66,7 +66,7 @@ class ScheduledExternalImportJob extends AbstractQueuedJob {
 			}
 
 			if ($this->repeat) {
-				$job = new ScheduledExternalImportJob($this->repeat, $source, $target, $this->includeParent, $this->includeChildren, $this->targetType, $this->duplicateStrategy, $this->params);
+				$job = ScheduledExternalImportJob::create($this->repeat, $source, $target, $this->includeParent, $this->includeChildren, $this->targetType, $this->duplicateStrategy, $this->params);
 				singleton(QueuedJobService::class)->queueJob($job, date('Y-m-d H:i:s', time() + $this->repeat));
 			}
 		}

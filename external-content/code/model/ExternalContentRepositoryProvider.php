@@ -7,7 +7,8 @@
  * @license BSD License http://silverstripe.org/bsd-license
  *
  */
-interface ExternalContentRepositoryProvider {
+interface ExternalContentRepositoryProvider
+{
 
 	/**
 	 * Retrieve a reference to the object that communicates with

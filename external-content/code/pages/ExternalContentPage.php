@@ -19,6 +19,8 @@ class ExternalContentPage extends Page {
 		'ExternalContentRoot' => DBVarchar::class,
 	);
 
+    private static $table_name = 'ExternalContentPage';
+
 	private static $has_one = array(
 			// 'ExternalContent' => 'ExternalContentSource'
 	);
@@ -106,7 +108,7 @@ class ExternalContentPage extends Page {
 	 */
 	public function Children() {
 		$item = $this->ContentItem();
-		return $item ? $item->stageChildren() : new ArrayList();
+		return $item ? $item->stageChildren() : ArrayList::create();
 	}
 
 }
@@ -134,8 +136,8 @@ class ExternalContentPage_Controller extends PageController {
 	/**
 	 * Display an item.
 	 *
-	 * @param HTTP_Request $request
-	 * @return String
+	 * @param HTTPRequest $request
+	 * @return string
 	 */
 	public function view($request) {
 		$object = null;
@@ -150,7 +152,7 @@ class ExternalContentPage_Controller extends PageController {
 				$type = $object instanceof ExternalContentItem ? $object->getType() : 'source';
 				$template = 'ExternalContent_' . get_class($object) . '_' . $type;
 
-				$viewer = new SSViewer(array($template, 'ExternalContent_' . get_class($object), 'ExternalContent', 'Page'));
+				$viewer = SSViewer::create(array($template, 'ExternalContent_' . get_class($object), 'ExternalContent', 'Page'));
 				$action = 'view';
 				$this->extend('updateViewer', $action, $viewer);
 

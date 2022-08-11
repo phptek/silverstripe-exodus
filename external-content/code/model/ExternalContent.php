@@ -13,8 +13,10 @@ use SilverStripe\Core\Config\Configurable;
  * @license BSD License http://silverstripe.org/bsd-license
  *
  */
-class ExternalContent {
+class ExternalContent
+{
     use Injectable;
+    use Configurable;
 
 	/**
 	 * The character to partition the compound id
@@ -23,7 +25,6 @@ class ExternalContent {
 	 */
 	const ID_SEPARATOR = '_';
 
-
 	/**
 	 * The format that externalised content can be referenced by
 	 *
@@ -31,11 +32,7 @@ class ExternalContent {
 	 */
 	const ID_FORMAT = "/(\d+)(\_.*)?/";
 
-
 	const DEFAULT_CLASS = ExternalContentSource::class;
-
-
-
 
 	/**
 	 * Get the actual object based on a composite ID

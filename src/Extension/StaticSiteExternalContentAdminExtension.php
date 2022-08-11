@@ -5,9 +5,8 @@ namespace PhpTek\Exodus\Extension;
 use \ExternalContent;
 use \ExternalContentSource;
 use SilverStripe\Core\Extension;
-use SilverStripe\View\Requirements;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Control\HTTPRequest;
 
 /**
  * @package phptek/silverstripe-exodus
@@ -16,7 +15,6 @@ use SilverStripe\ORM\DataObject;
  */
 class StaticSiteExternalContentAdminExtension extends Extension
 {
-    use Injectable;
 
     /**
      *
@@ -40,11 +38,11 @@ class StaticSiteExternalContentAdminExtension extends Extension
 
     /**
      *
-     * @param SS_HTTPRequest $request
+     * @param HTTPRequest $request
      * @throws Exception
-     * @return SS_HTTPResponse
+     * @return HTTPResponse
      */
-    public function crawlsite($request)
+    public function crawlsite(HTTPRequest $request)
     {
         $selected = isset($request['ID']) ? $request['ID'] : 0;
         if (!$selected) {
@@ -78,8 +76,8 @@ class StaticSiteExternalContentAdminExtension extends Extension
      *
      * Delete all StaticSiteImportDataObject's and related logic.
      *
-     * @param SS_HTTPRequest $request
-     * @return SS_HTTPResponse
+     * @param HTTPRequest $request
+     * @return HTTPResponse
      */
     public function clearimports($request)
     {

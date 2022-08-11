@@ -5,10 +5,13 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Convert;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\FieldType\DBText;
+use SilverStripe\ORM\Hierarchy\Hierarchy;
 
 /**
  * A class that represents any kind of an external content source where the
@@ -26,6 +29,9 @@ use SilverStripe\ORM\FieldType\DBText;
  */
 class ExternalContentSource extends DataObject
 {
+    use Injectable;
+    use Configurable;
+
 	private static $db = array(
 		'Name' => DBText::class,
 		'ShowContentInMenu' => DBBoolean::class, // should child items of this be seen in menus?,
@@ -37,6 +43,12 @@ class ExternalContentSource extends DataObject
 	);
 
     private static $default_source = null;
+
+    private static $extensions = [
+        'hierarchy' => Hierarchy::class,
+    ];
+
+    private static $table_name = 'ExternalContentSource';
 
 	/**
 	 * @var string - icon for cms tree

@@ -1,3 +1,7 @@
+---
+Name: external-content-extensions
+---
+
 ExternalContentItem:
   extensions:
     - SilverStripe\ORM\Hierarchy\Hierarchy

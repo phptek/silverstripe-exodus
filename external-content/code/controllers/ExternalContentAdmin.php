@@ -6,9 +6,7 @@ use SilverStripe\CMS\Model\CurrentPageIdentifier;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\View\Requirements;
 use SilverStripe\Core\ClassInfo;
-use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Security\Security;
 use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\Forms\CheckboxField;
@@ -381,7 +379,7 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 
 
 
-			$form = new Form($this, "EditForm", $fields, $actions);
+			$form = Form::create($this, "EditForm", $fields, $actions);
 			if ($record->ID) {
 				$form->loadDataFrom($record);
 			} else {
@@ -428,7 +426,7 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 		$fields = FieldList::create(
 			HiddenField::create("ParentID"),
 			HiddenField::create("Locale", 'Locale', i18n::get_locale()),
-			$type = new DropdownField("ProviderType", "", $classes)
+			$type = DropdownField::create("ProviderType", "", $classes)
 		);
 		$type->setAttribute('style', 'width:150px');
 
@@ -438,7 +436,7 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 				->setUseButtonTag(true)
 		);
 
-		$form = new Form($this, "AddForm", $fields, $actions);
+		$form = Form::create($this, "AddForm", $fields, $actions);
 
 		$form->addExtraClass('cms-edit-form ' . $this->BaseCSSClasses());
 		$this->extend('updateEditForm', $form);
@@ -507,17 +505,17 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 	 * @return Form
 	 */
 	function DeleteItemsForm() {
-		$form = new Form(
+		$form = Form::create(
 						$this,
 						'DeleteItemsForm',
 						FieldList::create(
-								new LiteralField('SelectedPagesNote',
+								LiteralField::create('SelectedPagesNote',
 										sprintf('<p>%s</p>', _t('ExternalContentAdmin.SELECT_CONNECTORS', 'Select the connectors that you want to delete and then click the button below'))
 								),
 								HiddenField::create('csvIDs')
 						),
 						FieldList::create(
-								new FormAction('deleteprovider', _t('ExternalContentAdmin.DELCONNECTORS', 'Delete the selected connectors'))
+								Form::createAction('deleteprovider', _t('ExternalContentAdmin.DELCONNECTORS', 'Delete the selected connectors'))
 						)
 		);
 
@@ -564,7 +562,7 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 	}
 
 	/**
-	 * @return String HTML
+	 * @return string
 	 */
 	public function treeview() {
 		return $this->renderWith($this->getTemplatesWithSuffix('_TreeView'));
