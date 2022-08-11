@@ -24,8 +24,8 @@ use SilverStripe\ORM\FieldType\DBText;
  * @license BSD License http://silverstripe.org/bsd-license
  *
  */
-class ExternalContentSource extends DataObject {
-
+class ExternalContentSource extends DataObject
+{
 	private static $db = array(
 		'Name' => DBText::class,
 		'ShowContentInMenu' => DBBoolean::class, // should child items of this be seen in menus?,
@@ -40,7 +40,6 @@ class ExternalContentSource extends DataObject {
 	 * @var string - icon for cms tree
 	 **/
 	private static $icon = 'cms/images/treeicons/root.png';
-
 
 	/**
 	 * @var ArrayList - children
@@ -59,7 +58,7 @@ class ExternalContentSource extends DataObject {
 	 * @return DataObject
 	 */
 	public function getObject($objectId) {
-		throw new Exception("Child classes MUST provide an implementation of getObject()");
+		throw new \Exception("Child classes MUST provide an implementation of getObject()");
 	}
 
 	/**
@@ -69,7 +68,7 @@ class ExternalContentSource extends DataObject {
 	 * @return ExternalContentItem
 	 */
 	public function getRoot() {
-		throw new Exception("Child classes MUST override this method");
+		throw new \Exception("Child classes MUST override this method");
 	}
 
 	/*
@@ -101,8 +100,8 @@ class ExternalContentSource extends DataObject {
 
 		$fields->removeByName('Sort');
 		$fields->removeByName('ParentID');
-		$fields->addFieldToTab('Root.Main', new TextField('Name', _t('ExternalContentSource.NAME', 'Name')));
-		$fields->addFieldToTab('Root.Main', new CheckboxField("ShowContentInMenu", _t('ExternalContentSource.SHOW_IN_MENUS', 'Show Content in Menus')));
+		$fields->addFieldToTab('Root.Main', TextField::create('Name', _t('ExternalContentSource.NAME', 'Name')));
+		$fields->addFieldToTab('Root.Main', CheckboxField::create("ShowContentInMenu", _t('ExternalContentSource.SHOW_IN_MENUS', 'Show Content in Menus')));
 
 		return $fields;
 	}
@@ -215,10 +214,10 @@ class ExternalContentSource extends DataObject {
 	public function stageChildren($showAll = false) {
 		// if we don't have an ID directly, we should load and return ALL the external content sources
 		if (!$this->ID) {
-			return DataObject::get('ExternalContentSource');
+			return DataObject::get(ExternalContentSource::class);
 		}
 
-		$children = new ArrayList();
+		$children = ArrayList::create();
 		return $children;
 	}
 
@@ -227,7 +226,7 @@ class ExternalContentSource extends DataObject {
 	 */
 	public function Children() {
 		if (!$this->children) {
-			$this->children = new ArrayList();
+			$this->children = ArrayList::create();
 			$kids = $this->stageChildren();
 			if ($kids) {
 				foreach ($kids as $child) {
@@ -308,6 +307,7 @@ class ExternalContentSource extends DataObject {
 			"<span class=\"jstree-pageicon\"></span><span class=\"item\">%s</span>",
 			Convert::raw2xml(str_replace(array("\n","\r"),"",$this->Name))
 		);
+
 		return $treeTitle;
 	}
 

@@ -25,7 +25,6 @@ use SilverStripe\Forms\DropdownField;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\Core\Convert;
-use SilverStripe\Core\Injector\Injectable;
 
 /**
  * Backend administration pages for the external content module
@@ -33,11 +32,8 @@ use SilverStripe\Core\Injector\Injectable;
  * @author Marcus Nyeholt <marcus@silverstripe.com.au>
  * @license BSD License http://silverstripe.org/bsd-license
  */
-class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, PermissionProvider {
-
-    use Configurable;
-    use Injectable;
-
+class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, PermissionProvider
+{
 	/**
 	 * The URL format to get directly to this controller
 	 * @var unknown_type
@@ -213,8 +209,8 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 			}
 
 			if (isset($request['Repeat']) && $request['Repeat'] > 0) {
-				$job = new ScheduledExternalImportJob($request['Repeat'], $from, $target, $includeSelected, $includeChildren, $targetType, $duplicates, $request);
-				singleton(QueuedJobService::class)->queueJob($job);
+				$job = ScheduledExternalImportJob::create($request['Repeat'], $from, $target, $includeSelected, $includeChildren, $targetType, $duplicates, $request);
+				(QueuedJobService::class)->queueJob($job);
 
 				$messageType = 'good';
 				$message = _t('ExternalContent.CONTENTMIGRATEQUEUED', 'Import job queued.');
@@ -307,15 +303,15 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 			if (($isSource || $isItem) && $record->canImport()) {
 				$allowedTypes = $record->allowedImportTargets();
 				if (isset($allowedTypes['sitetree'])) {
-					$fields->addFieldToTab('Root.Import', new TreeDropdownField("MigrationTarget", _t('ExternalContent.MIGRATE_TARGET', 'Page to import into'), 'SiteTree'));
+					$fields->addFieldToTab('Root.Import', TreeDropdownField::create("MigrationTarget", _t('ExternalContent.MIGRATE_TARGET', 'Page to import into'), 'SiteTree'));
 				}
 
 				if (isset($allowedTypes['file'])) {
-					$fields->addFieldToTab('Root.Import', new TreeDropdownField("FileMigrationTarget", _t('ExternalContent.FILE_MIGRATE_TARGET', 'Folder to import into'), 'Folder'));
+					$fields->addFieldToTab('Root.Import', TreeDropdownField::create("FileMigrationTarget", _t('ExternalContent.FILE_MIGRATE_TARGET', 'Folder to import into'), 'Folder'));
 				}
 
-				$fields->addFieldToTab('Root.Import', new CheckboxField("IncludeSelected", _t('ExternalContent.INCLUDE_SELECTED', 'Include Selected Item in Import')));
-				$fields->addFieldToTab('Root.Import', new CheckboxField("IncludeChildren", _t('ExternalContent.INCLUDE_CHILDREN', 'Include Child Items in Import'), true));
+				$fields->addFieldToTab('Root.Import', CheckboxField::create("IncludeSelected", _t('ExternalContent.INCLUDE_SELECTED', 'Include Selected Item in Import')));
+				$fields->addFieldToTab('Root.Import', CheckboxField::create("IncludeChildren", _t('ExternalContent.INCLUDE_CHILDREN', 'Include Child Items in Import'), true));
 
 				$duplicateOptions = array(
 					ExternalContentTransformer::DS_OVERWRITE => ExternalContentTransformer::DS_OVERWRITE,
@@ -323,7 +319,7 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 					ExternalContentTransformer::DS_SKIP => ExternalContentTransformer::DS_SKIP,
 				);
 
-				$fields->addFieldToTab('Root.Import', new OptionsetField(
+				$fields->addFieldToTab('Root.Import', OptionsetField::create(
 						"DuplicateMethod",
 						_t('ExternalContent.DUPLICATES', 'Select how duplicate items should be handled'),
 						$duplicateOptions,
@@ -342,26 +338,26 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 						86400	=> '1 day',
 						604800	=> '1 week',
 					);
-					$fields->addFieldToTab('Root.Import', new DropdownField('Repeat', 'Repeat import each ', $repeats));
+					$fields->addFieldToTab('Root.Import', DropdownField::create('Repeat', 'Repeat import each ', $repeats));
 				}
 
 				$migrateButton = FormAction::create('migrate', _t('ExternalContent.IMPORT', 'Start Importing'))
 					->setAttribute('data-icon', 'arrow-circle-double')
 					->setUseButtonTag(true);
 
-				$fields->addFieldToTab('Root.Import', new LiteralField('MigrateActions', "<div class='Actions'>{$migrateButton->forTemplate()}</div>"));
+				$fields->addFieldToTab('Root.Import', LiteralField::create('MigrateActions', "<div class='Actions'>{$migrateButton->forTemplate()}</div>"));
 			}
 
-			$fields->push($hf = new HiddenField("ID"));
+			$fields->push($hf = HiddenField::create("ID"));
 			$hf->setValue($id);
 
-			$fields->push($hf = new HiddenField("Version"));
+			$fields->push($hf = HiddenField::create("Version"));
 			$hf->setValue(1);
 
-			$actions = new FieldList();
+			$actions = FieldList::create();
 
 			$actions = CompositeField::create()->setTag('fieldset')->addExtraClass('ss-ui-buttonset');
-			$actions = new FieldList($actions);
+			$actions = FieldList::create($actions);
 
 			// Only show save button if not 'assets' folder
 			if ($record->canEdit()) {
@@ -424,19 +420,19 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 		array_shift($classes);
 
 		foreach ($classes as $key => $class) {
-			if (!singleton($class)->canCreate())
+			if (!(new $class())->canCreate())
 				unset($classes[$key]);
 			$classes[$key] = FormField::name_to_label($class);
 		}
 
-		$fields = new FieldList(
-			new HiddenField("ParentID"),
-			new HiddenField("Locale", 'Locale', i18n::get_locale()),
+		$fields = FieldList::create(
+			HiddenField::create("ParentID"),
+			HiddenField::create("Locale", 'Locale', i18n::get_locale()),
 			$type = new DropdownField("ProviderType", "", $classes)
 		);
 		$type->setAttribute('style', 'width:150px');
 
-		$actions = new FieldList(
+		$actions = FieldList::create(
 			FormAction::create("addprovider", _t('ExternalContent.CREATE', "Create"))
 				->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')
 				->setUseButtonTag(true)
@@ -514,13 +510,13 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 		$form = new Form(
 						$this,
 						'DeleteItemsForm',
-						new FieldList(
+						FieldList::create(
 								new LiteralField('SelectedPagesNote',
 										sprintf('<p>%s</p>', _t('ExternalContentAdmin.SELECT_CONNECTORS', 'Select the connectors that you want to delete and then click the button below'))
 								),
-								new HiddenField('csvIDs')
+								HiddenField::create('csvIDs')
 						),
-						new FieldList(
+						FieldList::create(
 								new FormAction('deleteprovider', _t('ExternalContentAdmin.DELCONNECTORS', 'Delete the selected connectors'))
 						)
 		);

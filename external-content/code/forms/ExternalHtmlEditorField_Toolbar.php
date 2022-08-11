@@ -41,12 +41,12 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 		//Requirements::javascript(THIRDPARTY_DIR . "/behaviour.js");
 		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external_tiny_mce_improvements.js');
 
-		$form = new Form(
+		$form = Form::create(
 			$this->controller,
 			"{$this->name}/LinkForm",
-			new FieldList(
-				new LiteralField('Heading', '<h2><img src="cms/images/closeicon.gif" alt="' . _t('HtmlEditorField.CLOSE', 'close').'" title="' . _t('HtmlEditorField.CLOSE', 'close') . '" />' . _t('HtmlEditorField.LINK', 'Link') . '</h2>'),
-				new OptionsetField(
+			FieldList::create(
+				LiteralField::create('Heading', '<h2><img src="cms/images/closeicon.gif" alt="' . _t('HtmlEditorField.CLOSE', 'close').'" title="' . _t('HtmlEditorField.CLOSE', 'close') . '" />' . _t('HtmlEditorField.LINK', 'Link') . '</h2>'),
+				OptionsetField::create(
 					'LinkType',
 					_t('HtmlEditorField.LINKTO', 'Link to'),
 					array(
@@ -58,19 +58,19 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 						'externalcontent' =>_t('HtmlEditorField.LINKEXTERNALCONTENT', 'External Content'),
 					)
 				),
-				new TreeDropdownField('internal', _t('HtmlEditorField.PAGE', "Page"), 'SiteTree', 'ID', 'MenuTitle'),
-				new TextField('external', _t('HtmlEditorField.URL', 'URL'), 'http://'),
-				new EmailField('email', _t('HtmlEditorField.EMAIL', 'Email address')),
-				new TreeDropdownField('file', _t('HtmlEditorField.FILE', 'File'), 'File', 'Filename'),
-				new ExternalTreeDropdownField('externalcontent', _t('ExternalHtmlEditorField.EXTERNAL_CONTENT', 'External Content'), 'ExternalContentSource', 'Link()'),
-				new TextField('Anchor', _t('HtmlEditorField.ANCHORVALUE', 'Anchor')),
-				new TextField('LinkText', _t('HtmlEditorField.LINKTEXT', 'Link text')),
-				new TextField('Description', _t('HtmlEditorField.LINKDESCR', 'Link description')),
-				new CheckboxField('TargetBlank', _t('HtmlEditorField.LINKOPENNEWWIN', 'Open link in a new window?'))
+				TreeDropdownField::create('internal', _t('HtmlEditorField.PAGE', "Page"), 'SiteTree', 'ID', 'MenuTitle'),
+				TextField::create('external', _t('HtmlEditorField.URL', 'URL'), 'http://'),
+				EmailField::create('email', _t('HtmlEditorField.EMAIL', 'Email address')),
+				TreeDropdownField::create('file', _t('HtmlEditorField.FILE', 'File'), 'File', 'Filename'),
+				ExternalTreeDropdownField::create('externalcontent', _t('ExternalHtmlEditorField.EXTERNAL_CONTENT', 'External Content'), 'ExternalContentSource', 'Link()'),
+				TextField::create('Anchor', _t('HtmlEditorField.ANCHORVALUE', 'Anchor')),
+				TextField::create('LinkText', _t('HtmlEditorField.LINKTEXT', 'Link text')),
+				TextField::create('Description', _t('HtmlEditorField.LINKDESCR', 'Link description')),
+				CheckboxField::create('TargetBlank', _t('HtmlEditorField.LINKOPENNEWWIN', 'Open link in a new window?'))
 			),
-			new FieldList(
-				new FormAction('insert', _t('HtmlEditorField.BUTTONINSERTLINK', 'Insert link')),
-				new FormAction('remove', _t('HtmlEditorField.BUTTONREMOVELINK', 'Remove link'))
+			FieldList::create(
+				FormAction::create('insert', _t('HtmlEditorField.BUTTONINSERTLINK', 'Insert link')),
+				FormAction::create('remove', _t('HtmlEditorField.BUTTONREMOVELINK', 'Remove link'))
 			)
 		);
 
@@ -93,13 +93,13 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 		//Requirements::javascript(THIRDPARTY_DIR . '/SWFUpload/SWFUpload.js');
 		//Requirements::javascript(CMS_DIR . '/javascript/Upload.js');
 
-		$form = new Form(
+		$form = Form::create(
 			$this->controller,
 			"{$this->name}/ImageForm",
-			new FieldList(
-				new LiteralField('Heading', '<h2><img src="cms/images/closeicon.gif" alt="' . _t('HtmlEditorField.CLOSE', 'close') . '" title="' . _t('HtmlEditorField.CLOSE', 'close') . '" />' . _t('HtmlEditorField.IMAGE', 'Image') . '</h2>'),
-				new TreeDropdownField('FolderID', _t('HtmlEditorField.FOLDER', 'Folder'), 'Folder'),
-				new LiteralField('AddFolderOrUpload',
+			FieldList::create(
+				LiteralField::create('Heading', '<h2><img src="cms/images/closeicon.gif" alt="' . _t('HtmlEditorField.CLOSE', 'close') . '" title="' . _t('HtmlEditorField.CLOSE', 'close') . '" />' . _t('HtmlEditorField.IMAGE', 'Image') . '</h2>'),
+				TreeDropdownField::create('FolderID', _t('HtmlEditorField.FOLDER', 'Folder'), 'Folder'),
+				LiteralField::create('AddFolderOrUpload',
 					'<div style="clear:both;"></div><div id="AddFolderGroup" style="display: none">
 						<a style="" href="#" id="AddFolder" class="link">' . _t('HtmlEditorField.CREATEFOLDER','Create Folder') . '</a>
 						<input style="display: none; margin-left: 2px; width: 94px;" id="NewFolderName" class="addFolder" type="text">
@@ -111,12 +111,12 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 						<a href="#" id="UploadFiles" class="link">' . _t('HtmlEditorField.UPLOAD','Upload') . '</a>
 					</div>'
 				),
-				new TextField('getimagesSearch', _t('HtmlEditorField.SEARCHFILENAME', 'Search by file name')),
-				new ThumbnailStripField('FolderImages', 'FolderID', 'getimages'),
-				new TextField('AltText', _t('HtmlEditorField.IMAGEALTTEXT', 'Alternative text (alt) - shown if image cannot be displayed'), '', 80),
-				new TextField('ImageTitle', _t('HtmlEditorField.IMAGETITLE', 'Title text (tooltip) - for additional information about the image')),
-				new TextField('CaptionText', _t('HtmlEditorField.CAPTIONTEXT', 'Caption text')),
-				new DropdownField(
+				TextField::create('getimagesSearch', _t('HtmlEditorField.SEARCHFILENAME', 'Search by file name')),
+				ThumbnailStripField::create('FolderImages', 'FolderID', 'getimages'),
+				TextField::create('AltText', _t('HtmlEditorField.IMAGEALTTEXT', 'Alternative text (alt) - shown if image cannot be displayed'), '', 80),
+				TextField::create('ImageTitle', _t('HtmlEditorField.IMAGETITLE', 'Title text (tooltip) - for additional information about the image')),
+				TextField::create('CaptionText', _t('HtmlEditorField.CAPTIONTEXT', 'Caption text')),
+				DropdownField::create(
 					'CSSClass',
 					_t('HtmlEditorField.CSSCLASS', 'Alignment / style'),
 					array(
@@ -126,13 +126,13 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 						'center' => _t('HtmlEditorField.CSSCLASSCENTER', 'Centered, on its own.'),
 					)
 				),
-				new FieldGroup(_t('HtmlEditorField.IMAGEDIMENSIONS', 'Dimensions'),
-					new TextField('Width', _t('HtmlEditorField.IMAGEWIDTHPX', 'Width'), 100),
-					new TextField('Height', " x " . _t('HtmlEditorField.IMAGEHEIGHTPX', 'Height'), 100)
+				FieldGroup::create(_t('HtmlEditorField.IMAGEDIMENSIONS', 'Dimensions'),
+					TextField::create('Width', _t('HtmlEditorField.IMAGEWIDTHPX', 'Width'), 100),
+					TextField::create('Height', " x " . _t('HtmlEditorField.IMAGEHEIGHTPX', 'Height'), 100)
 				)
 			),
-			new FieldList(
-				new FormAction('insertimage', _t('HtmlEditorField.BUTTONINSERTIMAGE', 'Insert image'))
+			FieldList::create(
+				FormAction::create('insertimage', _t('HtmlEditorField.BUTTONINSERTIMAGE', 'Insert image'))
 			)
 		);
 
@@ -148,21 +148,21 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 		//Requirements::javascript(THIRDPARTY_DIR . '/SWFUpload/SWFUpload.js');
 		//Requirements::javascript(CMS_DIR . '/javascript/Upload.js');
 
-		$form = new Form(
+		$form = Form::create(
 			$this->controller,
 			"{$this->name}/FlashForm",
-			new FieldList(
-				new LiteralField('Heading', '<h2><img src="cms/images/closeicon.gif" alt="'._t('HtmlEditorField.CLOSE', 'close').'" title="'._t('HtmlEditorField.CLOSE', 'close').'" />'._t('HtmlEditorField.FLASH', 'Flash').'</h2>'),
-				new TreeDropdownField("FolderID", _t('HtmlEditorField.FOLDER'), "Folder"),
-				new TextField('getflashSearch', _t('HtmlEditorField.SEARCHFILENAME', 'Search by file name')),
-				new ThumbnailStripField("Flash", "FolderID", "getflash"),
-				new FieldGroup(_t('HtmlEditorField.IMAGEDIMENSIONS', "Dimensions"),
-					new TextField("Width", _t('HtmlEditorField.IMAGEWIDTHPX', "Width"), 100),
-					new TextField("Height", "x " . _t('HtmlEditorField.IMAGEHEIGHTPX', "Height"), 100)
+			FieldList::create(
+				LiteralField::create('Heading', '<h2><img src="cms/images/closeicon.gif" alt="'._t('HtmlEditorField.CLOSE', 'close').'" title="'._t('HtmlEditorField.CLOSE', 'close').'" />'._t('HtmlEditorField.FLASH', 'Flash').'</h2>'),
+				TreeDropdownField::create("FolderID", _t('HtmlEditorField.FOLDER'), "Folder"),
+				TextField::create('getflashSearch', _t('HtmlEditorField.SEARCHFILENAME', 'Search by file name')),
+				ThumbnailStripField::create("Flash", "FolderID", "getflash"),
+				FieldGroup::create(_t('HtmlEditorField.IMAGEDIMENSIONS', "Dimensions"),
+					TextField::create("Width", _t('HtmlEditorField.IMAGEWIDTHPX', "Width"), 100),
+					TextField::create("Height", "x " . _t('HtmlEditorField.IMAGEHEIGHTPX', "Height"), 100)
 				)
 			),
-			new FieldList(
-				new FormAction("insertflash", _t('HtmlEditorField.BUTTONINSERTFLASH', 'Insert Flash'))
+			FieldList::create(
+				FormAction::create("insertflash", _t('HtmlEditorField.BUTTONINSERTFLASH', 'Insert Flash'))
 			)
 		);
 		$form->loadDataFrom($this);

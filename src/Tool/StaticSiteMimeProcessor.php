@@ -3,7 +3,9 @@
 namespace PhpTek\Exodus\Tool;
 
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Assets\File;
+use SilverStripe\Control\HTTP;
 
 /**
  *
@@ -15,6 +17,7 @@ use SilverStripe\Assets\File;
 class StaticSiteMimeProcessor
 {
     use Injectable;
+    use Configurable;
 
     /**
      *
@@ -153,7 +156,7 @@ class StaticSiteMimeProcessor
      */
     public static function ext_to_mime_compare($ext, $mime, $fix = false)
     {
-        $httpMimeTypes = Config::inst()->get('HTTP', 'MimeTypes');
+        $httpMimeTypes = Config::inst()->get(HTTP::class, 'MimeTypes');
         $mimeCategories = File::config()->get('app_categories');
         list($ext, $mime) = [strtolower($ext), strtolower($mime)];
 

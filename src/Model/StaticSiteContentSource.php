@@ -2,7 +2,7 @@
 
 namespace PhpTek\Exodus\Model;
 
-use \ExternalContentSource;
+use ExternalContentSource;
 use PhpTek\Exodus\Transform\StaticSiteImporter;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
 use PhpTek\Exodus\Tool\StaticSiteUrlList;

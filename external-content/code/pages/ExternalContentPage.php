@@ -26,7 +26,7 @@ class ExternalContentPage extends Page {
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
 		$fields->removeFieldFromTab('Root.Main', 'Content');
-		$fields->addFieldToTab('Root.Main', new ExternalTreeDropdownField('ExternalContentRoot', _t('ExternalContentPage.CONTENT_SOURCE', 'External Content Source'), 'ExternalContentSource'));
+		$fields->addFieldToTab('Root.Main', ExternalTreeDropdownField::create('ExternalContentRoot', _t('ExternalContentPage.CONTENT_SOURCE', 'External Content Source'), 'ExternalContentSource'));
 
 		return $fields;
 	}

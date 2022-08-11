@@ -157,7 +157,7 @@ class StaticSiteContentItem extends ExternalContentItem
         }
 
         Requirements::javascript('phptek/silverstripe-exodus:js/StaticSiteContentItem.js');
-        Requirements::css('phptek/silverstripe-exodus:css/StaticSiteConnector.css');
+        //Requirements::css('phptek/silverstripe-exodus:css/StaticSiteConnector.css');
 
         return $fields;
     }

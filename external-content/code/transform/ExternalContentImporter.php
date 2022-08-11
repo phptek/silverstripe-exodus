@@ -50,7 +50,7 @@ abstract class ExternalContentImporter {
 							$duplicateStrategy,
 							$params);
 
-			$service = singleton('QueuedJobService');
+			$service = singleton(QueuedJobService::class);
 			$service->queueJob($importer);
 			return $importer;
 		}

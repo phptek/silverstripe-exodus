@@ -28,10 +28,6 @@ use SilverStripe\Forms\ReadonlyField;
  */
 class ExternalContentItem extends DataObject
 {
-    use Configurable;
-    use Injectable;
-    use Extensible;
-
 	private static $db = [];
 
 	/**

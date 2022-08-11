@@ -4,7 +4,6 @@ namespace PhpTek\Exodus\Extension;
 
 use PhpTek\Exodus\Model\FailedURLRewriteObject;
 use PhpTek\Exodus\Model\StaticSiteContentSource;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
@@ -19,8 +18,6 @@ use SilverStripe\ORM\FieldType\DBVarchar;
  */
 class StaticSiteDataExtension extends DataExtension
 {
-    use Injectable;
-
     /**
      *
      * @var array

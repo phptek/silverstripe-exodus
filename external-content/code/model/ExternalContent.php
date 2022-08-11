@@ -1,6 +1,8 @@
 <?php
 
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Config\Configurable;
 
 /**
  * A class that provides methods for working with external content, aware of
@@ -12,6 +14,7 @@ use SilverStripe\ORM\DataObject;
  *
  */
 class ExternalContent {
+    use Injectable;
 
 	/**
 	 * The character to partition the compound id
