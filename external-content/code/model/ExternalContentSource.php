@@ -36,6 +36,8 @@ class ExternalContentSource extends DataObject
 		'ParentID' => '0'
 	);
 
+    private static $default_source = null;
+
 	/**
 	 * @var string - icon for cms tree
 	 **/

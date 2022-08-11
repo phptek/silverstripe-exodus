@@ -234,7 +234,7 @@ class ExternalContentItem extends DataObject
 	public function stageChildren($showAll = false) {
 		if ($this->Title != 'Content Root' && $this->source) {
 			$children = new ArrayList();
-			$item = new ExternalContentItem($this->source, $this->Title . '1');
+			$item = ExternalContentItem::create($this->source, $this->Title . '1');
 			$item->Title = $this->Title . '1';
 			$item->MenuTitle = $item->Title;
 

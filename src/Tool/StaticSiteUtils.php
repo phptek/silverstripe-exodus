@@ -24,7 +24,7 @@ class StaticSiteUtils
      * @param string $class Optional. The class passed to Config to find the value for $log_file.
      * @return null | void
      */
-    public function log($message, $filename = null, $mime = null, $class = 'StaticSiteContentExtractor')
+    public function log($message, $filename = null, $mime = null, $class = StaticSiteContentExtractor::class)
     {
         $logFile = Config::inst()->get($class, 'log_file');
         if (!$logFile) {
@@ -48,7 +48,7 @@ class StaticSiteUtils
     public function defineProxyOpts($set, &$crawler = null)
     {
         if ($set && is_bool($set) && $set !== false) {
-            $proxyOpts = Config::inst()->get('StaticSiteContentExtractor', 'curl_opts_proxy');
+            $proxyOpts = StaticSiteContentExtractor::config()->get('curl_opts_proxy');
             if (!$proxyOpts || !is_array($proxyOpts) || !count($proxyOpts)>0) {
                 return [];
             }

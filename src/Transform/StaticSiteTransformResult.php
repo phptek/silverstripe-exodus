@@ -2,6 +2,7 @@
 
 namespace PhpTek\Exodus\Transform;
 
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
 
 /**
@@ -15,6 +16,7 @@ use SilverStripe\Core\Injector\Injectable;
 class StaticSiteTransformResult extends \TransformResult
 {
     use Injectable;
+    use Configurable;
 
     /**
      *

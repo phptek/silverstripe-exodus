@@ -17,7 +17,7 @@ class StaticSiteContentExtractorTest extends SapphireTest
 		$badContent = '<head></head><body><p>test.</p></body>';
 		$url = '/test/test.html';
 		$mime = 'text/html';
-		$extractor = new StaticSiteContentExtractor($url, $mime, $badContent);
+		$extractor = StaticSiteContentExtractor::create($url, $mime, $badContent);
 		$extractor->prepareContent();
 		$matcher = array('tag' => 'html');
 
@@ -29,7 +29,7 @@ class StaticSiteContentExtractorTest extends SapphireTest
 		$goodContent = '<html><head></head><body><p>test.</p></body></html>';
 		$url = '/test/test.html';
 		$mime = 'text/html';
-		$extractor = new StaticSiteContentExtractor($url, $mime, $goodContent);
+		$extractor = StaticSiteContentExtractor::create($url, $mime, $goodContent);
 		$extractor->prepareContent();
 		$matcher = array('tag' => 'html');
 

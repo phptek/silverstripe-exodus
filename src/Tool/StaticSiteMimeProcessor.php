@@ -156,7 +156,7 @@ class StaticSiteMimeProcessor
      */
     public static function ext_to_mime_compare($ext, $mime, $fix = false)
     {
-        $httpMimeTypes = Config::inst()->get(HTTP::class, 'MimeTypes');
+        $httpMimeTypes = HTTP::config()->get('MimeTypes');
         $mimeCategories = File::config()->get('app_categories');
         list($ext, $mime) = [strtolower($ext), strtolower($mime)];
 

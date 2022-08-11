@@ -23,16 +23,14 @@ use SilverStripe\Core\Injector\Injectable;
  */
 class StaticSiteImporter extends ExternalContentImporter
 {
-    use Injectable;
-
     /**
      *
      * @return void
      */
     public function __construct()
     {
-        $this->contentTransforms['sitetree'] = new StaticSitePageTransformer();
-        $this->contentTransforms['file'] = new StaticSiteFileTransformer();
+        $this->contentTransforms['sitetree'] = StaticSitePageTransformer::create();
+        $this->contentTransforms['file'] = StaticSiteFileTransformer::create();
     }
 
     /**

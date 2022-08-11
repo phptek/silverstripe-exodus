@@ -11,6 +11,8 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\Core\ClassInfo;
 use PhpTek\Exodus\Model\StaticSiteImportDataObject;
 use SilverStripe\Assets\File;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Injector\Injectable;
 
 /**
  * Base content transformer. Comprises logic common to all types of legacy/scraped text
@@ -29,6 +31,9 @@ use SilverStripe\Assets\File;
  */
 abstract class StaticSiteDataTypeTransformer implements ExternalContentTransformer
 {
+    use Injectable;
+    use Configurable;
+
     /**
      * Holds the StaticSiteUtils object on construct
      *
@@ -83,7 +88,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
         $importRules = $importSchema->getImportRules();
 
         // Extract from the remote content based on those rules
-        $contentExtractor = new StaticSiteContentExtractor($item->AbsoluteURL, $item->ProcessedMIME);
+        $contentExtractor = StaticSiteContentExtractor::create($item->AbsoluteURL, $item->ProcessedMIME);
 
         if ($dataType == 'file') {
             $extraction = $contentExtractor->extractMapAndSelectors($importRules, $item);
@@ -169,7 +174,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
      */
     public function getSSExtensions()
     {
-        $extensions = singleton(File::class)->config()->app_categories;
+        $extensions = File::config()->get('app_categories');
         $exts = [];
         foreach ($extensions as $category => $extArray) {
             foreach ($extArray as $ext) {

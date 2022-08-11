@@ -108,7 +108,7 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 			$defaultSources = ClassInfo::getValidSubClasses(ExternalContentSource::class);
 			array_shift($defaultSources);
 			// Use one if defined in config, otherwise use first one found through reflection
-			$defaultSourceConfig = Config::inst()->get(ExternalContentSource::class, 'default_source');
+			$defaultSourceConfig = ExternalContentSource::config()->get('default_source');
 			if($defaultSourceConfig) {
 				$class = $defaultSourceConfig;
 			}

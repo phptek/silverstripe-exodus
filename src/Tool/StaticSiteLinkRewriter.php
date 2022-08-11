@@ -2,6 +2,7 @@
 
 namespace PhpTek\Exodus\Tool;
 
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
 
 /**
@@ -21,6 +22,7 @@ require_once(BASE_PATH . '/vendor/electrolinux/phpquery/phpQuery/phpQuery.php');
 class StaticSiteLinkRewriter
 {
     use Injectable;
+    use Configurable;
 
     /**
      * Simple map of tags to count as "linkable"

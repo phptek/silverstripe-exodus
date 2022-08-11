@@ -281,7 +281,7 @@ class StaticSiteContentSource extends ExternalContentSource
     public function urlList()
     {
         if (!$this->urlList) {
-            $this->urlList = new StaticSiteUrlList($this, "../assets/{$this->staticSiteCacheDir}");
+            $this->urlList = StaticSiteUrlList::create($this, "../assets/{$this->staticSiteCacheDir}");
             if ($processorClass = $this->UrlProcessor) {
                 $this->urlList->setUrlProcessor(new $processorClass());
             }
@@ -384,7 +384,7 @@ class StaticSiteContentSource extends ExternalContentSource
             }
         }
 
-        return new StaticSiteContentItem($this, $id);
+        return StaticSiteContentItem::create($this, $id);
     }
 
     /**
@@ -433,7 +433,7 @@ class StaticSiteContentSource extends ExternalContentSource
      */
     public function getContentImporter($target = null)
     {
-        return new StaticSiteImporter();
+        return StaticSiteImporter::create();
     }
 
     /**
@@ -474,8 +474,6 @@ class StaticSiteContentSource extends ExternalContentSource
  */
 class StaticSiteContentSource_ImportSchema extends DataObject
 {
-    use Injectable;
-
     /**
      * Default
      *
@@ -599,7 +597,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
         foreach (StaticSiteContentSource::get() as $source) {
             if (!$source->Schemas()->count()) {
                 Debug::message("Making a schema for $source->ID");
-                $defaultSchema = new StaticSiteContentSource_ImportSchema();
+                $defaultSchema = StaticSiteContentSource_ImportSchema::create();
                 $defaultSchema->Order = 1000000;
                 $defaultSchema->AppliesTo = self::$default_applies_to;
                 $defaultSchema->DataType = "Page";

@@ -177,7 +177,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
 
         $task = $this;
         // Callback for URL rewriter, called from StaticSiteLinkRewriter and passed through $callback($url)
-        $rewriter = new StaticSiteLinkRewriter(function ($url) use ($pageLookup, $fileLookup, $task) {
+        $rewriter = StaticSiteLinkRewriter::create(function ($url) use ($pageLookup, $fileLookup, $task) {
             $origUrl = $url;
             $anchor = '';
             if (strpos($url, '#') !== false) {

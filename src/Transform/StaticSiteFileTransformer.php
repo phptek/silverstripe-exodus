@@ -22,8 +22,6 @@ use SilverStripe\Control\Controller;
  */
 class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
 {
-    use Injectable;
-
     /**
      * Default value to pass to usleep() to reduce load on the remote server
      *
@@ -100,7 +98,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
 
         $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
 
-        return new StaticSiteTransformResult($file, $item->stageChildren());
+        return StaticSiteTransformResult::create($file, $item->stageChildren());
     }
 
     /**

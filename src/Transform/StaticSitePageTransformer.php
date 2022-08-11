@@ -3,6 +3,8 @@
 namespace PhpTek\Exodus\Transform;
 
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Versioned\Versioned;
+use PhpTek\Exodus\Transform\StaticSiteDataTypeTransformer;
 
 /**
  * URL transformer specific to SilverStripe's `SiteTree` class for use with the module's
@@ -96,7 +98,7 @@ class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
         if (!$dataType) {
             $this->utils->log(" - DataType for migration schema is empty for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
-            throw new Exception('DataType for migration schema is empty!');
+            throw new \Exception('DataType for migration schema is empty!');
         }
 
         // Process incoming according to user-selected duplication strategy
@@ -123,6 +125,6 @@ class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
 
         $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
 
-        return new StaticSiteTransformResult($page, $item->stageChildren());
+        return StaticSiteTransformResult::create($page, $item->stageChildren());
     }
 }

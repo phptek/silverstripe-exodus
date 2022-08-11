@@ -1,6 +1,8 @@
 <?php
 
 use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\ArrayList;
 use Symbiote\QueuedJobs\Jobs\AbstractQueuedJob;
 
@@ -11,6 +13,9 @@ use Symbiote\QueuedJobs\Jobs\AbstractQueuedJob;
  *
  */
 abstract class ExternalContentImporter {
+
+    use Injectable;
+    use Configurable;
 
 	protected $contentTransforms = array();
 	protected $params = array();
@@ -58,7 +63,7 @@ abstract class ExternalContentImporter {
 		$children = null;
 		if ($includeParent) {
 			// Get the children of a particular node
-			$children = new ArrayList();
+			$children = ArrayList::create();
 			$children->push($contentItem);
 		} else {
 			$children = $contentItem->stageChildren();

@@ -29,6 +29,7 @@ use SilverStripe\Core\Convert;
 class StaticSiteContentExtractor
 {
     use Injectable;
+    use Configurable;
 
     /**
      *

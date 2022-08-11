@@ -21,8 +21,6 @@ use SilverStripe\View\Requirements;
  */
 class StaticSiteContentItem extends ExternalContentItem
 {
-    use Injectable;
-
     /**
      * @var string
      */
@@ -119,10 +117,10 @@ class StaticSiteContentItem extends ExternalContentItem
     {
         $type = $this->getType();
         if ($type == 'file') {
-            return new StaticSiteFileTransformer();
+            return StaticSiteFileTransformer::create();
         }
         if ($type == 'sitetree') {
-            return new StaticSitePageTransformer();
+            return StaticSitePageTransformer::create();
         }
     }
 

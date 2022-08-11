@@ -7,6 +7,7 @@ use PhpTek\Exodus\Tool\StaticSiteUtils;
 use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
 
 /**
@@ -22,6 +23,7 @@ use SilverStripe\Core\Injector\Injectable;
 class StaticSiteUrlList
 {
     use Injectable;
+    use Configurable;
 
     /**
      *
@@ -352,7 +354,7 @@ class StaticSiteUrlList
             }
         }
 
-        $crawler = new StaticSiteCrawler($this, $limit, $verbose);
+        $crawler = StaticSiteCrawler::create($this, $limit, $verbose);
         $crawler->enableResumption();
         $crawler->setUrlCacheType(2); // "2" is the original value of PHPCrawlerUrlCacheTypes::URLCACHE_SQLITE which no longer exists
         $crawler->setWorkingDirectory($this->cacheDir);
@@ -735,6 +737,9 @@ use PHPCrawl\PHPCrawlerDocumentInfo;
  */
 class StaticSiteCrawler extends PHPCrawler
 {
+    use Injectable;
+    use Configurable;
+
     /**
      *
      * @var array
