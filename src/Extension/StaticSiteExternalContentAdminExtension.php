@@ -51,7 +51,7 @@ class StaticSiteExternalContentAdminExtension extends Extension
         } else {
             $source = ExternalContent::getDataObjectFor($selected);
             if (!($source instanceof ExternalContentSource)) {
-                throw new \Exception('ExternalContent is not instance of ExternalContentSource.');
+                throw new \Exception('ExternalContent is not an instance of ExternalContentSource.');
             }
 
             $messageType = 'good';

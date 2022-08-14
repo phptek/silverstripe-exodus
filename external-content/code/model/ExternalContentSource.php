@@ -18,7 +18,7 @@ use SilverStripe\ORM\Hierarchy\Hierarchy;
  * data can be represented in a tree state
  *
  * ExternalContentSources are hierarchical in nature, and are tagged
- * with the 'Hierarchy' extension to enable them to be displayed in
+ * with the 'Hierarchy' extension to enable them tTraceo be displayed in
  * content trees without problem. Due to their nature though, some of the
  * hierarchy functionality is explicitly overridden to prevent DB
  * access
@@ -294,7 +294,7 @@ class ExternalContentSource extends DataObject
 	function CMSTreeClasses() {
 		$classes = sprintf('class-%s', $this->class);
 		// Ensure that classes relating to whether there are further nodes to download are included
-		$classes .= $this->markingClasses();
+		//$classes .= $this->markingClasses();
 		return $classes;
 	}
 

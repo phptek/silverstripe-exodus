@@ -6,6 +6,6 @@ ExternalContentItem:
   extensions:
     - SilverStripe\ORM\Hierarchy\Hierarchy
 
-ExternalContentSource:
-  extensions:
-    - SilverStripe\ORM\Hierarchy\Hierarchy
+#ExternalContentSource:
+#  extensions:
+#    - SilverStripe\ORM\Hierarchy\Hierarchy

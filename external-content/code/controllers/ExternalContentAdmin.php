@@ -1,8 +1,10 @@
 <?php
 
 use SilverStripe\CMS\Controllers\CMSMain;
+use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\CMS\Controllers\CMSPageEditController;
 use SilverStripe\CMS\Model\CurrentPageIdentifier;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\View\Requirements;
 use SilverStripe\Core\ClassInfo;
@@ -18,19 +20,23 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\Form;
 use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\Core\Convert;
+use SilverStripe\ORM\Hierarchy\MarkedSet;
+use SilverStripe\Security\InheritedPermissions;
 
 /**
  * Backend administration pages for the external content module
  *
  * @author Marcus Nyeholt <marcus@silverstripe.com.au>
  * @license BSD License http://silverstripe.org/bsd-license
+ * @todo (Russell M) Subclass CMSMain instead and overload only the methods that _need_ it (viz SiteTree vs ExternalContentSource)
  */
-class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, PermissionProvider
+class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier, PermissionProvider
 {
 	/**
 	 * The URL format to get directly to this controller
@@ -91,6 +97,156 @@ class ExternalContentAdmin extends CMSMain implements CurrentPageIdentifier, Per
 
 		parent::pageStatus();
 	}
+
+	public function LinkTreeViewDeferred() {
+		return $this->Link('treeview');
+	}
+
+    /**
+     * Get a site tree HTML listing which displays the nodes under the given criteria.
+     *
+     * @param string $className The class of the root object
+     * @param string $rootID The ID of the root object.  If this is null then a complete tree will be
+     *  shown
+     * @param string $childrenMethod The method to call to get the children of the tree. For example,
+     *  Children, AllChildrenIncludingDeleted, or AllHistoricalChildren
+     * @param string $numChildrenMethod
+     * @param callable $filterFunction
+     * @param int $nodeCountThreshold
+     * @return string Nested unordered list with links to each page
+     */
+    public function getSiteTreeFor(
+        $className,
+        $rootID = null,
+        $childrenMethod = null,
+        $numChildrenMethod = null,
+        $filterFunction = null,
+        $nodeCountThreshold = null
+    ) {
+        $nodeCountThreshold = is_null($nodeCountThreshold) ? Config::inst()->get($className, 'node_threshold_total') : $nodeCountThreshold;
+        // Provide better defaults from filter
+        $filter = $this->getSearchFilter();
+        if ($filter) {
+            if (!$childrenMethod) {
+                $childrenMethod = $filter->getChildrenMethod();
+            }
+            if (!$numChildrenMethod) {
+                $numChildrenMethod = $filter->getNumChildrenMethod();
+            }
+            if (!$filterFunction) {
+                $filterFunction = function ($node) use ($filter) {
+                    return $filter->isPageIncluded($node);
+                };
+            }
+        }
+
+        // Build set from node and begin marking
+        $record = ($rootID) ? $this->getRecord($rootID) : null;
+        $rootNode = $record ? $record : DataObject::singleton($className);
+        $markingSet = MarkedSet::create($rootNode, $childrenMethod, $numChildrenMethod, $nodeCountThreshold);
+
+        // Set filter function
+        if ($filterFunction) {
+            $markingSet->setMarkingFilterFunction($filterFunction);
+        }
+
+        // Mark tree from this node
+        $markingSet->markPartialTree();
+
+        // Ensure current page is exposed
+        $currentPage = $this->currentPage();
+        if ($currentPage) {
+            $markingSet->markToExpose($currentPage);
+        }
+
+        // Pre-cache permissions
+        $checker = SiteTree::getPermissionChecker();
+        if ($checker instanceof InheritedPermissions) {
+            $checker->prePopulatePermissionCache(
+                InheritedPermissions::EDIT,
+                $markingSet->markedNodeIDs()
+            );
+        }
+
+        // Render using full-subtree template
+        return $markingSet->renderChildren(
+            [ self::class . '_SubTree', 'type' => 'Includes' ],
+            $this->getTreeNodeCustomisations()
+        );
+    }
+
+    /**
+     * Get callback to determine template customisations for nodes
+     *
+     * @return callable
+     */
+    protected function getTreeNodeCustomisations()
+    {
+        $rootTitle = $this->getCMSTreeTitle();
+        return function (ExternalContentSource $node) use ($rootTitle) {
+            return [
+                'listViewLink' => $this->LinkListViewChildren($node->ID),
+                'rootTitle' => $rootTitle,
+                'extraClass' => $this->getTreeNodeClasses($node),
+                'Title' => _t(
+                    self::class . '.PAGETYPE_TITLE',
+                    '(Page type: {type}) {title}',
+                    [
+                        'type' => $node->i18n_singular_name(),
+                        'title' => $node->Title,
+                    ]
+                )
+            ];
+        };
+    }
+
+    /**
+     * Link to list view for children of a parent page
+     *
+     * @param int|string $parentID Literal parentID, or placeholder (e.g. '%d') for
+     * client side substitution
+     * @return string
+     */
+    public function LinkListViewChildren($parentID)
+    {
+        return sprintf(
+            '%s?ParentID=%s',
+            CMSMain::singleton()->Link(),
+            $parentID
+        );
+    }
+
+    /**
+     * Get extra CSS classes for a page's tree node
+     *
+     * @param ExternalContentSource $node
+     * @return string
+     */
+    public function getTreeNodeClasses(ExternalContentSource $node)
+    {
+        // Get classes from object
+        $classes = $node->CMSTreeClasses();
+
+        // Get status flag classes
+        // $flags = $node->getStatusFlags();
+        // if ($flags) {
+        //     $statuses = array_keys($flags);
+        //     foreach ($statuses as $s) {
+        //         $classes .= ' status-' . $s;
+        //     }
+        // }
+
+        // Get additional filter classes
+        $filter = $this->getSearchFilter();
+        if ($filter && ($filterClasses = $filter->getPageClasses($node))) {
+            if (is_array($filterClasses)) {
+                $filterClasses = implode(' ', $filterClasses);
+            }
+            $classes .= ' ' . $filterClasses;
+        }
+
+        return trim($classes);
+    }
 
 	/**
 	 *
