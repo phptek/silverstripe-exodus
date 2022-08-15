@@ -2,7 +2,6 @@
 
 use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\Admin\LeftAndMain;
-use SilverStripe\CMS\Controllers\CMSPageEditController;
 use SilverStripe\CMS\Model\CurrentPageIdentifier;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Security\PermissionProvider;
@@ -76,8 +75,10 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		'updatetreenodes'
 	);
 
-	public function init(){
+	public function init()
+	{
 		parent::init();
+
 		Requirements::customCSS($this->generatePageIconsCss());
 		Requirements::css('phptek/silverstripe-exodus:external-content/css/external-content-admin.css');
 		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external-content-admin.js');
@@ -263,6 +264,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			array_shift($defaultSources);
 			// Use one if defined in config, otherwise use first one found through reflection
 			$defaultSourceConfig = ExternalContentSource::config()->get('default_source');
+			
 			if($defaultSourceConfig) {
 				$class = $defaultSourceConfig;
 			}
@@ -283,16 +285,16 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
     public function currentPageID() {
 		$session = $this->getRequest()->getSession();
+
 		if($this->getRequest()->requestVar('ID') && preg_match(ExternalContent::ID_FORMAT, $this->getRequest()->requestVar('ID')))	{
 			return $this->getRequest()->requestVar('ID');
 		} elseif (isset($this->urlParams['ID']) && preg_match(ExternalContent::ID_FORMAT, $this->urlParams['ID'])) {
 			return $this->urlParams['ID'];
-		} elseif($session->get($this->sessionNamespace() . ".currentPage")) {
+		} elseif($session && $session->get($this->sessionNamespace() . ".currentPage")) {
 			return $session->get($this->sessionNamespace() . ".currentPage");
 		}
-		else {
-			return null;
-		}
+
+		return null;
 	}
 
 	/**
@@ -383,9 +385,10 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			}
 		}
 
-        $session = $this->getRequest()->getSession();
-		$session->set("FormInfo.Form_EditForm.formError.message",$message);
-		$session->set("FormInfo.Form_EditForm.formError.type", $messageType);
+        if ($session = $this->getRequest()->getSession()) {
+			$session->set("FormInfo.Form_EditForm.formError.message",$message);
+			$session->set("FormInfo.Form_EditForm.formError.type", $messageType);
+		}
 
 		return $this->getResponseNegotiator()->respond($this->request);
 	}
@@ -510,14 +513,16 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 			$actions = FieldList::create();
 
-			$actions = CompositeField::create()->setTag('fieldset')->addExtraClass('ss-ui-buttonset');
+			$actions = CompositeField::create()
+				->setTag('fieldset')
+				->addExtraClass('btn btn-primary cms-content-addpage-button tool-button font-icon-plus');
 			$actions = FieldList::create($actions);
 
 			// Only show save button if not 'assets' folder
 			if ($record->canEdit()) {
 				$actions->push(
 					FormAction::create('save',_t('ExternalContent.SAVE','Save'))
-						->addExtraClass('ss-ui-action-constructive')
+						->addExtraClass('btn btn-primary cms-content-addpage-button tool-button font-icon-plus')
 						->setAttribute('data-icon', 'accept')
 						->setUseButtonTag(true)
 				);
@@ -526,14 +531,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			if($isSource && $record->canDelete()){
 				$actions->push(
 					FormAction::create('delete',_t('ExternalContent.DELETE','Delete'))
-						->addExtraClass('delete ss-ui-action-destructive')
+						->addExtraClass('delete btn btn-primary cms-content-addpage-button tool-button font-icon-plus')
 						->setAttribute('data-icon', 'decline')
 						->setUseButtonTag(true)
 				);
 			}
-
-
-
 
 			$form = Form::create($this, "EditForm", $fields, $actions);
 			if ($record->ID) {
@@ -563,8 +565,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		return $form;
 	}
 
-
-		/**
+	/**
 	 * Get the form used to create a new provider
 	 *
 	 * @return Form
@@ -574,9 +575,12 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		array_shift($classes);
 
 		foreach ($classes as $key => $class) {
-			if (!(new $class())->canCreate())
+			if (!(new $class())->canCreate()) {
 				unset($classes[$key]);
-			$classes[$key] = FormField::name_to_label($class);
+			}
+
+			$visible = explode('\\', $class);
+			$classes[$key] = FormField::name_to_label($visible[count($visible)-1]);
 		}
 
 		$fields = FieldList::create(
@@ -584,11 +588,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			HiddenField::create("Locale", 'Locale', i18n::get_locale()),
 			$type = DropdownField::create("ProviderType", "", $classes)
 		);
-		$type->setAttribute('style', 'width:150px');
 
 		$actions = FieldList::create(
 			FormAction::create("addprovider", _t('ExternalContent.CREATE', "Create"))
-				->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')
+				->addExtraClass('btn btn-primary tool-button font-icon-plus')
+				->setAttribute('data-icon', 'accept')
 				->setUseButtonTag(true)
 		);
 
@@ -608,11 +612,14 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	public function addprovider() {
 		// Providers are ALWAYS at the root
 		$parent = 0;
-
-		$name = (isset($_REQUEST['Name'])) ? basename($_REQUEST['Name']) : _t('ExternalContent.NEWCONNECTOR', "New Connector");
-
+		$name = (isset($_REQUEST['Name'])) ?
+			basename($_REQUEST['Name']) :
+			_t('ExternalContent.NEWCONNECTOR', "New Connector");
 		$type = $_REQUEST['ProviderType'];
-		$providerClasses = ClassInfo::subclassesFor(self::$tree_class);
+		$providerClasses = array_map(
+			function($item) { return strtolower($item); },
+			ClassInfo:: subclassesFor(self::$tree_class)
+		);
 
 		if (!in_array($type, $providerClasses)) {
 			throw new \Exception("Invalid connector type");
@@ -621,7 +628,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		$parentObj = null;
 
 		// Create object
-		$record = new $type();
+		$record = $type::create();
 		$record->ParentID = $parent;
 		$record->Name = $record->Title = $name;
 
@@ -634,26 +641,25 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		try {
 			$record->write();
 		} catch(ValidationException $ex) {
-			$form->sessionMessage($ex->getResult()->message(), 'bad');
+			//$form->sessionMessage($ex->getResult()->message(), 'bad');
 			return $this->getResponseNegotiator()->respond($this->request);
 		}
 
-		singleton(CMSPageEditController::class)->setCurrentPageID($record->ID);
-		$session = $this->getRequest()->getSession();
-
-		$session->set(
-			"FormInfo.Form_EditForm.formError.message",
-			sprintf(_t('ExternalContent.SourceAdded', 'Successfully created %s'), $type)
-		);
-
-		$session->set("FormInfo.Form_EditForm.formError.type", 'good');
+		$this->setCurrentPageID($record->ID);
+		
+		if ($session = $this->getRequest()->getSession()) {
+			$session->set(
+				"FormInfo.Form_EditForm.formError.message",
+				sprintf(_t('ExternalContent.SourceAdded', 'Successfully created %s'), $type)
+			);
+			$session->set("FormInfo.Form_EditForm.formError.type", 'good');
+		}
 
 		$msg = "New " . FormField::name_to_label($type) . " created";
 		$this->response->addHeader('X-Status', rawurlencode(_t('ExternalContent.PROVIDERADDED', $msg)));
+
 		return $this->getResponseNegotiator()->respond($this->request);
 	}
-
-
 
 	/**
 	 * Copied from AssetAdmin...
@@ -839,16 +845,23 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 */
 	public function delete($data, $form) {
 		$className = $this->config->get('tree_class');
-
 		$record = DataObject::get_by_id($className, Convert::raw2sql($data['ID']));
-		if($record && !$record->canDelete()) return Security::permissionFailure();
-		if(!$record || !$record->ID) $this->httpError(404, "Bad record ID #" . (int)$data['ID']);
+		
+		if($record && !$record->canDelete()) {
+			return Security::permissionFailure();
+		}
+
+		if(!$record || !$record->ID) {
+			$this->httpError(404, "Bad record ID #" . (int)$data['ID']);
+		}
+
 		$type = $record->ClassName;
 		$record->delete();
 
-        $session = $this->getRequest()->getSession();
-		$session->set("FormInfo.Form_EditForm.formError.message", "Deleted $type");
-		$session->set("FormInfo.Form_EditForm.formError.type", 'bad');
+        if ($session = $this->getRequest()->getSession()) {
+			$session->set("FormInfo.Form_EditForm.formError.message", "Deleted $type");
+			$session->set("FormInfo.Form_EditForm.formError.type", 'bad');
+		}
 
 		$this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.DELETED', 'Deleted.')));
 		return $this->getResponseNegotiator()->respond(
@@ -867,8 +880,8 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		return preg_replace('/^\s+|\n|\r|\s+$/m', '', $HTML);
 	}
 
-
-	public function updatetreenodes($request) {
+	public function updatetreenodes($request)
+	{
 		// noop
 		return parent::updatetreenodes($request);
 	}

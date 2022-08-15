@@ -23,7 +23,7 @@
 				$FieldHolder
 			<% end_loop %>
 				<% if $Controller.LinkPreview %>
-			<a href="$Controller.LinkPreview" target="_cmsPreview" class="cms-preview-toggle-link ss-ui-button" data-icon="preview">
+			<a href="$Controller.LinkPreview" target="_cmsPreview" class="cms-preview-toggle-link class="btn btn-primary cms-content-addpage-button tool-button font-icon-plus" data-icon="preview">
 				<%t SilverStripe\Admin\LeftAndMain.PreviewButton 'Preview' %> &raquo;
 			</a>
 			<% end_if %>
