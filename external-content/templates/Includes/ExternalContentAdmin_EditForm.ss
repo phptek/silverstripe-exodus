@@ -1,10 +1,9 @@
 <form $FormAttributes data-layout-type="border">
-
 	<div class="panel panel--padded panel--scrollable flexbox-area-grow cms-content-fields ">
 		<% if $Message %>
-		<p id="{$FormName}_error" class="alert $AlertType">$Message</p>
+		<p id="{$FormName}_error" class="message $AlertType">$Message</p>
 		<% else %>
-		<p id="{$FormName}_error" class="alert $AlertType" style="display: none"></p>
+		<p id="{$FormName}_error" class="message $AlertType" style="display: none"></p>
 		<% end_if %>
 
 		<fieldset>
@@ -14,22 +13,5 @@
 			<% end_loop %>
 			<div class="clear"><!-- --></div>
 		</fieldset>
-	</div>
-
-	<div class="toolbar--south cms-content-actions cms-content-controls south">
-		<% if $Actions %>
-		<div class="btn-toolbar">
-			<% loop $Actions %>
-				$FieldHolder
-			<% end_loop %>
-				<% if $Controller.LinkPreview %>
-			<a href="$Controller.LinkPreview" target="_cmsPreview" class="cms-preview-toggle-link btn btn-primary cms-content-addpage-button tool-button font-icon-plus" data-icon="preview">
-				<%t SilverStripe\Admin\LeftAndMain.PreviewButton 'Preview' %> &raquo;
-			</a>
-			<% end_if %>
-
-			<% include SilverStripe\\Admin\\LeftAndMain_ViewModeSelector SelectID="preview-mode-dropdown-in-content" %>
-		</div>
-		<% end_if %>
 	</div>
 </form>

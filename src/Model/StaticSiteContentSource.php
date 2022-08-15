@@ -8,6 +8,7 @@ use PhpTek\Exodus\Transform\StaticSiteImporter;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
 use PhpTek\Exodus\Tool\StaticSiteUrlList;
 use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
+use PhpTek\Exodus\Tool\StaticSiteUrlProcessor;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Convert;
@@ -69,7 +70,7 @@ class StaticSiteContentSource extends ExternalContentSource
      * @var array
      */
     private static $has_many = [
-        "Schemas" => StaticSiteContentSource_ImportSchema::class,
+        "Schemas" => StaticSiteContentSourceImportSchema::class,
         "Pages" => SiteTree::class,
         "Files" => File::class,
     ];
@@ -79,10 +80,10 @@ class StaticSiteContentSource extends ExternalContentSource
      * @var array
      */
     private static $export_columns = [
-        "StaticSiteContentSource_ImportSchema.DataType",
-        "StaticSiteContentSource_ImportSchema.Order",
-        "StaticSiteContentSource_ImportSchema.AppliesTo",
-        "StaticSiteContentSource_ImportSchema.MimeTypes",
+        "StaticSiteContentSourceImportSchema.DataType",
+        "StaticSiteContentSourceImportSchema.Order",
+        "StaticSiteContentSourceImportSchema.AppliesTo",
+        "StaticSiteContentSourceImportSchema.MimeTypes",
     ];
 
     /**
@@ -132,20 +133,20 @@ class StaticSiteContentSource extends ExternalContentSource
         $fields->removeFieldFromTab("Root", "Pages");
         $fields->removeFieldFromTab("Root", "Files");
         $fields->removeFieldFromTab("Root", "ShowContentInMenu");
-        $fields->insertBefore(HeaderField::create('CrawlConfigHeader', 'Crawl config'), 'BaseUrl');
+        $fields->insertBefore(HeaderField::create('CrawlConfigHeader', 'Crawl Setup'), 'BaseUrl');
 
         // Processing Option
         $processingOptions = ['' => "No pre-processing"];
 
-        foreach (ClassInfo::implementorsOf('StaticSiteUrlProcessor') as $processor) {
+        foreach (ClassInfo::implementorsOf(StaticSiteUrlProcessor::class) as $processor) {
             $processorObj = new $processor();
             $processingOptions[$processor] = "<strong>" . Convert::raw2xml($processorObj->getName())
                 . "</strong><br>" . Convert::raw2xml($processorObj->getDescription());
         }
 
-        $fields->addFieldToTab("Root.Main", OptionsetField::create("UrlProcessor", "URL processing", $processingOptions));
+        $fields->addFieldToTab("Root.Main", OptionsetField::create("UrlProcessor", "URL Processing", $processingOptions));
         $fields->addFieldToTab("Root.Main", $parseCss = CheckboxField::create("ParseCSS", "Fetch external CSS"));
-        $parseCss->setDescription("Fetches images defined in CSS <strong>background-image</strong> selectors, not ordinarily reachable.");
+        $parseCss->setDescription("Fetch images defined as CSS <strong>background-image</strong> selectors which are not ordinarily reachable.");
         $fields->addFieldToTab("Root.Main", $autoRunLinkTask = CheckboxField::create("AutoRunTask", "Automatically run link-rewrite task"));
         $autoRunLinkTask->setDescription("This will run the built-in link-rewriter task automatically once an import has completed.");
 
@@ -167,13 +168,13 @@ class StaticSiteContentSource extends ExternalContentSource
 
         switch ($this->urlList()->getSpiderStatus()) {
             case "Not started":
-                $crawlButtonText = _t('StaticSiteContentSource.CRAWL_SITE', 'Crawl site');
+                $crawlButtonText = _t('StaticSiteContentSource.CRAWL_SITE', 'Crawl');
                 break;
             case "Partial":
-                $crawlButtonText = _t('StaticSiteContentSource.RESUME_CRAWLING', 'Resume crawling');
+                $crawlButtonText = _t('StaticSiteContentSource.RESUME_CRAWLING', 'Resume Crawl');
                 break;
             case "Complete":
-                $crawlButtonText = _t('StaticSiteContentSource.RECRAWL_SITE', 'Re-crawl site');
+                $crawlButtonText = _t('StaticSiteContentSource.RECRAWL_SITE', 'Re-Crawl');
                 break;
             default:
                 throw new \LogicException("Invalid getSpiderStatus() value '".$this->urlList()->getSpiderStatus().";");
@@ -181,7 +182,8 @@ class StaticSiteContentSource extends ExternalContentSource
 
         $crawlButton = FormAction::create('crawlsite', $crawlButtonText)
             ->setAttribute('data-icon', 'arrow-circle-double')
-            ->setUseButtonTag(true);
+            ->setUseButtonTag(true)
+            ->addExtraClass('btn action btn btn-primary tool-button font-icon-plus');
 
         // Disable crawl-button if assets dir isn't writable
         if (!file_exists(ASSETS_PATH) || !is_writable(ASSETS_PATH)) {
@@ -194,9 +196,9 @@ class StaticSiteContentSource extends ExternalContentSource
             ReadonlyField::create("NumURLs", "Number of URLs", $this->urlList()->getNumURLs()),
             LiteralField::create(
                 'CrawlActions',
-                "<p>Before importing this content, all URLs on the site must be crawled (like a search engine does)."
-                . " Click the button below to do so:</p>"
-                . "<div class='Actions'>{$crawlButton->forTemplate()}</div>"
+                '<p class="message notice">Before importing content, all URLs'
+                . ' must first be crawled/spidered. Select the button below to start:</p>'
+                . '<div class="Actions">' . $crawlButton->forTemplate() . '</div>'
             )
         ]);
 
@@ -228,7 +230,7 @@ class StaticSiteContentSource extends ExternalContentSource
             ->setDescription("Add URLs that are not reachable through content scraping, eg: '/about/team'. One per line")
             ->setTitle('Additional URLs');
         $fields->dataFieldByName("UrlExcludePatterns")
-            ->setDescription("URLs that should be excluded. (Supports regular expressions e.g. '/about/.*'). One per URL")
+            ->setDescription("URLs that should be excluded. (Supports regular expressions e.g. '/about/.*'). One per line")
             ->setTitle('Excluded URLs');
 
         $hasImports = DataObject::get(StaticSiteImportDataObject::class);
@@ -322,7 +324,7 @@ class StaticSiteContentSource extends ExternalContentSource
      *
      * @param string $absoluteURL
      * @param string $mimeType (Optional)
-     * @return mixed StaticSiteContentSource_ImportSchema $schema or boolean false if no schema matches are found
+     * @return mixed StaticSiteContentSourceImportSchema $schema or boolean false if no schema matches are found
      */
     public function getSchemaForURL($absoluteURL, $mimeType = null)
     {
@@ -349,18 +351,18 @@ class StaticSiteContentSource extends ExternalContentSource
      * Performs a match on the Schema->AppliedTo field with reference to the URL
      * of the current iteration within getSchemaForURL().
      *
-     * @param StaticSiteContentSource_ImportSchema $schema
+     * @param StaticSiteContentSourceImportSchema $schema
      * @param string $url
      * @return boolean
      */
-    public function schemaCanParseURL(StaticSiteContentSource_ImportSchema $schema, $url)
+    public function schemaCanParseURL(StaticSiteContentSourceImportSchema $schema, $url)
     {
         $appliesTo = $schema->AppliesTo;
         if (!strlen($appliesTo)) {
             $appliesTo = $schema::$default_applies_to;
         }
 
-        // Use (escaped) pipes for delimeters as pipes are unlikely to appear in legitimate URLs
+        // Use (escaped) pipes for delimeters as pipes themselves are unlikely to appear in legit URLs
         $appliesTo = str_replace('|', '\|', $appliesTo);
         $urlToTest = str_replace(rtrim($this->BaseUrl, '/'), '', $url);
 
@@ -475,7 +477,7 @@ class StaticSiteContentSource extends ExternalContentSource
 /**
  * A collection of ImportRules that apply to some or all of the content being imported.
  */
-class StaticSiteContentSource_ImportSchema extends DataObject
+class StaticSiteContentSourceImportSchema extends DataObject
 {
     /**
      * Default
@@ -483,6 +485,11 @@ class StaticSiteContentSource_ImportSchema extends DataObject
      * @var string
      */
     private static $default_applies_to = '.*';
+
+    /**
+     * @var string
+     */
+    private static $table_name = 'StaticSiteContentSourceImportSchema';
 
     /**
      *
@@ -536,7 +543,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
      * @var array
      */
     private static $has_many = [
-        "ImportRules" => StaticSiteContentSource_ImportRule::class,
+        "ImportRules" => StaticSiteContentSourceImportRule::class,
     ];
 
     /**
@@ -577,13 +584,13 @@ class StaticSiteContentSource_ImportSchema extends DataObject
         $fields->removeFieldFromTab('Root', 'ImportRules');
 
         // Exclude File, as it doesn't use import rules
-        if ($this->DataType && in_array('File', ClassInfo::ancestry($this->DataType))) {
+        if ($this->DataType && in_array(File::class, ClassInfo::ancestry($this->DataType))) {
             return $fields;
         }
 
         if ($importRules) {
-            $importRules->getConfig()->removeComponentsByType('GridFieldAddExistingAutocompleter');
-            $importRules->getConfig()->removeComponentsByType('GridFieldAddNewButton');
+            $importRules->getConfig()->removeComponentsByType(GridFieldAddExistingAutocompleter::class);
+            $importRules->getConfig()->removeComponentsByType(GridFieldAddNewButton::class);
             $addNewButton = new GridFieldAddNewButton('after');
             $addNewButton->setButtonName("Add Rule");
             $importRules->getConfig()->addComponent($addNewButton);
@@ -602,7 +609,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
         foreach (StaticSiteContentSource::get() as $source) {
             if (!$source->Schemas()->count()) {
                 Debug::message("Making a schema for $source->ID");
-                $defaultSchema = StaticSiteContentSource_ImportSchema::create();
+                $defaultSchema = StaticSiteContentSourceImportSchema::create();
                 $defaultSchema->Order = 1000000;
                 $defaultSchema->AppliesTo = self::$default_applies_to;
                 $defaultSchema->DataType = Page::class;
@@ -610,7 +617,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
                 $defaultSchema->MimeTypes = "text/html";
                 $defaultSchema->write();
 
-                foreach (StaticSiteContentSource_ImportRule::get()->filter(array('SchemaID' => 0)) as $rule) {
+                foreach (StaticSiteContentSourceImportRule::get()->filter(array('SchemaID' => 0)) as $rule) {
                     $rule->SchemaID = $defaultSchema->ID;
                     $rule->write();
                 }
@@ -723,7 +730,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
 /**
  * A single import rule that forms part of an ImportSchema
  */
-class StaticSiteContentSource_ImportRule extends DataObject
+class StaticSiteContentSourceImportRule extends DataObject
 {
     /**
      *
@@ -737,6 +744,11 @@ class StaticSiteContentSource_ImportRule extends DataObject
         "PlainText" => DBBoolean::class,
         "OuterHTML" => DBBoolean::class,
     ];
+
+    /**
+     * @var string
+     */
+    private static $table_name = 'StaticSiteContentSourceImportRule';
 
     /**
      *
@@ -767,7 +779,7 @@ class StaticSiteContentSource_ImportRule extends DataObject
      * @var array
      */
     private static $has_one = [
-        "Schema" => StaticSiteContentSource_ImportSchema::class,
+        "Schema" => StaticSiteContentSourceImportSchema::class,
     ];
 
     /**
@@ -776,7 +788,7 @@ class StaticSiteContentSource_ImportRule extends DataObject
      */
     public function getTitle()
     {
-        return ($this->FieldName) ? $this->FieldName : $this->ID;
+        return $this->FieldName ?: $this->ID;
     }
 
     /**
@@ -785,7 +797,7 @@ class StaticSiteContentSource_ImportRule extends DataObject
      */
     public function getAbsoluteURL()
     {
-        return ($this->URLSegment) ? $this->URLSegment : $this->Filename;
+        return $this->URLSegment ?: $this->Filename;
     }
 
     /**
@@ -796,7 +808,7 @@ class StaticSiteContentSource_ImportRule extends DataObject
     {
         $fields = parent::getCMSFields();
         $dataType = $this->Schema()->DataType;
-        
+
         if ($dataType) {
             $fieldList = singleton($dataType)->inheritedDatabaseFields();
             $fieldList = array_combine(array_keys($fieldList), array_keys($fieldList));

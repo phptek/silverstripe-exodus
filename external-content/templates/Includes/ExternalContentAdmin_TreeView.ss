@@ -1,10 +1,6 @@
-<% include SilverStripe\\CMS\\Controllers\\CMSPagesController_ContentToolActions View='Tree' %>
-
-<div class="" id="cms-page-add-form" title="<%t SilverStripe\CMS\Controllers\CMSMain.AddNew 'Add new page' %>">
+<div id="cms-page-add-form" title="<%t SilverStripe\CMS\Controllers\CMSMain.AddNew 'Add new page' %>">
 	$AddForm
 </div>
-
-$ExtraTreeTools
 
 <% if $TreeIsFiltered %>
     <div class="cms-tree-filtered cms-notice flexbox-area-grow">

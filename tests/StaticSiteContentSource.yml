@@ -1,4 +1,4 @@
-PhpTek\Exodus\Model\StaticSiteContentSource_ImportRule:
+PhpTek\Exodus\Model\StaticSiteContentSourceImportRule:
   Title1:
     FieldName: Title
     CSSSelector: h1
@@ -10,7 +10,7 @@ PhpTek\Exodus\Model\StaticSiteContentSource_ImportRule:
     PlainText: false
     OuterHTML: False
 
-PhpTek\Exodus\Model\StaticSiteContentSource_ImportSchema:
+PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema:
   SchemaSiteTree1:
     DataType: Page
     Order: 1
@@ -46,7 +46,7 @@ PhpTek\Exodus\Model\StaticSiteContentSource_ImportSchema:
     Order: 1
     AppliesTo: '.*'
     MimeTypes: 'text/html'
-    ImportRules: =>StaticSiteContentSource_ImportRule.Title1,=>StaticSiteContentSource_ImportRule.Content1
+    ImportRules: =>StaticSiteContentSourceImportRule.Title1,=>StaticSiteContentSourceImportRule.Content1
   SchemaSiteTree8:
     DataType: Page
     Order: 1
@@ -139,75 +139,75 @@ PhpTek\Exodus\Model\StaticSiteContentSource:
     ID: 1
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaSiteTree1
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree1
     Pages: =>Page.testPage1
   MyContentSourceIsHTML2:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaSiteTree2
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree2
     Pages: =>Page.testPage2
   MyContentSourceIsHTML3:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaSiteTree3
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree3
     Pages: =>Page.testPage3
   MyContentSourceIsHTML4:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaSiteTree4,=>StaticSiteContentSource_ImportSchema.SchemaSiteTree5
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree4,=>StaticSiteContentSourceImportSchema.SchemaSiteTree5
     Pages: =>Page.testPage3
   MyContentSourceIsHTML5:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaSiteTree6
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree6
     Pages: =>Page.testPage3
   MyContentSourceIsHTML6:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaSiteTree6
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree6
     Pages: =>Page.testPage4
   MyContentSourceIsHTML7:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaSiteTree7
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree7
     Pages: =>Page.testPage4
   MyContentSourceIsHTML8:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaSiteTree8
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree8
     Pages: =>Page.testPage5
   MyContentSourceIsFile1:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaFile1
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaFile1
   MyContentSourceIsImage1:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage3,=>StaticSiteContentSource_ImportSchema.SchemaImage4
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage3,=>StaticSiteContentSourceImportSchema.SchemaImage4
     Files: =>File.testFile1
   MyContentSourceIsImage2:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage2,=>StaticSiteContentSource_ImportSchema.SchemaImage1
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage2,=>StaticSiteContentSourceImportSchema.SchemaImage1
     Files: =>File.testFile2
     ID: 44
   MyContentSourceIsImage3:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage1
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage1
     Files: =>File.testFile3
   MyContentSourceIsImage4:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage1
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage1
     Files: =>File.testFile4
   MyContentSourceIsImage5:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage5
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage5
     Files: =>File.testFile5
   MyContentSourceIsImage6:
     BaseUrl: http://localhost
     UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSource_ImportSchema.SchemaImage6
+    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage6
     Files: =>File.testFile6

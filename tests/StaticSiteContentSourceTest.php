@@ -31,7 +31,7 @@ class StaticSiteContentSourceTest extends SapphireTest {
 		$this->source = $this->objFromFixture("StaticSiteContentSource", 'MyContentSourceIsHTML1');
 		$absoluteURL = $this->source->BaseUrl.'/some-page-or-other';
 		$schema = $this->source->getSchemaForURL($absoluteURL, 'text/html');
-		$this->assertInstanceOf('StaticSiteContentSource_ImportSchema', $schema);
+		$this->assertInstanceOf('StaticSiteContentSourceImportSchema', $schema);
 		$this->assertEquals('/*', $schema->AppliesTo);
 		
 		// Correct schema is returned via URL matching string as defined by AppliesTo = "/sub-dir/.*"
@@ -80,7 +80,7 @@ class StaticSiteContentSourceTest extends SapphireTest {
 		$this->source = $this->objFromFixture("StaticSiteContentSource", 'MyContentSourceIsFile1');
 		$absoluteURL = $this->source->BaseUrl.'/test-graphics/some-file-or-other.pdf';
 		$schema = $this->source->getSchemaForURL($absoluteURL, 'application/pdf');
-		$this->assertInstanceOf('StaticSiteContentSource_ImportSchema', $schema);
+		$this->assertInstanceOf('StaticSiteContentSourceImportSchema', $schema);
 		$this->assertEquals('/test-graphics/.*', $schema->AppliesTo);
 		
 		// Correct schema is returned via URL matching anything - as defined by AppliesTo = ".*"
@@ -88,14 +88,14 @@ class StaticSiteContentSourceTest extends SapphireTest {
 		$this->source = $this->objFromFixture("StaticSiteContentSource", 'MyContentSourceIsFile1');
 		$absoluteURL = $this->source->BaseUrl.'/test-graphics/some-file-or-other.jpg';
 		$schema = $this->source->getSchemaForURL($absoluteURL, 'application/pdf');
-		$this->assertInstanceOf('StaticSiteContentSource_ImportSchema', $schema);
+		$this->assertInstanceOf('StaticSiteContentSourceImportSchema', $schema);
 		$this->assertEquals('/test-graphics/.*', $schema->AppliesTo);		
 		
 		// Correct schema is returned via URL matching anything - as defined by AppliesTo = ".*"
 		$this->source = $this->objFromFixture("StaticSiteContentSource", 'MyContentSourceIsFile1');
 		$absoluteURL = $this->source->BaseUrl.'/test-graphics/some-file-or-other.pdf';
 		$schema = $this->source->getSchemaForURL($absoluteURL, 'application/pdf');
-		$this->assertInstanceOf('StaticSiteContentSource_ImportSchema', $schema);
+		$this->assertInstanceOf('StaticSiteContentSourceImportSchema', $schema);
 		$this->assertEquals('1', $schema->Order);		
 		
 		// Correct schema is returned via URL matching anything - as defined by AppliesTo = ".*"
@@ -121,7 +121,7 @@ class StaticSiteContentSourceTest extends SapphireTest {
 		$this->source = $this->objFromFixture("StaticSiteContentSource", 'MyContentSourceIsImage1');
 		$absoluteURL = $this->source->BaseUrl.'/test-graphics/some-file-or-other.png';
 		$schema = $this->source->getSchemaForURL($absoluteURL, 'image/png');
-		$this->assertInstanceOf('StaticSiteContentSource_ImportSchema', $schema);
+		$this->assertInstanceOf('StaticSiteContentSourceImportSchema', $schema);
 		$this->assertEquals('/test-graphics/.*', $schema->AppliesTo);
 		
 		// Correct schema is returned via URL matching anything - as defined by AppliesTo = ".*"
@@ -129,7 +129,7 @@ class StaticSiteContentSourceTest extends SapphireTest {
 		$this->source = $this->objFromFixture("StaticSiteContentSource", 'MyContentSourceIsImage1');
 		$absoluteURL = $this->source->BaseUrl.'/test-graphics/some-file-or-other.jpg';
 		$schema = $this->source->getSchemaForURL($absoluteURL, 'image/png');
-		$this->assertInstanceOf('StaticSiteContentSource_ImportSchema', $schema);
+		$this->assertInstanceOf('StaticSiteContentSourceImportSchema', $schema);
 		$this->assertEquals('/test-graphics/.*', $schema->AppliesTo);		
 		
 		// Correct schema is returned via URL matching anything - as defined by AppliesTo = ".*"

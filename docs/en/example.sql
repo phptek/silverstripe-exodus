@@ -45,15 +45,15 @@ INSERT INTO `StaticSiteContentSource` VALUES (1,'http://my-site.localhost','Stat
 UNLOCK TABLES;
 
 --
--- Table structure for table `StaticSiteContentSource_ImportRule`
+-- Table structure for table `StaticSiteContentSourceImportRule`
 --
 
-DROP TABLE IF EXISTS `StaticSiteContentSource_ImportRule`;
+DROP TABLE IF EXISTS `StaticSiteContentSourceImportRule`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `StaticSiteContentSource_ImportRule` (
+CREATE TABLE `StaticSiteContentSourceImportRule` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `ClassName` enum('StaticSiteContentSource_ImportRule') DEFAULT 'StaticSiteContentSource_ImportRule',
+  `ClassName` enum('StaticSiteContentSourceImportRule') DEFAULT 'StaticSiteContentSourceImportRule',
   `Created` datetime DEFAULT NULL,
   `LastEdited` datetime DEFAULT NULL,
   `FieldName` varchar(50) DEFAULT NULL,
@@ -70,25 +70,25 @@ CREATE TABLE `StaticSiteContentSource_ImportRule` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `StaticSiteContentSource_ImportRule`
+-- Dumping data for table `StaticSiteContentSourceImportRule`
 --
 
-LOCK TABLES `StaticSiteContentSource_ImportRule` WRITE;
-/*!40000 ALTER TABLE `StaticSiteContentSource_ImportRule` DISABLE KEYS */;
-INSERT INTO `StaticSiteContentSource_ImportRule` VALUES (1,'StaticSiteContentSource_ImportRule','2014-03-19 21:31:36','2014-04-21 21:48:38','Title','h2.title',NULL,NULL,1,0,1),(2,'StaticSiteContentSource_ImportRule','2014-03-19 21:34:03','2014-04-21 21:49:22','Content','div#main',NULL,NULL,0,0,2),(3,'StaticSiteContentSource_ImportRule','2014-03-19 21:34:42','2014-03-19 21:34:46','Title','#content h1',NULL,NULL,1,0,2),(4,'StaticSiteContentSource_ImportRule','2014-03-19 21:35:31','2014-04-21 21:49:09','Content','div#main','.panel-left',NULL,0,0,1);
-/*!40000 ALTER TABLE `StaticSiteContentSource_ImportRule` ENABLE KEYS */;
+LOCK TABLES `StaticSiteContentSourceImportRule` WRITE;
+/*!40000 ALTER TABLE `StaticSiteContentSourceImportRule` DISABLE KEYS */;
+INSERT INTO `StaticSiteContentSourceImportRule` VALUES (1,'StaticSiteContentSourceImportRule','2014-03-19 21:31:36','2014-04-21 21:48:38','Title','h2.title',NULL,NULL,1,0,1),(2,'StaticSiteContentSourceImportRule','2014-03-19 21:34:03','2014-04-21 21:49:22','Content','div#main',NULL,NULL,0,0,2),(3,'StaticSiteContentSourceImportRule','2014-03-19 21:34:42','2014-03-19 21:34:46','Title','#content h1',NULL,NULL,1,0,2),(4,'StaticSiteContentSourceImportRule','2014-03-19 21:35:31','2014-04-21 21:49:09','Content','div#main','.panel-left',NULL,0,0,1);
+/*!40000 ALTER TABLE `StaticSiteContentSourceImportRule` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `StaticSiteContentSource_ImportSchema`
+-- Table structure for table `StaticSiteContentSourceImportSchema`
 --
 
-DROP TABLE IF EXISTS `StaticSiteContentSource_ImportSchema`;
+DROP TABLE IF EXISTS `StaticSiteContentSourceImportSchema`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `StaticSiteContentSource_ImportSchema` (
+CREATE TABLE `StaticSiteContentSourceImportSchema` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `ClassName` enum('StaticSiteContentSource_ImportSchema') DEFAULT 'StaticSiteContentSource_ImportSchema',
+  `ClassName` enum('StaticSiteContentSourceImportSchema') DEFAULT 'StaticSiteContentSourceImportSchema',
   `Created` datetime DEFAULT NULL,
   `LastEdited` datetime DEFAULT NULL,
   `DataType` varchar(50) DEFAULT NULL,
@@ -103,13 +103,13 @@ CREATE TABLE `StaticSiteContentSource_ImportSchema` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `StaticSiteContentSource_ImportSchema`
+-- Dumping data for table `StaticSiteContentSourceImportSchema`
 --
 
-LOCK TABLES `StaticSiteContentSource_ImportSchema` WRITE;
-/*!40000 ALTER TABLE `StaticSiteContentSource_ImportSchema` DISABLE KEYS */;
-INSERT INTO `StaticSiteContentSource_ImportSchema` VALUES (1,'StaticSiteContentSource_ImportSchema','2014-03-19 21:30:16','2014-03-19 21:30:16','HomePage',1,'^/?$','text/html',1),(2,'StaticSiteContentSource_ImportSchema','2014-03-19 21:33:07','2014-03-19 21:33:07','Page',2,'.*','text/html',1),(3,'StaticSiteContentSource_ImportSchema','2014-03-19 21:36:09','2014-03-19 21:36:09','Image',3,'.*','image/png\r\nimage/gif\r\nimage/jpeg',1),(4,'StaticSiteContentSource_ImportSchema','2014-03-19 21:36:41','2014-03-19 21:36:41','File',4,'.*','application/pdf\r\ntext/plain\r\ntext/csv',1);
-/*!40000 ALTER TABLE `StaticSiteContentSource_ImportSchema` ENABLE KEYS */;
+LOCK TABLES `StaticSiteContentSourceImportSchema` WRITE;
+/*!40000 ALTER TABLE `StaticSiteContentSourceImportSchema` DISABLE KEYS */;
+INSERT INTO `StaticSiteContentSourceImportSchema` VALUES (1,'StaticSiteContentSourceImportSchema','2014-03-19 21:30:16','2014-03-19 21:30:16','HomePage',1,'^/?$','text/html',1),(2,'StaticSiteContentSourceImportSchema','2014-03-19 21:33:07','2014-03-19 21:33:07','Page',2,'.*','text/html',1),(3,'StaticSiteContentSourceImportSchema','2014-03-19 21:36:09','2014-03-19 21:36:09','Image',3,'.*','image/png\r\nimage/gif\r\nimage/jpeg',1),(4,'StaticSiteContentSourceImportSchema','2014-03-19 21:36:41','2014-03-19 21:36:41','File',4,'.*','application/pdf\r\ntext/plain\r\ntext/csv',1);
+/*!40000 ALTER TABLE `StaticSiteContentSourceImportSchema` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

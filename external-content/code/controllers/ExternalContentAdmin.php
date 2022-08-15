@@ -264,7 +264,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			array_shift($defaultSources);
 			// Use one if defined in config, otherwise use first one found through reflection
 			$defaultSourceConfig = ExternalContentSource::config()->get('default_source');
-			
+
 			if($defaultSourceConfig) {
 				$class = $defaultSourceConfig;
 			}
@@ -553,13 +553,14 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 		} else {
 			// Create a dummy form
-			$fields = FieldList::create();
-			$form = Form::create($this, "EditForm", $fields, FieldList::create());
+			$form = Form::create($this, "EditForm", FieldList::create(), FieldList::create());
 		}
 
-		$form->addExtraClass('cms-edit-form center ss-tabset ' . $this->BaseCSSClasses());
-		$form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
-		$form->setAttribute('data-pjax-fragment', 'CurrentForm');
+		$form
+            ->addExtraClass('cms-edit-form center ss-tabset ' . $this->BaseCSSClasses())
+		    ->setTemplate($this->getTemplatesWithSuffix('_EditForm'))
+            ->setAttribute('data-pjax-fragment', 'CurrentForm');
+
 		$this->extend('updateEditForm', $form);
 
 		return $form;
@@ -586,7 +587,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		$fields = FieldList::create(
 			HiddenField::create("ParentID"),
 			HiddenField::create("Locale", 'Locale', i18n::get_locale()),
-			$type = DropdownField::create("ProviderType", "", $classes)
+			DropdownField::create("ProviderType", "", $classes)
 		);
 
 		$actions = FieldList::create(
@@ -598,7 +599,6 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 		$form = Form::create($this, "AddForm", $fields, $actions);
 
-		$form->addExtraClass('cms-edit-form ' . $this->BaseCSSClasses());
 		$this->extend('updateEditForm', $form);
 
 		return $form;
@@ -646,7 +646,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		}
 
 		$this->setCurrentPageID($record->ID);
-		
+
 		if ($session = $this->getRequest()->getSession()) {
 			$session->set(
 				"FormInfo.Form_EditForm.formError.message",
@@ -846,7 +846,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	public function delete($data, $form) {
 		$className = $this->config->get('tree_class');
 		$record = DataObject::get_by_id($className, Convert::raw2sql($data['ID']));
-		
+
 		if($record && !$record->canDelete()) {
 			return Security::permissionFailure();
 		}
