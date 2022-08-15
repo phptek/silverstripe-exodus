@@ -3,6 +3,7 @@
 namespace PhpTek\Exodus\Model;
 
 use ExternalContentSource;
+use Page;
 use PhpTek\Exodus\Transform\StaticSiteImporter;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
 use PhpTek\Exodus\Tool\StaticSiteUrlList;
@@ -131,34 +132,37 @@ class StaticSiteContentSource extends ExternalContentSource
         $fields->removeFieldFromTab("Root", "Pages");
         $fields->removeFieldFromTab("Root", "Files");
         $fields->removeFieldFromTab("Root", "ShowContentInMenu");
-
         $fields->insertBefore(HeaderField::create('CrawlConfigHeader', 'Crawl config'), 'BaseUrl');
 
         // Processing Option
         $processingOptions = ['' => "No pre-processing"];
+
         foreach (ClassInfo::implementorsOf('StaticSiteUrlProcessor') as $processor) {
             $processorObj = new $processor();
             $processingOptions[$processor] = "<strong>" . Convert::raw2xml($processorObj->getName())
                 . "</strong><br>" . Convert::raw2xml($processorObj->getDescription());
         }
-        $fields->addFieldToTab("Root.Main", new OptionsetField("UrlProcessor", "URL processing", $processingOptions));
-        $fields->addFieldToTab("Root.Main", $parseCss = new CheckboxField("ParseCSS", "Fetch external CSS"));
+
+        $fields->addFieldToTab("Root.Main", OptionsetField::create("UrlProcessor", "URL processing", $processingOptions));
+        $fields->addFieldToTab("Root.Main", $parseCss = CheckboxField::create("ParseCSS", "Fetch external CSS"));
         $parseCss->setDescription("Fetches images defined in CSS <strong>background-image</strong> selectors, not ordinarily reachable.");
-        $fields->addFieldToTab("Root.Main", $autoRunLinkTask = new CheckboxField("AutoRunTask", "Automatically run link-rewrite task"));
-        $autoRunLinkTask->setDescription("This will run the link-rewriter task automatically once an import has completed.");
+        $fields->addFieldToTab("Root.Main", $autoRunLinkTask = CheckboxField::create("AutoRunTask", "Automatically run link-rewrite task"));
+        $autoRunLinkTask->setDescription("This will run the built-in link-rewriter task automatically once an import has completed.");
 
         // Schemas Gridfield
-        $fields->addFieldToTab('Root.Main', new HeaderField('ImportConfigHeader', 'Import config'));
+        $fields->addFieldToTab('Root.Main', HeaderField::create('ImportConfigHeader', 'Import Configuration'));
+        $addNewButton = (new GridFieldAddNewButton('after'))->setButtonName("Add Schema");
         $importRules = $fields->dataFieldByName('Schemas');
         $importRules->getConfig()->removeComponentsByType(GridFieldAddExistingAutocompleter::class);
         $importRules->getConfig()->removeComponentsByType(GridFieldAddNewButton::class);
-        $addNewButton = new GridFieldAddNewButton('after');
-        $addNewButton->setButtonName("Add Schema");
         $importRules->getConfig()->addComponent($addNewButton);
         $fields->removeFieldFromTab("Root", "Schemas");
-        $fields->addFieldToTab("Root.Main", new LiteralField("", "<p>Schemas define rules for importing scraped content into database fields"
-            . " via CSS selector rules. If more than one schema exists for a field, then they will be"
-            . " processed in the order of Priority. The first Schema to a match a URL Pattern will be the one used for that field.</p>"));
+        $fields->addFieldToTab('Root.Main', LiteralField::create('', '<p class="message notice">Schemas define'
+            . ' rules for importing scraped content into database fields'
+            . ' via CSS selector rules. If more than one schema exists for a field, then they will be'
+            . ' processed in the order of Priority. The first Schema to a match a URL Pattern will be'
+            . ' the one used for that field.</p>'
+        ));
         $fields->addFieldToTab("Root.Main", $importRules);
 
         switch ($this->urlList()->getSpiderStatus()) {
@@ -180,19 +184,18 @@ class StaticSiteContentSource extends ExternalContentSource
             ->setUseButtonTag(true);
 
         // Disable crawl-button if assets dir isn't writable
-        $crawlMsg = 'Click the button below to do so:';
         if (!file_exists(ASSETS_PATH) || !is_writable(ASSETS_PATH)) {
             $crawlMsg = '<span class="message warning"><strong>Warning!</strong> Assets directory is not writable.</span>';
             $crawlButton->setDisabled(true);
         }
 
         $fields->addFieldsToTab('Root.Crawl', [
-            new ReadonlyField("CrawlStatus", "Crawling Status", $this->urlList()->getSpiderStatus()),
-            new ReadonlyField("NumURLs", "Number of URLs", $this->urlList()->getNumURLs()),
-            new LiteralField(
+            ReadonlyField::create("CrawlStatus", "Crawling Status", $this->urlList()->getSpiderStatus()),
+            ReadonlyField::create("NumURLs", "Number of URLs", $this->urlList()->getNumURLs()),
+            LiteralField::create(
                 'CrawlActions',
                 "<p>Before importing this content, all URLs on the site must be crawled (like a search engine does)."
-                . " $crawlMsg</p>"
+                . " Click the button below to do so:</p>"
                 . "<div class='Actions'>{$crawlButton->forTemplate()}</div>"
             )
         ]);
@@ -217,7 +220,7 @@ class StaticSiteContentSource extends ExternalContentSource
 
             $fields->addFieldToTab(
                 'Root.Crawl',
-                new LiteralField('CrawlURLList', "<p>The following URLs have been identified:</p>" . $urlsAsUL)
+                LiteralField::create('CrawlURLList', '<p class="mesage notice">The following URLs have been identified: </p>' . $urlsAsUL)
             );
         }
 
@@ -266,7 +269,7 @@ class StaticSiteContentSource extends ExternalContentSource
         $urlList = $this->urlList();
         if ($this->isChanged('UrlProcessor') && $urlList->hasCrawled()) {
             if ($processorClass = $this->UrlProcessor) {
-                $urlList->setUrlProcessor(new $processorClass());
+                $urlList->setUrlProcessor($processorClass::create());
             } else {
                 $urlList->setUrlProcessor(null);
             }
@@ -283,7 +286,7 @@ class StaticSiteContentSource extends ExternalContentSource
         if (!$this->urlList) {
             $this->urlList = StaticSiteUrlList::create($this, "../assets/{$this->staticSiteCacheDir}");
             if ($processorClass = $this->UrlProcessor) {
-                $this->urlList->setUrlProcessor(new $processorClass());
+                $this->urlList->setUrlProcessor($processorClass::create());
             }
             if ($this->ExtraCrawlUrls) {
                 $extraCrawlUrls = preg_split('/\s+/', trim($this->ExtraCrawlUrls));
@@ -554,17 +557,19 @@ class StaticSiteContentSource_ImportSchema extends DataObject
         $fields = parent::getCMSFields();
         $fields->removeFieldFromTab('Root.Main', 'DataType');
         $fields->removeByName('ContentSourceID');
-        $dataObjects = ClassInfo::subclassesFor('DataObject');
+        $dataObjects = ClassInfo::subclassesFor(DataObject::class);
+
         array_shift($dataObjects);
         natcasesort($dataObjects);
+
         $appliesTo = $fields->dataFieldByName('AppliesTo');
         $appliesTo->setDescription('A full or partial URI. Supports regular expressions.');
-        $fields->addFieldToTab('Root.Main', new DropdownField('DataType', 'DataType', $dataObjects));
-        $mimes = new TextareaField('MimeTypes', 'Mime-types');
+        $fields->addFieldToTab('Root.Main', DropdownField::create('DataType', 'Data Type', $dataObjects));
+        $mimes = TextareaField::create('MimeTypes', 'Mime-types');
         $mimes->setRows(3);
-        $mimes->setDescription('Be sure to pick a Mime-type that the DataType supports. e.g. text/html (<strong>SiteTree</strong>), image/png or image/jpeg (<strong>Image</strong>) or application/pdf (<strong>File</strong>), separated by a newline.');
+        $mimes->setDescription('Be sure to pick a Mime-type that the above Data Type supports. e.g. text/html (<strong>SiteTree</strong>), image/png or image/jpeg (<strong>Image</strong>) or application/pdf (<strong>File</strong>), separated by a newline.');
         $fields->addFieldToTab('Root.Main', $mimes);
-        $notes = new TextareaField('Notes', 'Notes');
+        $notes = TextareaField::create('Notes', 'Notes');
         $notes->setDescription('Use this field to add any notes about this schema. (Purely informational. Data is not used in imports)');
         $fields->addFieldToTab('Root.Main', $notes);
 
@@ -600,7 +605,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
                 $defaultSchema = StaticSiteContentSource_ImportSchema::create();
                 $defaultSchema->Order = 1000000;
                 $defaultSchema->AppliesTo = self::$default_applies_to;
-                $defaultSchema->DataType = "Page";
+                $defaultSchema->DataType = Page::class;
                 $defaultSchema->ContentSourceID = $source->ID;
                 $defaultSchema->MimeTypes = "text/html";
                 $defaultSchema->write();
@@ -645,7 +650,7 @@ class StaticSiteContentSource_ImportSchema extends DataObject
      */
     public function validate()
     {
-        $result = new ValidationResult();
+        $result = ValidationResult::create();
         $mime = $this->validateMimes();
         if (!is_bool($mime)) {
             $result->error('Invalid Mime-type "' . $mime . '" for DataType "' . $this->DataType . '"');
@@ -790,8 +795,8 @@ class StaticSiteContentSource_ImportRule extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-
         $dataType = $this->Schema()->DataType;
+        
         if ($dataType) {
             $fieldList = singleton($dataType)->inheritedDatabaseFields();
             $fieldList = array_combine(array_keys($fieldList), array_keys($fieldList));
@@ -799,11 +804,11 @@ class StaticSiteContentSource_ImportRule extends DataObject
             unset($fieldList->WorkflowDefinitionID);
             unset($fieldList->Version);
 
-            $fieldNameField = new DropdownField("FieldName", "Field Name", $fieldList);
+            $fieldNameField = DropdownField::create("FieldName", "Field Name", $fieldList);
             $fieldNameField->setEmptyString("(choose)");
             $fields->insertBefore($fieldNameField, "CSSSelector");
         } else {
-            $fields->replaceField('FieldName', $fieldName = new ReadonlyField("FieldName", "Field Name"));
+            $fields->replaceField('FieldName', $fieldName = ReadonlyField::create("FieldName", "Field Name"));
             $fieldName->setDescription('Save this rule before being able to add a field name');
         }
 

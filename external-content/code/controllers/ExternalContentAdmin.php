@@ -19,6 +19,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\Form;
 use SilverStripe\Control\Director;
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\DropdownField;
@@ -80,7 +81,6 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		parent::init();
 
 		Requirements::customCSS($this->generatePageIconsCss());
-		Requirements::css('phptek/silverstripe-exodus:external-content/css/external-content-admin.css');
 		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external-content-admin.js');
 		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external-content-reload.js');
 	}
@@ -880,10 +880,10 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		return preg_replace('/^\s+|\n|\r|\s+$/m', '', $HTML);
 	}
 
-	public function updatetreenodes($request)
+	public function updatetreenodes(HTTPRequest $request)
 	{
 		// noop
-		return parent::updatetreenodes($request);
+		return singleton(CMSMain::class)->updatetreenodes($request);
 	}
 
 }

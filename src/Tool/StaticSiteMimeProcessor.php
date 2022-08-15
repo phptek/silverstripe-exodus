@@ -6,6 +6,7 @@ use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Assets\File;
 use SilverStripe\Control\HTTP;
+use SilverStripe\Core\Config\Config;
 
 /**
  *
@@ -48,7 +49,7 @@ class StaticSiteMimeProcessor
      */
     public static function get_mime_for_ss_type($SSType = null)
     {
-        $httpMimeTypes = Config::inst()->get('HTTP', 'MimeTypes');
+        $httpMimeTypes = Config::inst()->get(HTTP::class, 'MimeTypes');
         // This config file not guaranteed to always be present
         if (!$httpMimeTypes or !is_array($httpMimeTypes)) {
             return false;
