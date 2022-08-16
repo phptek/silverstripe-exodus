@@ -513,16 +513,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 			$actions = FieldList::create();
 
-			$actions = CompositeField::create()
-				->setTag('fieldset')
-				->addExtraClass('btn btn-primary cms-content-addpage-button tool-button font-icon-plus');
-			$actions = FieldList::create($actions);
-
 			// Only show save button if not 'assets' folder
 			if ($record->canEdit()) {
 				$actions->push(
 					FormAction::create('save',_t('ExternalContent.SAVE','Save'))
-						->addExtraClass('btn btn-primary cms-content-addpage-button tool-button font-icon-plus')
+						->addExtraClass('save btn btn-primary tool-button font-icon-plus')
 						->setAttribute('data-icon', 'accept')
 						->setUseButtonTag(true)
 				);
@@ -531,7 +526,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			if($isSource && $record->canDelete()){
 				$actions->push(
 					FormAction::create('delete',_t('ExternalContent.DELETE','Delete'))
-						->addExtraClass('delete btn btn-primary cms-content-addpage-button tool-button font-icon-plus')
+						->addExtraClass('delete btn btn-primary tool-button font-icon-plus')
 						->setAttribute('data-icon', 'decline')
 						->setUseButtonTag(true)
 				);
@@ -844,7 +839,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 * Delete the content source/item.
 	 */
 	public function delete($data, $form) {
-		$className = $this->config->get('tree_class');
+		$className = $this->config()->get('tree_class');
 		$record = DataObject::get_by_id($className, Convert::raw2sql($data['ID']));
 
 		if($record && !$record->canDelete()) {

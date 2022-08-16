@@ -10,7 +10,7 @@ use SilverStripe\Core\Injector\Injectable;
  * Helper class for rewriting links using phpQuery.
  *
  * @author Sam Minnee <sam@silverstripe.com>
- * @author Russell Michell <russ@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @author Michael Parkhill <mike@silverstripe.com>
  * @package phptek/silverstripe-exodus
  * @see {@link StaticSiteRewriteLinksTask}

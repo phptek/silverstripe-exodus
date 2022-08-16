@@ -13,7 +13,7 @@ use SilverStripe\ORM\FieldType\DBVarchar;
  * running of the StaticSiteRewriteLinksTask. This data is then used to power the
  * {@link FailedURLRewriteReport}.
  *
- * @author Russell Michell <russ@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @package phptek/silverstripe-exodus
  * @see {@link StaticSiteLinkRewriteTask}
  */

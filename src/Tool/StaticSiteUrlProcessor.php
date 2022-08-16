@@ -3,12 +3,12 @@
 namespace PhpTek\Exodus\Tool;
 
 /**
- * Interface for building URL processing plug-ins for StaticSiteUrlList.
+ * Interface for building URL processing plug-ins for {@link StaticSiteUrlList}.
  *
- * The URL processing plugins are used to process the relative URL before it it used for two separate purposes:
+ * The URL processing plugins are used to process the relative URL before it's used for two separate purposes:
  *
- *  - Generating default URL and Title in the external content browser.
- *  - Building content hierarchy.
+ *  1. Generating default URL and Title in the external content browser
+ *  2. Building the content hierarchy
  *
  * For example, MOSS has a habit of putting unnecessary "/Pages/" elements into the URLs, and adding
  * .aspx extensions. We don't want to include these in the content hierarchy.
@@ -16,7 +16,7 @@ namespace PhpTek\Exodus\Tool;
  * More sophisticated processing might be done to facilitate importing of less.
  *
  * @author Sam Minee <sam@silverstripe.com>
- * @author Russell Michell <russ@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @package phptek/silverstripe-exodus
  */
 interface StaticSiteUrlProcessor
@@ -25,7 +25,7 @@ interface StaticSiteUrlProcessor
      * Return a name for the style of URLs to be processed.
      * This name will be shown in the CMS when users are configuring the content import.
      *
-     * @return string The name, in plaintext (no HTML)
+     * @return string The name in plaintext (no markup)
      */
     public function getName();
 
@@ -33,24 +33,23 @@ interface StaticSiteUrlProcessor
      * Return an explanation of what processing is done.
      * This explanation will be shown in the CMS when users are configuring the content import.
      *
-     * @return string The description, in plaintext (no HTML)
+     * @return string The description in plaintext (no markup)
      */
     public function getDescription();
 
-
     /**
-     * Return a description for this processor, to be shown in the CMS.
+     * Return a description for this processor to be shown in the CMS.
      *
-     * @param array $urlData The unprocessed URL and mime-type as returned from PHPCrawler
+     * @param array $urlData The unprocessed URL and mime-type as returned from {@link PHPCrawl}.
      * @return array An array comprising a processed URL and its Mime-Type
      */
-    public function processURL($urlData);
+    public function processURL(array $urlData);
 }
 
 /**
  * Processor for MOSS Standard-URLs while dropping file extensions
  */
-class StaticSiteURLProcessor_DropExtensions implements StaticSiteUrlProcessor
+class StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
 {
     /**
      *
@@ -67,7 +66,7 @@ class StaticSiteURLProcessor_DropExtensions implements StaticSiteUrlProcessor
      */
     public function getDescription()
     {
-        return "Drop extensions and trailing slashes.";
+        return "Removes extensions and trailing slashes.";
     }
 
     /**
@@ -88,15 +87,16 @@ class StaticSiteURLProcessor_DropExtensions implements StaticSiteUrlProcessor
             $qs = $matches[2];
             $url = preg_replace("#\.[^./?]*$#", "$1", $url);
             $url = $this->postProcessUrl($url);
+
             return [
                 'url' => "$url?$qs",
                 'mime' => $urlData['mime'],
             ];
-        }
-        // No query string
-        else {
+        } else {
+            // No query string
             $url = $urlData['url'];
             $url = preg_replace("#\.[^./?]*$#", "$1", $url);
+
             return [
                 'url' => $this->postProcessUrl($url),
                 'mime' => $urlData['mime'],
@@ -127,7 +127,7 @@ class StaticSiteURLProcessor_DropExtensions implements StaticSiteUrlProcessor
 /**
  * Processor for MOSS URLs (Microsoft Office Sharepoint Server)
  */
-class StaticSiteMOSSURLProcessor extends StaticSiteURLProcessor_DropExtensions implements StaticSiteUrlProcessor
+class StaticSiteMOSSURLProcessor extends StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
 {
     /**
      *
@@ -144,7 +144,7 @@ class StaticSiteMOSSURLProcessor extends StaticSiteURLProcessor_DropExtensions i
      */
     public function getDescription()
     {
-        return "Removes '/Pages/' and drops extensions and trailing slashes.";
+        return "Removes '/Pages/' from URIs, removes extensions and trailing slashes.";
     }
 
     /**

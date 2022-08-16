@@ -14,4 +14,14 @@
 			<div class="clear"><!-- --></div>
 		</fieldset>
 	</div>
+
+    <div class="toolbar--south cms-content-actions cms-content-controls south">
+        <% if $Actions %>
+        <div class="btn-toolbar">
+        <% loop $Actions %>
+        $FieldHolder
+        <% end_loop %>
+        </div>
+        <% end_if %>
+    </div>
 </form>

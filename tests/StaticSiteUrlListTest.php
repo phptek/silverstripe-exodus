@@ -20,7 +20,7 @@ class StaticSiteUrlListTest extends SapphireTest {
 	
 	/**
 	 * @var array
-	 * Array of URL tests designed for exercising the StaticSiteURLProcessor_DropExtensions URL Processor
+	 * Array of URL tests designed for exercising the StaticSiteURLProcessorDropExtensions URL Processor
 	 */
 	public static $url_patterns_for_drop_extensions = array(
 		'/test/contains-double-slash-normal-and-encoded/%2ftest' => '/test/contains-double-slash-normal-and-encoded/test',
@@ -91,13 +91,13 @@ class StaticSiteUrlListTest extends SapphireTest {
 	 */
 	
 	/**
-	 * Tests dodgy URLs with "Bad" server code(s) using the StaticSiteURLProcessor_DropExtensions URL Processor
+	 * Tests dodgy URLs with "Bad" server code(s) using the StaticSiteURLProcessorDropExtensions URL Processor
 	 */
 	public function testHandleDocumentInfoBadServerCode_DropExtensions() {
 		$source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsHTML7');
 		$cacheDir = BASE_PATH . '/staticsiteconnector/tests/static-site-1/';
 		$urlList = new StaticSiteUrlList($source, $cacheDir);
-		$urlList->setUrlProcessor(new StaticSiteURLProcessor_DropExtensions());
+		$urlList->setUrlProcessor(new StaticSiteURLProcessorDropExtensions());
 		$crawler = new StaticSiteCrawler($urlList);
 		
 		foreach(self::$url_patterns_for_drop_extensions as $urlFromServer => $expected) {

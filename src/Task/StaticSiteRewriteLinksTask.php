@@ -38,7 +38,7 @@ use SilverStripe\Forms\FormField;
  * CMS {@link FailedURLRewriteReport}. See also {@link FailedURLRewriteSummary}.
  *
  * @author Sam Minnee <sam@silverstripe.com>
- * @author Russell Michell <russ@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @author Michael Parkhill <mike@silverstripe.com>
  * @package phptek/silverstripe-exodus
  */

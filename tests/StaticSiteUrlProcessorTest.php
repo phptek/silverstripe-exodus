@@ -6,16 +6,16 @@ use SilverStripe\Dev\SapphireTest;
 
 /**
  * 
- * @author Russell Michell <russ@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @package staticsiteconnector
  */
 class StaticSiteUrlProcessorTest extends SapphireTest {
 	
 	/**
-	 * Tests StaticSiteURLProcessor_DropExtensions URL Processor
+	 * Tests StaticSiteURLProcessorDropExtensions URL Processor
 	 */
-	public function testStaticSiteURLProcessor_DropExtensions() {
-		$processor = new StaticSiteURLProcessor_DropExtensions();
+	public function testStaticSiteURLProcessorDropExtensions() {
+		$processor = new StaticSiteURLProcessorDropExtensions();
 		
 		$this->assertFalse($processor->processUrl('http://test.com/test1.html'));
 		$this->assertFalse($processor->processUrl(''));
@@ -47,7 +47,7 @@ class StaticSiteUrlProcessorTest extends SapphireTest {
 	}
 	
 	/**
-	 * Tests StaticSiteURLProcessor_DropExtensions URL Processor
+	 * Tests StaticSiteURLProcessorDropExtensions URL Processor
 	 */
 	public function testStaticSiteMOSSURLProcessor() {
 		$processor = new StaticSiteMOSSURLProcessor();

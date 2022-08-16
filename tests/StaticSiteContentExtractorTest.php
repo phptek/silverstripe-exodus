@@ -7,7 +7,7 @@ use PhpTek\Exodus\Tool\StaticSiteContentExtractor;
 
 /**
  *
- * @author Russell Michell <russ@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @package staticsiteconnector
  */
 class StaticSiteContentExtractorTest extends SapphireTest

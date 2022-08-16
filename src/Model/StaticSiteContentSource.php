@@ -11,9 +11,7 @@ use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use PhpTek\Exodus\Tool\StaticSiteUrlProcessor;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Core\ClassInfo;
-use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\ReadonlyField;
@@ -139,22 +137,24 @@ class StaticSiteContentSource extends ExternalContentSource
         $processingOptions = ['' => "No pre-processing"];
 
         foreach (ClassInfo::implementorsOf(StaticSiteUrlProcessor::class) as $processor) {
-            $processorObj = new $processor();
-            $processingOptions[$processor] = "<strong>" . Convert::raw2xml($processorObj->getName())
-                . "</strong><br>" . Convert::raw2xml($processorObj->getDescription());
+            $processorObj = singleton($processor);
+            $processingOptions[$processor] = sprintf(
+                '%s: %s',
+                $processorObj->getName(),
+                $processorObj->getDescription()
+            );
         }
 
         $fields->addFieldToTab("Root.Main", OptionsetField::create("UrlProcessor", "URL Processing", $processingOptions));
         $fields->addFieldToTab("Root.Main", $parseCss = CheckboxField::create("ParseCSS", "Fetch external CSS"));
-        $parseCss->setDescription("Fetch images defined as CSS <strong>background-image</strong> selectors which are not ordinarily reachable.");
+       // $parseCss->setDescription("Fetch images defined as CSS <strong>background-image</strong> selectors which are not ordinarily reachable.");
         $fields->addFieldToTab("Root.Main", $autoRunLinkTask = CheckboxField::create("AutoRunTask", "Automatically run link-rewrite task"));
-        $autoRunLinkTask->setDescription("This will run the built-in link-rewriter task automatically once an import has completed.");
+       // $autoRunLinkTask->setDescription("This will run the built-in link-rewriter task automatically once an import has completed.");
 
         // Schemas Gridfield
         $fields->addFieldToTab('Root.Main', HeaderField::create('ImportConfigHeader', 'Import Configuration'));
         $addNewButton = (new GridFieldAddNewButton('after'))->setButtonName("Add Schema");
         $importRules = $fields->dataFieldByName('Schemas');
-        $importRules->getConfig()->removeComponentsByType(GridFieldAddExistingAutocompleter::class);
         $importRules->getConfig()->removeComponentsByType(GridFieldAddNewButton::class);
         $importRules->getConfig()->addComponent($addNewButton);
         $fields->removeFieldFromTab("Root", "Schemas");
@@ -198,7 +198,7 @@ class StaticSiteContentSource extends ExternalContentSource
                 'CrawlActions',
                 '<p class="message notice">Before importing content, all URLs'
                 . ' must first be crawled/spidered. Select the button below to start:</p>'
-                . '<div class="Actions">' . $crawlButton->forTemplate() . '</div>'
+                . $crawlButton->forTemplate()
             )
         ]);
 
@@ -250,7 +250,7 @@ class StaticSiteContentSource extends ExternalContentSource
                 LiteralField::create('ImportCount', '<p><strong>Total imports: </strong><span>' . $importCount . '</span></p>'),
                 ListboxField::create('ShowImports', 'Select import(s) to clear:', $_source, '', null, true),
                 CheckboxField::create('ClearAllImports', 'Clear all import meta-data', 0),
-                LiteralField::create('ImportActions', "<div class='Actions'>{$clearImportButton->forTemplate()}</div>")
+                LiteralField::create('ImportActions', $clearImportButton->forTemplate())
             ])->addExtraClass('clear-imports');
             $fields->addFieldToTab('Root.Import', $clearImportField);
         }
@@ -275,6 +275,7 @@ class StaticSiteContentSource extends ExternalContentSource
             } else {
                 $urlList->setUrlProcessor(null);
             }
+
             $urlList->reprocessUrls();
         }
     }
@@ -287,6 +288,7 @@ class StaticSiteContentSource extends ExternalContentSource
     {
         if (!$this->urlList) {
             $this->urlList = StaticSiteUrlList::create($this, "../assets/{$this->staticSiteCacheDir}");
+
             if ($processorClass = $this->UrlProcessor) {
                 $this->urlList->setUrlProcessor($processorClass::create());
             }
@@ -447,18 +449,16 @@ class StaticSiteContentSource extends ExternalContentSource
      */
     public function isValid()
     {
-        if (!(bool)$this->BaseUrl) {
-            return false;
-        }
-        return true;
+        return (bool) $this->BaseUrl;
     }
 
     /**
      *
      * @param Member $member
+     * @param array $context
      * @return boolean
      */
-    public function canImport($member = NULL, $context = [])
+    public function canImport($member = null, $context = [])
     {
         return $this->isValid();
     }
@@ -466,9 +466,10 @@ class StaticSiteContentSource extends ExternalContentSource
     /**
      *
      * @param Member $member
+     * @param array $context
      * @return boolean
      */
-    public function canCreate($member = NULL, $context = [])
+    public function canCreate($member = null, $context = [])
     {
         return true;
     }
@@ -519,7 +520,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
      */
     private static $field_labels = [
         "AppliesTo" => "URL Pattern",
-        "DataType" => "Data type",
+        "DataType" => "Data Type",
         "Order" => "Priority",
         "MimeTypes"	=> "Mime-types",
     ];
@@ -810,7 +811,7 @@ class StaticSiteContentSourceImportRule extends DataObject
         $dataType = $this->Schema()->DataType;
 
         if ($dataType) {
-            $fieldList = singleton($dataType)->inheritedDatabaseFields();
+            $fieldList = singleton($dataType)->compositeDatabaseFields();
             $fieldList = array_combine(array_keys($fieldList), array_keys($fieldList));
             unset($fieldList->ParentID);
             unset($fieldList->WorkflowDefinitionID);

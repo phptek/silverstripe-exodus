@@ -11,7 +11,7 @@ use SilverStripe\ORM\FieldType\DBText;
  * A model object that represents a single failed link-rewrite summary. This data is displayed
  * at the top of the {@link FailedURLRewriteReport}.
  *
- * @author Russell Michell <russ@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @package phptek/silverstripe-exodus
  */
 class FailedURLRewriteSummary extends DataObject

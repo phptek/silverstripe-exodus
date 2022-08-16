@@ -13,7 +13,7 @@ use SilverStripe\Security\Security;
 /**
  * Caches some metadata for each import. Allows imports to have a DataObject-like functionality.
  *
- * @author Russell Michell <russ@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @package phptek/silverstripe-exodus
  * @see {@link StaticSiteImporter}
  */

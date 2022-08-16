@@ -6,7 +6,7 @@ use SilverStripe\Dev\SapphireTest;
 
 /**
  * 
- * @author Russell Michell <russ@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @package staticsiteconnector
  */
 class StaticSiteRewriteLinksTaskTest extends SapphireTest {

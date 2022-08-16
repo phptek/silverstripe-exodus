@@ -20,7 +20,7 @@ use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 /**
  * A CMS report for URLs that failed to be re-written.
  *
- * @author Russell Michell <russ@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @package phptek/silverstripe-exodus
  * @see {@link FailedURLRewriteObject}
  * @see {@link FailedURLRewriteSummary}
