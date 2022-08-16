@@ -1,5 +1,5 @@
-<div id="form_actions_right" class="ajaxActions">
-</div>
+<!--<div id="form_actions_right" class="ajaxActions">
+</div>-->
 
 <% if $EditForm %>
 	$EditForm
@@ -10,4 +10,4 @@
 	</form>
 <% end_if %>
 
-<p id="statusMessage" style="visibility:hidden"></p>
+<!--<p id="statusMessage" style="visibility:hidden"></p>-->

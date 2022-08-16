@@ -32,6 +32,7 @@ use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Dev\Debug;
+use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDatetime;
 
@@ -131,7 +132,7 @@ class StaticSiteContentSource extends ExternalContentSource
         $fields->removeFieldFromTab("Root", "Pages");
         $fields->removeFieldFromTab("Root", "Files");
         $fields->removeFieldFromTab("Root", "ShowContentInMenu");
-        $fields->insertBefore(HeaderField::create('CrawlConfigHeader', 'Crawl Setup'), 'BaseUrl');
+        $fields->insertBefore(HeaderField::create('CrawlConfigHeader', 'Import Configuration'), 'BaseUrl');
 
         // Processing Option
         $processingOptions = ['' => "No pre-processing"];
@@ -145,15 +146,17 @@ class StaticSiteContentSource extends ExternalContentSource
             );
         }
 
+        $fields->addFieldToTab("Root.Main", TextField::create("BaseUrl", "Base URL"), 'ExtraCrawlUrls');
         $fields->addFieldToTab("Root.Main", OptionsetField::create("UrlProcessor", "URL Processing", $processingOptions));
         $fields->addFieldToTab("Root.Main", $parseCss = CheckboxField::create("ParseCSS", "Fetch external CSS"));
-       // $parseCss->setDescription("Fetch images defined as CSS <strong>background-image</strong> selectors which are not ordinarily reachable.");
+        $parseCss->setDescription("Fetch images defined as CSS <strong>background-image</strong> selectors which are not ordinarily reachable.");
         $fields->addFieldToTab("Root.Main", $autoRunLinkTask = CheckboxField::create("AutoRunTask", "Automatically run link-rewrite task"));
-       // $autoRunLinkTask->setDescription("This will run the built-in link-rewriter task automatically once an import has completed.");
+        $autoRunLinkTask->setDescription("This will run the built-in link-rewriter task automatically once an import has completed.");
 
-        // Schemas Gridfield
+        // Schema Gridfield
         $fields->addFieldToTab('Root.Main', HeaderField::create('ImportConfigHeader', 'Import Configuration'));
-        $addNewButton = (new GridFieldAddNewButton('after'))->setButtonName("Add Schema");
+        $addNewButton = new GridFieldAddNewButton('after');
+        $addNewButton->setButtonName("Add Schema");
         $importRules = $fields->dataFieldByName('Schemas');
         $importRules->getConfig()->removeComponentsByType(GridFieldAddNewButton::class);
         $importRules->getConfig()->addComponent($addNewButton);

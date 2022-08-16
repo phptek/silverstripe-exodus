@@ -98,10 +98,10 @@ class StaticSiteMimeProcessor
      * Return a mapping of SS types (File, SiteTree etc) to suitable file-extensions
      * out of the File class.
      *
-     * @param string $SSType
+     * @param string $ss_type
      * @return array
      */
-    public static function ss_type_to_suffix_map($SSType = null)
+    public static function ss_type_to_suffix_map($ss_type = null)
     {
         $mimeCategories = File::config()->get('app_categories');
 
@@ -117,8 +117,8 @@ class StaticSiteMimeProcessor
         // Get SilverStripe supported File-ish mime categories
         // File contains values of $mimeKeysForSiteTree which we don't want
         $mimeKeysForFile = array_merge(
-            array_splice($mimeCategories['doc'], 14, 2),
-            array_splice($mimeCategories['doc'], 0, 11)
+            array_splice($mimeCategories['document'], 14, 2),
+            array_splice($mimeCategories['document'], 0, 11)
         );
 
         // Get SilverStripe supported Image-ish mime categories
@@ -129,14 +129,16 @@ class StaticSiteMimeProcessor
             'image'		=> $mimeKeysForImage
         ];
 
-        if ($SSType) {
-            $SSType = strtolower($SSType);
+        if ($ss_type) {
+            $ss_type = strtolower($ss_type);
             // Only support specific classes
-            if (!in_array(strtolower($SSType), array_keys($mimeCategories))) {
+            if (!in_array($ss_type, array_keys($mimeCategories))) {
                 return false;
             }
-            return $map[$SSType];
+
+            return $map[$ss_type];
         }
+
         return $map;
     }
 
