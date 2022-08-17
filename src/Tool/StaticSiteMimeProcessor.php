@@ -172,10 +172,10 @@ class StaticSiteMimeProcessor
             }
 
             // Attempt to "fix" broken or badly encoded file-extensions by guessing what it should be, based on $mime
-            $coreExts = array_merge($mimeCategories['doc'], $mimeCategories['image']);
+            $coreExts = array_merge($mimeCategories['document'], $mimeCategories['image']);
             foreach ($coreExts as $coreExt) {
                 // Make sure we check the correct category so we don't find a match for ms-excel in the image \File category (.cel) !!
-                $isFile = in_array($coreExt, $mimeCategories['doc']) && singleton(__CLASS__)->isOfFile($mime);		// dirty
+                $isFile = in_array($coreExt, $mimeCategories['document']) && singleton(__CLASS__)->isOfFile($mime);		// dirty
                 $isImge = in_array($coreExt, $mimeCategories['image']) && singleton(__CLASS__)->isOfImage($mime);	// more dirt
 
                 if (($isFile || $isImge) && stristr($mime, $coreExt) !== false) {
@@ -183,8 +183,10 @@ class StaticSiteMimeProcessor
                     return $coreExt == 'jpeg' ? 'jpg' : $coreExt;
                 }
             }
+
             return false;
         }
+
         return false;
     }
 
