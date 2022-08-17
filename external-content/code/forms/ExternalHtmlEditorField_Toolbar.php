@@ -1,5 +1,8 @@
 <?php
 
+use SilverStripe\Assets\File;
+use SilverStripe\Assets\Folder;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\RequestHandler;
 use SilverStripe\View\Requirements;
 use SilverStripe\Forms\Form;
@@ -58,11 +61,11 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 						'externalcontent' =>_t('HtmlEditorField.LINKEXTERNALCONTENT', 'External Content'),
 					)
 				),
-				TreeDropdownField::create('internal', _t('HtmlEditorField.PAGE', "Page"), 'SiteTree', 'ID', 'MenuTitle'),
+				TreeDropdownField::create('internal', _t('HtmlEditorField.PAGE', "Page"), SiteTree::class, 'ID', 'MenuTitle'),
 				TextField::create('external', _t('HtmlEditorField.URL', 'URL'), 'http://'),
 				EmailField::create('email', _t('HtmlEditorField.EMAIL', 'Email address')),
-				TreeDropdownField::create('file', _t('HtmlEditorField.FILE', 'File'), 'File', 'Filename'),
-				ExternalTreeDropdownField::create('externalcontent', _t('ExternalHtmlEditorField.EXTERNAL_CONTENT', 'External Content'), 'ExternalContentSource', 'Link()'),
+				TreeDropdownField::create('file', _t('HtmlEditorField.FILE', 'File'), File::class, 'Filename'),
+				ExternalTreeDropdownField::create('externalcontent', _t('ExternalHtmlEditorField.EXTERNAL_CONTENT', 'External Content'), ExternalContentSource::class, 'Link()'),
 				TextField::create('Anchor', _t('HtmlEditorField.ANCHORVALUE', 'Anchor')),
 				TextField::create('LinkText', _t('HtmlEditorField.LINKTEXT', 'Link text')),
 				TextField::create('Description', _t('HtmlEditorField.LINKDESCR', 'Link description')),
@@ -98,7 +101,7 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 			"{$this->name}/ImageForm",
 			FieldList::create(
 				LiteralField::create('Heading', '<h2><img src="cms/images/closeicon.gif" alt="' . _t('HtmlEditorField.CLOSE', 'close') . '" title="' . _t('HtmlEditorField.CLOSE', 'close') . '" />' . _t('HtmlEditorField.IMAGE', 'Image') . '</h2>'),
-				TreeDropdownField::create('FolderID', _t('HtmlEditorField.FOLDER', 'Folder'), 'Folder'),
+				TreeDropdownField::create('FolderID', _t('HtmlEditorField.FOLDER', 'Folder'), Folder::class),
 				LiteralField::create('AddFolderOrUpload',
 					'<div style="clear:both;"></div><div id="AddFolderGroup" style="display: none">
 						<a style="" href="#" id="AddFolder" class="link">' . _t('HtmlEditorField.CREATEFOLDER','Create Folder') . '</a>
@@ -153,7 +156,7 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler {
 			"{$this->name}/FlashForm",
 			FieldList::create(
 				LiteralField::create('Heading', '<h2><img src="cms/images/closeicon.gif" alt="'._t('HtmlEditorField.CLOSE', 'close').'" title="'._t('HtmlEditorField.CLOSE', 'close').'" />'._t('HtmlEditorField.FLASH', 'Flash').'</h2>'),
-				TreeDropdownField::create("FolderID", _t('HtmlEditorField.FOLDER'), "Folder"),
+				TreeDropdownField::create("FolderID", _t('HtmlEditorField.FOLDER'), Folder::class),
 				TextField::create('getflashSearch', _t('HtmlEditorField.SEARCHFILENAME', 'Search by file name')),
 				ThumbnailStripField::create("Flash", "FolderID", "getflash"),
 				FieldGroup::create(_t('HtmlEditorField.IMAGEDIMENSIONS', "Dimensions"),

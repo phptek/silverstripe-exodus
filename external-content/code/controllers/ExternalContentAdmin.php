@@ -2,6 +2,7 @@
 
 use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\Admin\LeftAndMain;
+use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\CurrentPageIdentifier;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Security\PermissionProvider;
@@ -14,7 +15,6 @@ use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\HiddenField;
-use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\Form;
@@ -460,11 +460,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			if (($isSource || $isItem) && $record->canImport()) {
 				$allowedTypes = $record->allowedImportTargets();
 				if (isset($allowedTypes['sitetree'])) {
-					$fields->addFieldToTab('Root.Import', TreeDropdownField::create("MigrationTarget", _t('ExternalContent.MIGRATE_TARGET', 'Page to import into'), 'SiteTree'));
+					$fields->addFieldToTab('Root.Import', TreeDropdownField::create("MigrationTarget", _t('ExternalContent.MIGRATE_TARGET', 'Page to import into'), SiteTree::class));
 				}
 
 				if (isset($allowedTypes['file'])) {
-					$fields->addFieldToTab('Root.Import', TreeDropdownField::create("FileMigrationTarget", _t('ExternalContent.FILE_MIGRATE_TARGET', 'Folder to import into'), 'Folder'));
+					$fields->addFieldToTab('Root.Import', TreeDropdownField::create("FileMigrationTarget", _t('ExternalContent.FILE_MIGRATE_TARGET', 'Folder to import into'), Folder::class));
 				}
 
 				$fields->addFieldToTab('Root.Import', CheckboxField::create("IncludeSelected", _t('ExternalContent.INCLUDE_SELECTED', 'Include Selected Item in Import')));
@@ -478,7 +478,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 				$fields->addFieldToTab('Root.Import', OptionsetField::create(
 						"DuplicateMethod",
-						_t('ExternalContent.DUPLICATES', 'Select how duplicate items should be handled'),
+						_t('ExternalContent.DUPLICATES', 'Duplicate item handling'),
 						$duplicateOptions,
 						$duplicateOptions[ExternalContentTransformer::DS_SKIP]
 					)
