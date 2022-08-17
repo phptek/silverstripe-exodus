@@ -187,10 +187,11 @@ class StaticSiteContentSource extends ExternalContentSource
             ->setAttribute('data-icon', 'arrow-circle-double')
             ->setUseButtonTag(true)
             ->addExtraClass('btn action btn btn-primary tool-button font-icon-plus');
+        $crawlMsg = 'Click the button below to do so:';
 
         // Disable crawl-button if assets dir isn't writable
         if (!file_exists(ASSETS_PATH) || !is_writable(ASSETS_PATH)) {
-            $crawlMsg = '<span class="message warning"><strong>Warning!</strong> Assets directory is not writable.</span>';
+            $crawlMsg = '<p class="message warning">Warning: Assets directory is not writable.</p>';
             $crawlButton->setDisabled(true);
         }
 
@@ -199,9 +200,9 @@ class StaticSiteContentSource extends ExternalContentSource
             ReadonlyField::create("NumURLs", "Number of URLs", $this->urlList()->getNumURLs()),
             LiteralField::create(
                 'CrawlActions',
-                '<p class="message notice">Before importing content, all URLs'
-                . ' must first be crawled/spidered. Select the button below to start:</p>'
-                . $crawlButton->forTemplate()
+                "<p>Before importing this content, all URLs on the site must be crawled (like a search engine does)."
+                . " $crawlMsg</p>"
+                . '<div class="btn-toolbar">' . $crawlButton->forTemplate() . '</div>'
             )
         ]);
 
@@ -290,7 +291,7 @@ class StaticSiteContentSource extends ExternalContentSource
     public function urlList()
     {
         if (!$this->urlList) {
-            $this->urlList = StaticSiteUrlList::create($this, "../assets/{$this->staticSiteCacheDir}");
+            $this->urlList = StaticSiteUrlList::create($this, ASSETS_DIR . "/{$this->staticSiteCacheDir}");
 
             if ($processorClass = $this->UrlProcessor) {
                 $this->urlList->setUrlProcessor($processorClass::create());

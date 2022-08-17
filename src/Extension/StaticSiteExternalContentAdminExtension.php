@@ -38,18 +38,20 @@ class StaticSiteExternalContentAdminExtension extends Extension
 
     /**
      *
-     * @param HTTPRequest $request
+     * @param array $data
      * @throws Exception
      * @return HTTPResponse
      */
-    public function crawlsite(HTTPRequest $request)
+    public function crawlsite(array $request)
     {
-        $selected = isset($request['ID']) ? $request['ID'] : 0;
+        $selected = $request['ID'] ?? 0;
+
         if (!$selected) {
             $messageType = 'bad';
             $message = _t('ExternalContent.NOITEMSELECTED', 'No item selected to crawl.');
         } else {
             $source = ExternalContent::getDataObjectFor($selected);
+
             if (!($source instanceof ExternalContentSource)) {
                 throw new \Exception('ExternalContent is not an instance of ExternalContentSource.');
             }

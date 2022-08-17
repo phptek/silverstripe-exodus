@@ -8,6 +8,7 @@ use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Environment;
 use SilverStripe\Core\Injector\Injectable;
 
 /**
@@ -94,9 +95,11 @@ class StaticSiteUrlList
     {
         // baseURL must not have a trailing slash
         $baseURL = $source->BaseUrl;
+
         if (substr($baseURL, -1) == "/") {
             $baseURL = substr($baseURL, 0, -1);
         }
+
         // cacheDir must have a trailing slash
         if (substr($cacheDir, -1) != "/") {
             $cacheDir .= "/";
@@ -281,7 +284,7 @@ class StaticSiteUrlList
         // if (SapphireTest::is_running_test()) {
         //     $this->cacheDir = BASE_PATH . '/staticsiteconnector/tests/static-site-1/';
         // }
-        
+
         return file_exists($this->cacheDir . 'urls') && !file_exists($this->cacheDir . 'crawlerid');
     }
 
@@ -346,7 +349,7 @@ class StaticSiteUrlList
      */
     public function crawl($limit=false, $verbose=false)
     {
-        increase_time_limit_to(3600);
+        Environment::increaseTimeLimitTo(3600);
 
         if (!is_dir($this->cacheDir)) {
             if (!mkdir($this->cacheDir)) {
@@ -730,6 +733,7 @@ class StaticSiteUrlList
 
 use PHPCrawl\PHPCrawler;
 use PHPCrawl\PHPCrawlerDocumentInfo;
+use PHPCrawl\PHPCrawlerURLDescriptor;
 
 /**
  * Extends PHPCrawler essentially to override its handleDocumentInfo() method.
