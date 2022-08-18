@@ -33,6 +33,7 @@ use SilverStripe\Forms\DropdownField;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Dev\Debug;
 use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\DataObjectSchema;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDatetime;
 
@@ -161,10 +162,11 @@ class StaticSiteContentSource extends ExternalContentSource
         $importRules->getConfig()->removeComponentsByType(GridFieldAddNewButton::class);
         $importRules->getConfig()->addComponent($addNewButton);
         $fields->removeFieldFromTab("Root", "Schemas");
-        $fields->addFieldToTab('Root.Main', LiteralField::create('', '<p class="message notice">Schemas define'
-            . ' rules for importing scraped content into database fields'
-            . ' via CSS selector rules. If more than one schema exists for a field, then they will be'
-            . ' processed in the order of Priority. The first Schema to a match a URL Pattern will be'
+        $fields->addFieldToTab('Root.Main', LiteralField::create('SchemaIntro', ''
+            . '<p class="message notice">Schemas define'
+            . ' rules for importing crawled content into database fields'
+            . ' with the use of CSS selectors. If more than one schema exists for a field, then they will be'
+            . ' processed in the order of Priority. The first Schema to a match a URI Pattern will be'
             . ' the one used for that field.</p>'
         ));
         $fields->addFieldToTab("Root.Main", $importRules);
@@ -305,6 +307,7 @@ class StaticSiteContentSource extends ExternalContentSource
                 $this->urlList->setExcludePatterns($urlExcludePatterns);
             }
         }
+
         return $this->urlList;
     }
 
@@ -316,11 +319,12 @@ class StaticSiteContentSource extends ExternalContentSource
      * @return StaticSiteCrawler
      * @throws LogicException
      */
-    public function crawl($limit=false, $verbose=false)
+    public function crawl($limit = false, $verbose = false)
     {
         if (!$this->BaseUrl) {
-            throw new \LogicException("Can't crawl a site until Base URL is set.");
+            throw new \LogicException('Can\'t crawl a site until "Base URL" is set.');
         }
+
         return $this->urlList()->crawl($limit, $verbose);
     }
 
@@ -480,7 +484,7 @@ class StaticSiteContentSource extends ExternalContentSource
 }
 
 /**
- * A collection of ImportRules that apply to some or all of the content being imported.
+ * Represents a single import-rule that applies to some or all of the content to be imported.
  */
 class StaticSiteContentSourceImportSchema extends DataObject
 {
@@ -573,6 +577,12 @@ class StaticSiteContentSourceImportSchema extends DataObject
 
         array_shift($dataObjects);
         natcasesort($dataObjects);
+
+        $fields->insertBefore('Order', LiteralField::create('ImportIntro', ''
+            . '<p class="message notice">An Import Schema maps a source URI regex and Mime-Type'
+            . ' to a target content-type (Usually a SiteTree subclass, but could be an ElementalBlock).'
+            . ' Content that matches will be saved as the selected Data Type.</p>'
+        ));
 
         $appliesTo = $fields->dataFieldByName('AppliesTo');
         $appliesTo->setDescription('A full or partial URI. Supports regular expressions.');
@@ -772,11 +782,12 @@ class StaticSiteContentSourceImportRule extends DataObject
      * @var array
      */
     private static $field_labels = [
-        "FieldName" => "Field Name",
-        "CSSSelector" => "CSS Selector",
-        "Attribute" => "Element attribute",
-        "PlainText" => "Convert to plain text",
-        "OuterHTML" => "Use the outer HTML",
+        "FieldName" => "Target Field Name",
+        "CSSSelector" => "CSS Selector(s)",
+        'ExcludeCSSSelector' => 'Excluded CSS Selector(s)',
+        "Attribute" => "Element Attribute",
+        "PlainText" => "Convert to plain text?",
+        "OuterHTML" => "Use outer HTML?",
     ];
 
     /**
@@ -815,15 +826,35 @@ class StaticSiteContentSourceImportRule extends DataObject
         $dataType = $this->Schema()->DataType;
 
         if ($dataType) {
-            $fieldList = singleton($dataType)->compositeDatabaseFields();
+            $fieldList = singleton(DataObjectSchema::class)
+                ->fieldSpecs($dataType, DataObjectSchema::DB_ONLY);
             $fieldList = array_combine(array_keys($fieldList), array_keys($fieldList));
-            unset($fieldList->ParentID);
-            unset($fieldList->WorkflowDefinitionID);
-            unset($fieldList->Version);
+            $exclusions = array_merge(
+                array_keys(DataObject::config()->get('fixed_fields')),
+                // TODO make this a regex ala #ID$##
+                [
+                    'ParentID',
+                    'WorkflowDefinitionID',
+                    'Version',
+                ]
+            );
 
-            $fieldNameField = DropdownField::create("FieldName", "Field Name", $fieldList);
-            $fieldNameField->setEmptyString("(choose)");
-            $fields->insertBefore($fieldNameField, "CSSSelector");
+            foreach (array_combine($exclusions, $exclusions) as $exclusion) {
+                unset($fieldList[$exclusion]);
+            }
+
+            sort($fieldList);
+
+            $fieldNameField = DropdownField::create("FieldName", 'Target Field', $fieldList)
+                ->setEmptyString("(choose)")
+                ->setDescription('Source content matched by the CSS selector(s) below is written to this field ');
+            $fields->insertBefore($fieldNameField, 'CSSSelector');
+            $fields->dataFieldByName('CSSSelector')
+                ->setDescription('A list of valid CSS selectors (separated by a space) whose content'
+                . ' is written to the "Target Field" above');
+                $fields->dataFieldByName('ExcludeCSSSelector')
+                ->setDescription('A list of valid CSS selectors (separated by a space) whose content'
+                . ' should be ignored. This is useful for fine-tuning what is returned in an import.');
         } else {
             $fields->replaceField('FieldName', $fieldName = ReadonlyField::create("FieldName", "Field Name"));
             $fieldName->setDescription('Save this rule before being able to add a field name');

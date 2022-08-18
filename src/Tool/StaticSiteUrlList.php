@@ -234,12 +234,15 @@ class StaticSiteUrlList
 
         $_regular = [];
         $_inferred = [];
+
         foreach ($urls['regular'] as $key => $urlData) {
             array_push($_regular, $urlData['url']);
         }
+
         foreach ($urls['inferred'] as $key => $urlData) {
             array_push($_inferred, $urlData['url']);
         }
+
         return count(array_unique($_regular)) + count($_inferred);
     }
 
@@ -362,6 +365,7 @@ class StaticSiteUrlList
         $crawler->enableResumption();
         $crawler->setUrlCacheType(2); // "2" is the original value of PHPCrawlerUrlCacheTypes::URLCACHE_SQLITE which no longer exists
         $crawler->setWorkingDirectory($this->cacheDir);
+
         // Find links in externally-linked CSS files
         if ($this->source->ParseCSS) {
             $crawler->addLinkSearchContentType("#text/css# i");
@@ -401,7 +405,9 @@ class StaticSiteUrlList
 
         ksort($this->urls['regular']);
         ksort($this->urls['inferred']);
+
         $this->saveURLs();
+
         return $crawler;
     }
 
@@ -787,11 +793,14 @@ class StaticSiteCrawler extends PHPCrawler
     public function __construct(StaticSiteUrlList $urlList, $limit = false, $verbose = false)
     {
         parent::__construct();
+
         $this->urlList = $urlList;
         $this->verbose = $verbose;
+
         if ($limit) {
             $this->setPageLimit($limit);
         }
+
         $this->utils = singleton(StaticSiteUtils::class);
     }
 
