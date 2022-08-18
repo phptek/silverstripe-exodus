@@ -293,7 +293,7 @@ class StaticSiteContentSource extends ExternalContentSource
     public function urlList()
     {
         if (!$this->urlList) {
-            $this->urlList = StaticSiteUrlList::create($this, ASSETS_DIR . "/{$this->staticSiteCacheDir}");
+            $this->urlList = StaticSiteUrlList::create($this, ASSETS_PATH . "/{$this->staticSiteCacheDir}");
 
             if ($processorClass = $this->UrlProcessor) {
                 $this->urlList->setUrlProcessor($processorClass::create());
