@@ -3,8 +3,10 @@
 namespace PhpTek\Exodus\Transform;
 
 use SilverStripe\Assets\File;
+use SilverStripe\Assets\Folder;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Control\Controller;
+use SilverStripe\ORM\DataObject;
 
 /**
  * URL transformer specific to SilverStripe's `File` class for use with the module's
@@ -69,7 +71,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         if (!$dataType) {
             $this->utils->log(" - DataType for migration schema is empty for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
-            throw new Exception('DataType for migration schema is empty!');
+            throw new \Exception('DataType for migration schema is empty!');
         }
 
         // Process incoming according to user-selected duplication strategy
@@ -92,7 +94,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
          */
         try {
             $this->write($file, $item, $source, $contentFields['tmp_path']);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->utils->log($e->getMessage(), $item->AbsoluteURL, $item->ProcessedMIME);
         }
 
@@ -275,8 +277,9 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      */
     public function versionFile($relativeFilePath)
     {
-        $base = ASSETS_PATH;
-        while (file_exists("$base/$relativeFilePath")) {
+        $fullPath = sprintf('%s/%s', ASSETS_PATH, $relativeFilePath);
+
+        while (file_exists($fullPath)) {
             $i = isset($i) ? ($i+1) : 2;
             $oldFilePath = $relativeFilePath;
 

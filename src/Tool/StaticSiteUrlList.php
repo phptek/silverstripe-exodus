@@ -121,7 +121,7 @@ class StaticSiteUrlList
      * @param StaticSiteUrlProcessor $urlProcessor
      * @return void
      */
-    public function setUrlProcessor(StaticSiteUrlProcessor $urlProcessor)
+    public function setUrlProcessor(StaticSiteUrlProcessor $urlProcessor = null)
     {
         $this->urlProcessor = $urlProcessor;
     }
@@ -350,7 +350,7 @@ class StaticSiteUrlList
      * @param bool $verbose
      * @return \StaticSiteCrawler
      */
-    public function crawl($limit=false, $verbose=false)
+    public function crawl($limit = false, $verbose = false)
     {
         Environment::increaseTimeLimitTo(3600);
 
@@ -400,6 +400,7 @@ class StaticSiteUrlList
 
         $crawler->setURL($this->baseURL);
         $crawler->go();
+        //$crawler->goMultiProcessedLinux();
 
         unlink($this->cacheDir . 'crawlerid');
 
@@ -418,9 +419,9 @@ class StaticSiteUrlList
      */
     public function saveURLs()
     {
-        if (!SapphireTest::is_running_test()) {
-            file_put_contents($this->cacheDir . 'urls', serialize($this->urls));
-        }
+        // if (!SapphireTest::is_running_test()) {
+        //     file_put_contents($this->cacheDir . 'urls', serialize($this->urls));
+        // }
     }
 
     /**
@@ -844,6 +845,7 @@ class StaticSiteCrawler extends PHPCrawler
         if ($this->verbose) {
             echo "[+] " . $info->url . PHP_EOL;
         }
+
         $this->urlList->saveURLs();
     }
 

@@ -7,6 +7,7 @@ use PhpTek\Exodus\Transform\StaticSiteFileTransformer;
 use PhpTek\Exodus\Transform\StaticSitePageTransformer;
 use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
+use SilverStripe\Core\Convert;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\ReadonlyField;

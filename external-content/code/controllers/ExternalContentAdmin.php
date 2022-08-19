@@ -2,6 +2,7 @@
 
 use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\Admin\LeftAndMain;
+use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\CurrentPageIdentifier;
 use SilverStripe\CMS\Model\SiteTree;
@@ -28,6 +29,8 @@ use SilverStripe\ORM\ValidationException;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\Hierarchy\MarkedSet;
 use SilverStripe\Security\InheritedPermissions;
+use Symbiote\QueuedJobs\DataObjects\QueuedJobDescriptor;
+use Symbiote\QueuedJobs\Services\QueuedJobService;
 
 /**
  * Backend administration pages for the external content module
@@ -58,7 +61,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	private static $url_rule = '$Action//$ID';
 	private static $menu_title = 'External Content';
 	private static $tree_class = ExternalContentSource::class;
-	private static $allowed_actions = array(
+	private static $allowed_actions = [
 		'addprovider',
 		'deleteprovider',
 		'deletemarked',
@@ -74,7 +77,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		'AddForm',
 		'updateSources',
 		'updatetreenodes'
-	);
+    ];
 
 	public function init()
 	{
@@ -267,19 +270,19 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 			if($defaultSourceConfig) {
 				$class = $defaultSourceConfig;
-			}
-			else if(isset($defaultSources[0])) {
+			} else if(isset($defaultSources[0])) {
 				$class = $defaultSources[0];
-			}
-			else {
+			} else {
 				$class = null;
 			}
 
 			if($class && $source = DataObject::get($class)->first()) {
 				return $source->ID;
 			}
+
 			return null;
 		}
+
 		return $id;
 	}
 
@@ -305,9 +308,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 */
 	public function currentPage() {
 		$id = $this->getCurrentPageID();
-		if (preg_match(ExternalContent::ID_FORMAT, $id)) {
+
+		if (preg_match(ExternalContent::ID_FORMAT, (string) $id)) {
 			return ExternalContent::getDataObjectFor($id);
 		}
+
 		if ($id == 'root') {
 			return singleton($this->config()->get('tree_class'));
 		}
@@ -351,22 +356,24 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		if ($selected && ($migrationTarget || $fileMigrationTarget)) {
 			// get objects and start stuff
 			$target = null;
-			$targetType = 'SiteTree';
+			$targetType = SiteTree::class;
+
 			if ($migrationTarget) {
-				$target = DataObject::get_by_id('SiteTree', $migrationTarget);
+				$target = DataObject::get_by_id(SiteTree::class, $migrationTarget);
 			} else {
-				$targetType = 'File';
-				$target = DataObject::get_by_id('File', $fileMigrationTarget);
+				$targetType = File::class;
+				$target = DataObject::get_by_id(File::class, $fileMigrationTarget);
 			}
 
 			$from = ExternalContent::getDataObjectFor($selected);
+
 			if ($from instanceof ExternalContentSource) {
 				$selected = false;
 			}
 
 			if (isset($request['Repeat']) && $request['Repeat'] > 0) {
 				$job = ScheduledExternalImportJob::create($request['Repeat'], $from, $target, $includeSelected, $includeChildren, $targetType, $duplicates, $request);
-				(QueuedJobService::class)->queueJob($job);
+				singleton(QueuedJobService::class)->queueJob($job);
 
 				$messageType = 'good';
 				$message = _t('ExternalContent.CONTENTMIGRATEQUEUED', 'Import job queued.');
@@ -411,20 +418,26 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	}
 
 
-		/**
+    /**
 	 * Return the edit form
 	 * @see cms/code/LeftAndMain#EditForm()
 	 */
-	public function EditForm($request = null) {
+	public function EditForm($request = null)
+    {
 		//HTMLEditorField::include_js();
 
 		$cur = $this->getCurrentPageID();
+
 		if ($cur) {
 			$record = $this->currentPage();
-			if (!$record)
+
+			if (!$record) {
 				return false;
-			if ($record && !$record->canView())
-				return Security::permissionFailure($this);
+            }
+
+            if ($record && !$record->canView()) {
+                return Security::permissionFailure($this);
+            }
 		}
 
 		if ($this->hasMethod('getEditForm')) {
@@ -434,14 +447,13 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		return false;
 	}
 
-
 	/**
 	 * Return the form for editing
 	 */
 	public function getEditForm($id = null, $fields = null) {
 		$record = null;
 
-		if(!$id){
+		if(!$id) {
 			$id = $this->getCurrentPageID();
 		}
 
@@ -459,24 +471,52 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 			if (($isSource || $isItem) && $record->canImport()) {
 				$allowedTypes = $record->allowedImportTargets();
+
 				if (isset($allowedTypes['sitetree'])) {
-					$fields->addFieldToTab('Root.Import', TreeDropdownField::create("MigrationTarget", _t('ExternalContent.MIGRATE_TARGET', 'Page to import into'), SiteTree::class));
+					$fields->addFieldToTab(
+                        'Root.Import',
+                        TreeDropdownField::create(
+                            "MigrationTarget",
+                            _t('ExternalContent.MIGRATE_TARGET', 'Parent page-type to import into'),
+                            SiteTree::class
+                        )->setDescription('All imported page-like content will be organised hierarchically beneath this page.'));
 				}
 
 				if (isset($allowedTypes['file'])) {
-					$fields->addFieldToTab('Root.Import', TreeDropdownField::create("FileMigrationTarget", _t('ExternalContent.FILE_MIGRATE_TARGET', 'Folder to import into'), Folder::class));
+					$fields->addFieldToTab(
+                        'Root.Import',
+                        TreeDropdownField::create(
+                            "FileMigrationTarget",
+                            _t('ExternalContent.FILE_MIGRATE_TARGET', 'Parent folder to import into'),
+                            Folder::class
+                        )->setDescription('All imported file-like content will be organised hierarchically beneath this folder.'));
 				}
 
-				$fields->addFieldToTab('Root.Import', CheckboxField::create("IncludeSelected", _t('ExternalContent.INCLUDE_SELECTED', 'Include Selected Item in Import')));
-				$fields->addFieldToTab('Root.Import', CheckboxField::create("IncludeChildren", _t('ExternalContent.INCLUDE_CHILDREN', 'Include Child Items in Import'), true));
+				$fields->addFieldToTab(
+                    'Root.Import',
+                    CheckboxField::create(
+                        "IncludeSelected",
+                        _t('ExternalContent.INCLUDE_SELECTED', 'Include Selected Item in Import')
+                    )
+                );
+				$fields->addFieldToTab(
+                    'Root.Import',
+                    CheckboxField::create(
+                        "IncludeChildren",
+                        _t('ExternalContent.INCLUDE_CHILDREN', 'Include Child Items in Import'),
+                        true
+                    )
+                );
 
-				$duplicateOptions = array(
+				$duplicateOptions = [
 					ExternalContentTransformer::DS_OVERWRITE => ExternalContentTransformer::DS_OVERWRITE,
 					ExternalContentTransformer::DS_DUPLICATE => ExternalContentTransformer::DS_DUPLICATE,
 					ExternalContentTransformer::DS_SKIP => ExternalContentTransformer::DS_SKIP,
-				);
+                ];
 
-				$fields->addFieldToTab('Root.Import', OptionsetField::create(
+				$fields->addFieldToTab(
+                    'Root.Import',
+                    OptionsetField::create(
 						"DuplicateMethod",
 						_t('ExternalContent.DUPLICATES', 'Duplicate item handling'),
 						$duplicateOptions,
@@ -484,8 +524,8 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 					)
 				);
 
-				if (class_exists('QueuedJobDescriptor')) {
-					$repeats = array(
+				if (class_exists(QueuedJobDescriptor::class)) {
+					$repeats = [
 						0		=> 'None',
 						300		=> '5 minutes',
 						900		=> '15 minutes',
@@ -494,15 +534,25 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 						33200	=> '12 hours',
 						86400	=> '1 day',
 						604800	=> '1 week',
-					);
-					$fields->addFieldToTab('Root.Import', DropdownField::create('Repeat', 'Repeat import each ', $repeats));
+                    ];
+
+					$fields->addFieldToTab(
+                        'Root.Import',
+                        DropdownField::create('Repeat', 'Repeat import each ', $repeats)
+                    );
 				}
 
 				$migrateButton = FormAction::create('migrate', _t('ExternalContent.IMPORT', 'Start Importing'))
 					->setAttribute('data-icon', 'arrow-circle-double')
 					->setUseButtonTag(true);
 
-				$fields->addFieldToTab('Root.Import', LiteralField::create('MigrateActions', "<div class='Actions'>{$migrateButton->forTemplate()}</div>"));
+				$fields->addFieldToTab(
+                    'Root.Import',
+                    LiteralField::create(
+                        'MigrateActions',
+                        "<div class='Actions'>{$migrateButton->forTemplate()}</div>"
+                    )
+                );
 			}
 
 			$fields->push($hf = HiddenField::create("ID"));
@@ -533,19 +583,19 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			}
 
 			$form = Form::create($this, "EditForm", $fields, $actions);
+
 			if ($record->ID) {
 				$form->loadDataFrom($record);
 			} else {
-				$form->loadDataFrom(array(
+				$form->loadDataFrom([
 					"ID" => "root",
 					"URL" => Director::absoluteBaseURL() . self::$url_segment,
-				));
+				]);
 			}
 
 			if (!$record->canEdit()) {
 				$form->makeReadonly();
 			}
-
 		} else {
 			// Create a dummy form
 			$form = Form::create($this, "EditForm", FieldList::create(), FieldList::create());
@@ -663,17 +713,17 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 */
 	function DeleteItemsForm() {
 		$form = Form::create(
-						$this,
-						'DeleteItemsForm',
-						FieldList::create(
-								LiteralField::create('SelectedPagesNote',
-										sprintf('<p>%s</p>', _t('ExternalContentAdmin.SELECT_CONNECTORS', 'Select the connectors that you want to delete and then click the button below'))
-								),
-								HiddenField::create('csvIDs')
-						),
-						FieldList::create(
-								Form::createAction('deleteprovider', _t('ExternalContentAdmin.DELCONNECTORS', 'Delete the selected connectors'))
-						)
+            $this,
+            'DeleteItemsForm',
+            FieldList::create(
+                LiteralField::create('SelectedPagesNote',
+                        sprintf('<p>%s</p>', _t('ExternalContentAdmin.SELECT_CONNECTORS', 'Select the connectors that you want to delete and then click the button below'))
+                ),
+                HiddenField::create('csvIDs')
+            ),
+            FieldList::create(
+                FormAction::create('deleteprovider', _t('ExternalContentAdmin.DELCONNECTORS', 'Delete the selected connectors'))
+            )
 		);
 
 		$form->addExtraClass('actionparams');
@@ -695,6 +745,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		foreach ($ids as $id) {
 			if (is_numeric($id)) {
 				$record = ExternalContent::getDataObjectFor($id);
+
 				if ($record) {
 					$script .= $this->deleteTreeNodeJS($record);
 					$record->delete();
@@ -704,6 +755,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		}
 
 		$size = sizeof($ids);
+
 		if ($size > 1) {
 			$message = $size . ' ' . _t('AssetAdmin.FOLDERSDELETED', 'folders deleted.');
 		} else {
@@ -728,6 +780,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	public function SiteTreeAsUL() {
 		$html = $this->getSiteTreeFor($this->config()->get('tree_class'), null, null, 'NumChildren');
 		$this->extend('updateSiteTreeAsUL', $html);
+
 		return $html;
 	}
 
@@ -770,13 +823,17 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			$obj = singleton($class);
 			$iconSpec = $obj->config()->get('icon');
 
-			if(!$iconSpec) continue;
+            if (!$iconSpec) {
+                continue;
+            }
 
 			// Legacy support: We no longer need separate icon definitions for folders etc.
 			$iconFile = (is_array($iconSpec)) ? $iconSpec[0] : $iconSpec;
 
 			// Legacy support: Add file extension if none exists
-			if(!pathinfo($iconFile, PATHINFO_EXTENSION)) $iconFile .= '-file.gif';
+            if (!pathinfo($iconFile, PATHINFO_EXTENSION)) {
+                $iconFile .= '-file.gif';
+            }
 
 			$iconPathInfo = pathinfo($iconFile);
 
@@ -803,14 +860,15 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	/**
 	 * Save the content source/item.
 	 */
-	public function save($urlParams, $form) {
-
+	public function save($urlParams, $form)
+    {
 		// Retrieve the record.
-
 		$record = null;
+
 		if (isset($urlParams['ID'])) {
 			$record = ExternalContent::getDataObjectFor($urlParams['ID']);
 		}
+
 		if (!$record) {
 			return parent::save($urlParams, $form);
 		}
@@ -827,18 +885,19 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			}
 
 			// Set the form response.
-
 			$this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.SAVEDUP', 'Saved.')));
 		} else {
 			$this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.SAVEDUP', 'You don\'t have write access.')));
 		}
+
 		return $this->getResponseNegotiator()->respond($this->request);
 	}
 
 	/**
 	 * Delete the content source/item.
 	 */
-	public function delete($data, $form) {
+	public function delete($data, $form)
+    {
 		$className = $this->config()->get('tree_class');
 		$record = DataObject::get_by_id($className, Convert::raw2sql($data['ID']));
 
@@ -859,6 +918,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		}
 
 		$this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.DELETED', 'Deleted.')));
+
 		return $this->getResponseNegotiator()->respond(
 			$this->request,
 			array('currentform' => array($this, 'EmptyForm'))
@@ -869,9 +929,10 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 * Retrieve the updated source list, used in an AJAX request to update the current view.
 	 * @return String
 	 */
-	public function updateSources() {
-
+	public function updateSources()
+    {
 		$HTML = $this->treeview()->value;
+
 		return preg_replace('/^\s+|\n|\r|\s+$/m', '', $HTML);
 	}
 
@@ -880,5 +941,4 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		// noop
 		return singleton(CMSMain::class)->updatetreenodes($request);
 	}
-
 }

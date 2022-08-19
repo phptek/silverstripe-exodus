@@ -117,7 +117,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
         $dataType,
         $item,
         $baseUrl,
-        $strategy = ExternalContentTransformer::SKIP,
+        $strategy = ExternalContentTransformer::DS_SKIP,
         DataObject $parentObject = null
     )
     {

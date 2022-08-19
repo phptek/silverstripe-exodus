@@ -10,6 +10,7 @@ use SilverStripe\Dev\TaskRunner;
 use SilverStripe\Control\HTTPRequest;
 use PhpTek\Exodus\Task\StaticSiteRewriteLinksTask;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Injector\Injector;
 
 /**
  * Physically brings content into SilverStripe as defined by URLs fetched

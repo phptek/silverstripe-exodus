@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Transform;
 
+use SilverStripe\Assets\File;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
 

@@ -220,7 +220,8 @@ TXT;
         $gridField = parent::getReportField();
         $gridField->setModelClass('FailedURLRewriteObject');
         $config = $gridField->getConfig();
-        $config->addComponent(GridFieldDeleteAction::create());
+        $config->addComponent(new GridFieldDeleteAction());
+
         return $gridField;
     }
 }

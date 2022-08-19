@@ -2,6 +2,7 @@
 
 namespace PhpTek\Exodus\Tool;
 
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injectable;
 
 /**
@@ -27,6 +28,7 @@ class StaticSiteUtils
     public function log($message, $filename = null, $mime = null, $class = StaticSiteContentExtractor::class)
     {
         $logFile = Config::inst()->get($class, 'log_file');
+
         if (!$logFile) {
             return;
         }

@@ -9,8 +9,10 @@ use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Control\Director;
+use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Convert;
+use SilverStripe\Core\TempFolder;
 
 /**
  * This tool uses a combination of cURL and phpQuery to extract content from a URL.
@@ -303,10 +305,10 @@ class StaticSiteContentExtractor
     {
         $this->utils->log(" - CURL START: {$this->url} ({$this->mime})");
 
-        $ch        = curl_init();
-        $timeout   = 10;
-        $ssInfo = new SapphireInfo();
-        $useragent = 'SilverStripe/' . $ssInfo->version();
+        $ch = curl_init();
+        $timeout = 10;
+        // @todo Add current version from Composer
+        $useragent = 'phptek/silverstripe-exodus';
 
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -346,21 +348,24 @@ class StaticSiteContentExtractor
 
         // Deal to files, write to them directly and then return
         if ($this->mimeProcessor->isOfFileOrImage($this->mime)) {
-            $tmp_name = tempnam(getTempFolder() . '/' . rand(), 'tmp');
+            $tmp_name = tempnam(TempFolder::getTempFolder('/') . '/' . rand(), 'tmp');
             $fp = fopen($tmp_name, 'w+');
-            curl_setopt($ch, CURLOPT_HEADER, 0);	// We do not want _any_ header info, it corrupts the file data
-            curl_setopt($ch, CURLOPT_FILE, $fp);	// write curl response directly to file, no messing about
+            curl_setopt($ch, CURLOPT_HEADER, 0); // We do not want _any_ header info, it corrupts the file data
+            curl_setopt($ch, CURLOPT_FILE, $fp); // write curl response directly to file, no messing about
             curl_exec($ch);
             curl_close($ch);
             fclose($fp);
-            $this->setTmpFileName($tmp_name);		// Set a tmp filename
+
+            $this->setTmpFileName($tmp_name); // Set a tmp filename
+
             return 'file';
+
         }
 
         $fullResponseBody = curl_exec($ch);
         $curlError = curl_error($ch);
-
         @list($responseHeaders, $responseBody) = explode("\n\n", str_replace("\r", "", $fullResponseBody), 2);
+
         if (preg_match("#^HTTP/1.1 100#", $responseHeaders)) {
             list($responseHeaders, $responseBody) = explode("\n\n", str_replace("\r", "", $responseBody), 2);
         }
@@ -378,7 +383,8 @@ class StaticSiteContentExtractor
             $statusCode = 500;
         }
 
-        $response = new SS_HTTPResponse($responseBody, $statusCode);
+        $response = HTTPResponse::create($responseBody, $statusCode);
+
         foreach ($responseHeaders as $headerLine) {
             if (strpos($headerLine, ":") !== false) {
                 list($headerName, $headerVal) = explode(":", $headerLine, 2);

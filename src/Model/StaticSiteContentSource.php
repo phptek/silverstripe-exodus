@@ -346,7 +346,8 @@ class StaticSiteContentSource extends ExternalContentSource
             $schemaMimeTypes = StaticSiteMimeProcessor::get_mimetypes_from_text($schema->MimeTypes);
             $schemaMimeTypesShow = implode(', ', $schemaMimeTypes);
             $this->utils->log(' - Schema: ' . ($i + 1) . ', DataType: ' . $schema->DataType . ', AppliesTo: ' . $schema->AppliesTo . ' mimetypes: ' . $schemaMimeTypesShow);
-            array_push($schemaMimeTypes, StaticSiteUrlList::$undefined_mime_type);
+            array_push($schemaMimeTypes, StaticSiteUrlList::config()->get('undefined_mime_type'));
+
             if ($schemaCanParseURL) {
                 if ($mimeType && $schemaMimeTypes && (!in_array($mimeType, $schemaMimeTypes))) {
                     continue;
@@ -369,7 +370,7 @@ class StaticSiteContentSource extends ExternalContentSource
     {
         $appliesTo = $schema->AppliesTo;
         if (!strlen($appliesTo)) {
-            $appliesTo = $schema::$default_applies_to;
+            $appliesTo = $schema::config()->get('default_applies_to');
         }
 
         // Use (escaped) pipes for delimeters as pipes themselves are unlikely to appear in legit URLs
@@ -674,13 +675,16 @@ class StaticSiteContentSourceImportSchema extends DataObject
     {
         $result = ValidationResult::create();
         $mime = $this->validateMimes();
-        if (!is_bool($mime)) {
-            $result->error('Invalid Mime-type "' . $mime . '" for DataType "' . $this->DataType . '"');
-        }
         $appliesTo = $this->validateUrlPattern();
-        if (!is_bool($appliesTo)) {
-            $result->error('Invalid PCRE expression "' . $appliesTo . '"');
+
+        if (!is_bool($mime)) {
+            $result->addError('Invalid Mime-type "' . $mime . '" for DataType "' . $this->DataType . '"');
         }
+
+        if (!is_bool($appliesTo)) {
+            $result->addError('Invalid PCRE expression "' . $appliesTo . '"');
+        }
+
         return $result;
     }
 
@@ -693,7 +697,8 @@ class StaticSiteContentSourceImportSchema extends DataObject
     public function validateMimes()
     {
         $selectedMimes = StaticSiteMimeProcessor::get_mimetypes_from_text($this->MimeTypes);
-        $dt = $this->DataType ? $this->DataType : $_POST['DataType']; // @todo
+
+        $dt = $this->DataType ?? $_POST['DataType']; // @todo
         if (!$dt) {
             return true; // probably just creating
         }
@@ -718,11 +723,13 @@ class StaticSiteContentSourceImportSchema extends DataObject
 
         $mimesForSSType = StaticSiteMimeProcessor::get_mime_for_ss_type($type);
         $mimes = $mimesForSSType ? $mimesForSSType : [];
+
         foreach ($mimes as $mime) {
             if (!in_array($mime, $mimesForSSType)) {
                 return $mime;
             }
         }
+
         return true;
     }
 

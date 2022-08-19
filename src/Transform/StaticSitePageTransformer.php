@@ -119,9 +119,9 @@ class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
             }
         }
 
-        Versioned::reading_stage('Stage');
+        Versioned::set_reading_mode('Stage');
         $page->write();
-        $page->publish('Stage', 'Live');
+        $page->publishRecursive();
 
         $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
 

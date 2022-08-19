@@ -2,6 +2,7 @@
 
 namespace PhpTek\Exodus\Tool;
 
+use phpQuery;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
 
@@ -103,6 +104,7 @@ class StaticSiteLinkRewriter
     {
         $pq = phpQuery::newDocument($content);
         $this->rewriteInPQ($pq);
+
         return $pq->html();
     }
 }
