@@ -189,7 +189,7 @@ class StaticSiteContentSource extends ExternalContentSource
             ->setAttribute('data-icon', 'arrow-circle-double')
             ->setUseButtonTag(true)
             ->addExtraClass('btn action btn btn-primary tool-button font-icon-plus');
-        $crawlMsg = 'Click the button below to do so:';
+        $crawlMsg = 'Select the button below start/continue:';
 
         // Disable crawl-button if assets dir isn't writable
         if (!file_exists(ASSETS_PATH) || !is_writable(ASSETS_PATH)) {
@@ -199,11 +199,11 @@ class StaticSiteContentSource extends ExternalContentSource
 
         $fields->addFieldsToTab('Root.Crawl', [
             ReadonlyField::create("CrawlStatus", "Crawling Status", $this->urlList()->getSpiderStatus()),
-            ReadonlyField::create("NumURLs", "Number of URLs", $this->urlList()->getNumURLs()),
+            ReadonlyField::create("NumURLs", "Number of URLs Crawled", $this->urlList()->getNumURLs()),
             LiteralField::create(
                 'CrawlActions',
-                "<p>Before importing this content, all URLs on the site must be crawled (like a search engine does)."
-                . " $crawlMsg</p>"
+                '<p class="message notice">Before loading this content into Silverstripe, all source URLs must first be crawled. '
+                . $crawlMsg . '</p>'
                 . '<div class="btn-toolbar">' . $crawlButton->forTemplate() . '</div>'
             )
         ]);
@@ -228,7 +228,10 @@ class StaticSiteContentSource extends ExternalContentSource
 
             $fields->addFieldToTab(
                 'Root.Crawl',
-                LiteralField::create('CrawlURLList', '<p class="mesage notice">The following URLs have been identified: </p>' . $urlsAsUL)
+                LiteralField::create(
+                    'CrawlURLList',
+                    '<p class="mesage notice">The following URLs have been identified: </p>' . $urlsAsUL
+                )
             );
         }
 
@@ -241,6 +244,7 @@ class StaticSiteContentSource extends ExternalContentSource
 
         $hasImports = DataObject::get(StaticSiteImportDataObject::class);
         $_source = [];
+
         foreach ($hasImports as $import) {
             $date = DBField::create_field(DBDatetime::class, $import->Created)->Time24();
             $_source[$import->ID] = $date . ' (Import #' . $import->ID . ')';
@@ -258,6 +262,7 @@ class StaticSiteContentSource extends ExternalContentSource
                 CheckboxField::create('ClearAllImports', 'Clear all import meta-data', 0),
                 LiteralField::create('ImportActions', $clearImportButton->forTemplate())
             ])->addExtraClass('clear-imports');
+
             $fields->addFieldToTab('Root.Import', $clearImportField);
         }
 
@@ -322,7 +327,7 @@ class StaticSiteContentSource extends ExternalContentSource
     public function crawl($limit = false, $verbose = false)
     {
         if (!$this->BaseUrl) {
-            throw new \LogicException('Can\'t crawl a site until "Base URL" is set.');
+            throw new \LogicException('Can\'t crawl a site until the "Base URL" field is set.');
         }
 
         return $this->urlList()->crawl($limit, $verbose);

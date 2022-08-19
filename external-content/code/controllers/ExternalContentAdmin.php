@@ -469,6 +469,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			$isSource = $record instanceof ExternalContentSource;
 			$isItem = $record instanceof ExternalContentItem;
 
+            // TODO Hide the "import" tab until all URLs have been crawled
 			if (($isSource || $isItem) && $record->canImport()) {
 				$allowedTypes = $record->allowedImportTargets();
 
@@ -479,7 +480,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                             "MigrationTarget",
                             _t('ExternalContent.MIGRATE_TARGET', 'Parent page-type to import into'),
                             SiteTree::class
-                        )->setDescription('All imported page-like content will be organised hierarchically beneath this page.'));
+                        )->setDescription('All imported page-like content will be organised hierarchically under here.'));
 				}
 
 				if (isset($allowedTypes['file'])) {
@@ -489,7 +490,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                             "FileMigrationTarget",
                             _t('ExternalContent.FILE_MIGRATE_TARGET', 'Parent folder to import into'),
                             Folder::class
-                        )->setDescription('All imported file-like content will be organised hierarchically beneath this folder.'));
+                        )->setDescription('All imported file-like content will be organised hierarchically under here.'));
 				}
 
 				$fields->addFieldToTab(
@@ -499,6 +500,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                         _t('ExternalContent.INCLUDE_SELECTED', 'Include Selected Item in Import')
                     )
                 );
+
 				$fields->addFieldToTab(
                     'Root.Import',
                     CheckboxField::create(

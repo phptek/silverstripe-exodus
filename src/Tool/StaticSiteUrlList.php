@@ -2,6 +2,7 @@
 
 namespace PhpTek\Exodus\Tool;
 
+use PHPCrawl\Enums\PHPCrawlerUrlCacheTypes;
 use PhpTek\Exodus\Model\StaticSiteContentSource;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
 use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
@@ -348,7 +349,8 @@ class StaticSiteUrlList
      *
      * @param number $limit
      * @param bool $verbose
-     * @return \StaticSiteCrawler
+     * @return StaticSiteCrawler
+     * @throws Exception
      */
     public function crawl($limit = false, $verbose = false)
     {
@@ -356,14 +358,13 @@ class StaticSiteUrlList
 
         if (!is_dir($this->cacheDir)) {
             if (!mkdir($this->cacheDir)) {
-                user_error('Unable to create cache directory at: ' . $this->cacheDir);
-                exit;
+                throw new \Exception('Unable to create cache directory at: ' . $this->cacheDir);
             }
         }
 
         $crawler = StaticSiteCrawler::create($this, $limit, $verbose);
         $crawler->enableResumption();
-        $crawler->setUrlCacheType(2); // "2" is the original value of PHPCrawlerUrlCacheTypes::URLCACHE_SQLITE which no longer exists
+        $crawler->setUrlCacheType(PHPCrawlerUrlCacheTypes::URLCACHE_SQLITE);
         $crawler->setWorkingDirectory($this->cacheDir);
 
         // Find links in externally-linked CSS files
@@ -419,9 +420,7 @@ class StaticSiteUrlList
      */
     public function saveURLs()
     {
-        // if (!SapphireTest::is_running_test()) {
-        //     file_put_contents($this->cacheDir . 'urls', serialize($this->urls));
-        // }
+        file_put_contents($this->cacheDir . 'urls', serialize($this->urls));
     }
 
     /**
@@ -561,6 +560,7 @@ class StaticSiteUrlList
     {
         $mime = self::$undefined_mime_type;
         $processedURL = $processedURLData;
+
         if (is_array($processedURLData)) {
             /*
              * If $processedURLData['url'] is not HTML, it's unlikely its parent
@@ -616,6 +616,7 @@ class StaticSiteUrlList
     {
         $url = $urlData;
         $mime = self::$undefined_mime_type;
+
         if (is_array($urlData)) {
             $url = $urlData['url'];
             $mime = $urlData['mime'];
@@ -635,6 +636,7 @@ class StaticSiteUrlList
             if ($this->urls['regular'][$url] === true) {
                 $this->urls['regular'][$url] = $this->generateProcessedURL($urlData);
             }
+
             return $this->urls['regular'][$url];
         } elseif (in_array($url, array_keys($this->urls['inferred']))) {
             return $this->urls['inferred'][$url];
@@ -806,9 +808,15 @@ class StaticSiteCrawler extends PHPCrawler
     }
 
     /**
-     * After checking raw status codes out of PHPCrawler we continue to save each URL to our cache file
+     * After checking raw status codes out of PHPCrawler we continue to save each URL to our cache file.
      *
-     * @param PHPCrawlerDocumentInfo $info
+     * $PageInfo gives us:
+     *
+     * $PageInfo->url
+     * $PageInfo->http_status_code
+     * $PageInfo->links_found_url_descriptors
+     *
+     * @param PHPCrawlerDocumentInfo $PageInfo
      * @return mixed null | void
      * @todo Can we make use of PHPCrawlerDocumentInfo#error_occured instead of manually checking server codes??
      * @todo The comments below state that badly formatted URLs never make it to our caching logic. Wrong.
@@ -816,7 +824,7 @@ class StaticSiteCrawler extends PHPCrawler
      */
     public function handleDocumentInfo(PHPCrawlerDocumentInfo $PageInfo): int
     {
-        $info = $PageInfo; // upgraded phpcrawler compat
+        $info = $PageInfo; // upgraded phpcrawler compatibility
         /*
          * MOSS has many URLs with brackets, e.g. http://www.stuff.co.nz/news/cat-stuck-up-tree/(/
          * These result in a 404 returned from curl requests for it, and won't filter down to our caching or URL Processor logic.
@@ -847,6 +855,8 @@ class StaticSiteCrawler extends PHPCrawler
         }
 
         $this->urlList->saveURLs();
+
+        return 0;
     }
 
     /**

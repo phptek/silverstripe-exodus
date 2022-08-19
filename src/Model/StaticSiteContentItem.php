@@ -40,10 +40,13 @@ class StaticSiteContentItem extends ExternalContentItem
     public function init()
     {
         $url = $this->externalId;
-
         $processedURL = $this->source->urlList()->processedURL($url);
         $parentURL = $this->source->urlList()->parentProcessedURL($processedURL);
-        $subURL = substr($processedURL['url'], strlen($parentURL['url']));
+        $subURL = substr(
+            $processedURL ? $processedURL['url'] : '',
+            strlen($parentURL['url'])
+        );
+
         if ($subURL != "/") {
             $subURL = trim($subURL, '/');
         }
@@ -52,8 +55,8 @@ class StaticSiteContentItem extends ExternalContentItem
         $this->Name = $subURL;
         $this->Title = $this->Name;
         $this->AbsoluteURL = rtrim($this->source->BaseUrl, '/') . $this->externalId;
-        $this->ProcessedURL = $processedURL['url'];
-        $this->ProcessedMIME = $processedURL['mime'];
+        $this->ProcessedURL = $processedURL['url'] ?? '';
+        $this->ProcessedMIME = $processedURL['mime'] ?? '';
     }
 
     /**

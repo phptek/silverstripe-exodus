@@ -2,6 +2,8 @@
 
 namespace PhpTek\Exodus\Tool;
 
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  * Interface for building URL processing plug-ins for {@link StaticSiteUrlList}.
  *
@@ -48,9 +50,12 @@ interface StaticSiteUrlProcessor
 
 /**
  * Processor for MOSS Standard-URLs while dropping file extensions
+ * @todo Move into a "Processors" namespace
  */
 class StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
 {
+    use Injectable;
+
     /**
      *
      * @return string
@@ -126,6 +131,7 @@ class StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
 
 /**
  * Processor for MOSS URLs (Microsoft Office Sharepoint Server)
+ * @todo Move into a "Processors" namespace
  */
 class StaticSiteMOSSURLProcessor extends StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
 {
