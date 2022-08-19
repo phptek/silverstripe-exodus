@@ -6,7 +6,6 @@ use PHPCrawl\Enums\PHPCrawlerUrlCacheTypes;
 use PhpTek\Exodus\Model\StaticSiteContentSource;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
 use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
-use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Environment;
@@ -26,6 +25,21 @@ class StaticSiteUrlList
 {
     use Injectable;
     use Configurable;
+
+    /**
+     * @var string
+     */
+    public const CRAWL_STATUS_COMPLETE = 'Complete';
+
+    /**
+     * @var string
+     */
+    public const CRAWL_STATUS_PARTIAL = 'Partial';
+
+    /**
+     * @var string
+     */
+    public const CRAWL_STATUS_NOTSTARTED = 'Not started';
 
     /**
      *
@@ -185,19 +199,21 @@ class StaticSiteUrlList
     }
 
     /**
-     * Returns the status of the spidering: "Complete", "Partial", or "Not started".
+     * Returns the status of the spidering.
      *
      * @return string
      */
-    public function getSpiderStatus()
+    public function getSpiderStatus(): string
     {
         if (file_exists($this->cacheDir . 'urls')) {
             if (file_exists($this->cacheDir . 'crawlerid')) {
-                return "Partial";
+                return self::CRAWL_STATUS_PARTIAL;
             }
-            return "Complete";
+
+            return self::CRAWL_STATUS_COMPLETE;
         }
-        return "Not started";
+
+        return self::CRAWL_STATUS_NOTSTARTED;
     }
 
     /**
@@ -655,15 +671,19 @@ class StaticSiteUrlList
     public function generateProcessedURL($urlData)
     {
         $urlIsEmpty = (!$urlData || !isset($urlData['url']));
+
         if ($urlIsEmpty) {
             throw new \LogicException("Can't pass a blank URL to generateProcessedURL");
         }
+
         if ($this->urlProcessor) {
             $urlData = $this->urlProcessor->processURL($urlData);
         }
+
         if (!$urlData) {
             throw new \LogicException(get_class($this->urlProcessor) . " returned a blank URL.");
         }
+
         return $urlData;
     }
 
@@ -690,6 +710,7 @@ class StaticSiteUrlList
         }
 
         $children = [];
+
         foreach ($this->urls['regular'] as $urlKey => $potentialProcessedChild) {
             $potentialProcessedChild = $urlKey;
             if (preg_match($regEx, $potentialProcessedChild)) {
@@ -698,6 +719,7 @@ class StaticSiteUrlList
                 }
             }
         }
+
         foreach ($this->urls['inferred'] as $urlKey => $potentialProcessedChild) {
             $potentialProcessedChild = $urlKey;
             if (preg_match($regEx, $potentialProcessedChild)) {

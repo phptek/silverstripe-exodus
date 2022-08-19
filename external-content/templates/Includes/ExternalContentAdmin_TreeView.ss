@@ -1,3 +1,4 @@
+<!-- Renders the CMS' central pane tree-view -->
 <div id="cms-page-add-form" title="<%t SilverStripe\CMS\Controllers\CMSMain.AddNew 'Add new page' %>">
 	$AddForm
 </div>

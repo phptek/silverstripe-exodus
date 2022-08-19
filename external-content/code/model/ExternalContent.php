@@ -32,6 +32,9 @@ class ExternalContent
 	 */
 	const ID_FORMAT = "/(\d+)(\_.*)?/";
 
+    /**
+     * @var string
+     */
 	const DEFAULT_CLASS = ExternalContentSource::class;
 
 	/**
@@ -57,6 +60,7 @@ class ExternalContent
 			$id = $matches[1];
 			$composed = isset($matches[2]) ? trim($matches[2], self::ID_SEPARATOR) : null;
 			$obj = DataObject::get_by_id(self::DEFAULT_CLASS, $id);
+
 			if ($composed && $obj) {
 				$obj = $obj->getObject($composed);
 			}

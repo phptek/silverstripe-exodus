@@ -21,6 +21,7 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\Form;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\DropdownField;
@@ -107,17 +108,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	}
 
     /**
-     * Get a site tree HTML listing which displays the nodes under the given criteria.
+     * Copied directly from {@link CMSMain}. It appears this method used to be on {@link LeftAndMain}
+     * when the "external-content" module was first written. Since we need to to subclass L&M and not CMSMain
+     * we need a copy of it here.
      *
-     * @param string $className The class of the root object
-     * @param string $rootID The ID of the root object.  If this is null then a complete tree will be
-     *  shown
-     * @param string $childrenMethod The method to call to get the children of the tree. For example,
-     *  Children, AllChildrenIncludingDeleted, or AllHistoricalChildren
-     * @param string $numChildrenMethod
-     * @param callable $filterFunction
-     * @param int $nodeCountThreshold
-     * @return string Nested unordered list with links to each page
+     * @inheritDoc
      */
     public function getSiteTreeFor(
         $className,
@@ -130,13 +125,16 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         $nodeCountThreshold = is_null($nodeCountThreshold) ? Config::inst()->get($className, 'node_threshold_total') : $nodeCountThreshold;
         // Provide better defaults from filter
         $filter = $this->getSearchFilter();
+
         if ($filter) {
             if (!$childrenMethod) {
                 $childrenMethod = $filter->getChildrenMethod();
             }
+
             if (!$numChildrenMethod) {
                 $numChildrenMethod = $filter->getNumChildrenMethod();
             }
+
             if (!$filterFunction) {
                 $filterFunction = function ($node) use ($filter) {
                     return $filter->isPageIncluded($node);
@@ -145,7 +143,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         }
 
         // Build set from node and begin marking
-        $record = ($rootID) ? $this->getRecord($rootID) : null;
+        $record = $rootID ? $this->getRecord($rootID) : null;
         $rootNode = $record ? $record : DataObject::singleton($className);
         $markingSet = MarkedSet::create($rootNode, $childrenMethod, $numChildrenMethod, $nodeCountThreshold);
 
@@ -164,13 +162,13 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         }
 
         // Pre-cache permissions
-        $checker = SiteTree::getPermissionChecker();
-        if ($checker instanceof InheritedPermissions) {
-            $checker->prePopulatePermissionCache(
-                InheritedPermissions::EDIT,
-                $markingSet->markedNodeIDs()
-            );
-        }
+        // $checker = SiteTree::getPermissionChecker();
+        // if ($checker instanceof InheritedPermissions) {
+        //     $checker->prePopulatePermissionCache(
+        //         InheritedPermissions::EDIT,
+        //         $markingSet->markedNodeIDs()
+        //     );
+        // }
 
         // Render using full-subtree template
         return $markingSet->renderChildren(
@@ -301,12 +299,12 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	}
 
 	/**
-	 *
-	 * Custom currentPage() method to handle opening the 'root' folder
+	 * Custom currentPage() method to handle opening the 'root' node
 	 *
 	 * @return DataObject
 	 */
-	public function currentPage() {
+	public function currentPage()
+    {
 		$id = $this->getCurrentPageID();
 
 		if (preg_match(ExternalContent::ID_FORMAT, (string) $id)) {
@@ -424,8 +422,6 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 */
 	public function EditForm($request = null)
     {
-		//HTMLEditorField::include_js();
-
 		$cur = $this->getCurrentPageID();
 
 		if ($cur) {
@@ -469,7 +465,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			$isSource = $record instanceof ExternalContentSource;
 			$isItem = $record instanceof ExternalContentItem;
 
-            // TODO Hide the "import" tab until all URLs have been crawled
+            // TODO Get the crawl status and show the "Import" tab if complete
 			if (($isSource || $isItem) && $record->canImport()) {
 				$allowedTypes = $record->allowedImportTargets();
 
@@ -624,7 +620,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		array_shift($classes);
 
 		foreach ($classes as $key => $class) {
-			if (!(new $class())->canCreate()) {
+			if (!$class::create()->canCreate()) {
 				unset($classes[$key]);
 			}
 
@@ -780,9 +776,13 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		return $this->renderWith($this->getTemplatesWithSuffix('_TreeView'));
 	}
 
-	public function SiteTreeAsUL() {
+    /**
+     * @return string
+     */
+	public function SiteTreeAsUL()
+    {
 		$html = $this->getSiteTreeFor($this->config()->get('tree_class'), null, null, 'NumChildren');
-		$this->extend('updateSiteTreeAsUL', $html);
+		//$this->extend('updateSiteTreeAsUL', $html);
 
 		return $html;
 	}
@@ -930,16 +930,21 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 	/**
 	 * Retrieve the updated source list, used in an AJAX request to update the current view.
-	 * @return String
+     *
+	 * @return string
 	 */
-	public function updateSources()
+	public function updateSources(): string
     {
 		$HTML = $this->treeview()->value;
 
 		return preg_replace('/^\s+|\n|\r|\s+$/m', '', $HTML);
 	}
 
-	public function updatetreenodes(HTTPRequest $request)
+    /**
+     * @param HTTPRequest $request
+     * @return HTTPResponse
+     */
+	public function updatetreenodes(HTTPRequest $request): HTTPResponse
 	{
 		// noop
 		return singleton(CMSMain::class)->updatetreenodes($request);

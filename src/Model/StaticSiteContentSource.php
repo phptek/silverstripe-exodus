@@ -46,6 +46,10 @@ use SilverStripe\ORM\FieldType\DBDatetime;
  */
 class StaticSiteContentSource extends ExternalContentSource
 {
+    /**
+     * @var string
+     */
+    public const CACHE_DIR_PREFIX = 'static-site-';
 
     /**
      * @var string
@@ -117,7 +121,7 @@ class StaticSiteContentSource extends ExternalContentSource
     public function __construct($record = null, $isSingleton = false, $model = null)
     {
         parent::__construct($record, $isSingleton, $model);
-        $this->staticSiteCacheDir = "static-site-{$this->ID}";
+        $this->staticSiteCacheDir = sprintf('%s%s', self::CACHE_DIR_PREFIX, $this->ID);
         $this->utils = singleton(StaticSiteUtils::class);
     }
 
@@ -172,13 +176,13 @@ class StaticSiteContentSource extends ExternalContentSource
         $fields->addFieldToTab("Root.Main", $importRules);
 
         switch ($this->urlList()->getSpiderStatus()) {
-            case "Not started":
+            case StaticSiteUrlList::CRAWL_STATUS_NOTSTARTED:
                 $crawlButtonText = _t('StaticSiteContentSource.CRAWL_SITE', 'Crawl');
                 break;
-            case "Partial":
+                case StaticSiteUrlList::CRAWL_STATUS_PARTIAL:
                 $crawlButtonText = _t('StaticSiteContentSource.RESUME_CRAWLING', 'Resume Crawl');
                 break;
-            case "Complete":
+                case StaticSiteUrlList::CRAWL_STATUS_COMPLETE;
                 $crawlButtonText = _t('StaticSiteContentSource.RECRAWL_SITE', 'Re-Crawl');
                 break;
             default:
@@ -224,6 +228,7 @@ class StaticSiteContentSource extends ExternalContentSource
                     $urlsAsUL .= "<li>$processed <em>(was: $raw)</em></li>";
                 }
             }
+
             $urlsAsUL .= "</ul>";
 
             $fields->addFieldToTab(
@@ -303,10 +308,12 @@ class StaticSiteContentSource extends ExternalContentSource
             if ($processorClass = $this->UrlProcessor) {
                 $this->urlList->setUrlProcessor($processorClass::create());
             }
+
             if ($this->ExtraCrawlUrls) {
                 $extraCrawlUrls = preg_split('/\s+/', trim($this->ExtraCrawlUrls));
                 $this->urlList->setExtraCrawlUrls($extraCrawlUrls);
             }
+
             if ($this->UrlExcludePatterns) {
                 $urlExcludePatterns = preg_split('/\s+/', trim($this->UrlExcludePatterns));
                 $this->urlList->setExcludePatterns($urlExcludePatterns);

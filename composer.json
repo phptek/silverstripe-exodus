@@ -1,6 +1,6 @@
 {
   "name": "phptek/silverstripe-exodus",
-  "description": "An ETL provider for migrating content from any website into a Silverstripe based project.",
+  "description": "Export content from arbitrary websites and load it into a Silverstripe site in an ETL fashion.",
   "license": "BSD-3-Clause",
   "type": "silverstripe-vendormodule",
   "keywords": [
@@ -9,15 +9,28 @@
     "migration",
     "migrator",
     "content",
-    "content migration",
     "staticsiteconnector",
+    "connect",
+    "exodus",
     "scraper",
-    "scrape"
+    "scrape",
+    "ETL",
+    "extract",
+    "extractor",
+    "transform",
+    "transformer",
+    "load",
+    "import",
+    "importer"
   ],
   "authors": [
     {
       "name": "Russell Michell",
       "email": "russ@theruss.com"
+    },
+    {
+        "name": "Sam Minnee",
+        "email": "sam@silverstripe.com"
     }
   ],
   "replace": {
