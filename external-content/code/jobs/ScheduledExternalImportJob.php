@@ -1,5 +1,6 @@
 <?php
 
+use SilverStripe\Core\Injector\Injectable;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
 use Symbiote\QueuedJobs\Services\QueuedJobService;
 
@@ -8,6 +9,8 @@ use Symbiote\QueuedJobs\Services\QueuedJobService;
  * @license BSD License http://silverstripe.org/bsd-license/
  */
 class ScheduledExternalImportJob extends AbstractQueuedJob {
+
+    use Injectable;
 
 	const MIN_REPEAT = 300;
 

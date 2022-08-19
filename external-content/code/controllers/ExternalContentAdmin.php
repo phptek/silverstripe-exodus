@@ -345,12 +345,12 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 		if(!$selected){
 			$messageType = 'bad';
-			$message = _t('ExternalContent.NOITEMSELECTED', 'No item selected to import.');
+			$message = _t('ExternalContent.NOITEMSELECTED', 'No item selected to import into.');
 		}
 
 		if(!$migrationTarget || !$fileMigrationTarget){
 			$messageType = 'bad';
-			$message = _t('ExternalContent.NOTARGETSELECTED', 'No target to import to selected.');
+			$message = _t('ExternalContent.NOTARGETSELECTED', 'No target selected to import into.');
 		}
 
 		if ($selected && ($migrationTarget || $fileMigrationTarget)) {
@@ -544,6 +544,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 				$migrateButton = FormAction::create('migrate', _t('ExternalContent.IMPORT', 'Start Importing'))
 					->setAttribute('data-icon', 'arrow-circle-double')
+                    ->addExtraClass('migrate btn btn-primary tool-button font-icon-plus')
 					->setUseButtonTag(true);
 
 				$fields->addFieldToTab(
