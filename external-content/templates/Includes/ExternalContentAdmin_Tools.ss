@@ -1,3 +1,4 @@
+<!-- The templates used in the "Tools" tpl-variable in _Content.ss -->
 <div class="cms-content-tools fill-height cms-panel cms-panel-layout" data-expandonclick="true" data-layout-type="border" id="cms-content-tools-CMSMain" style="width: 300px;">
     <div class="cms-content-header north vertical-align-items">
         <div class="cms-content-header-info vertical-align-items fill-width">

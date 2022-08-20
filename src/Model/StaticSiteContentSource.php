@@ -202,8 +202,8 @@ class StaticSiteContentSource extends ExternalContentSource
         }
 
         $fields->addFieldsToTab('Root.Crawl', [
-            ReadonlyField::create("CrawlStatus", "Crawling Status", $this->urlList()->getSpiderStatus()),
-            ReadonlyField::create("NumURLs", "Number of URLs Crawled", $this->urlList()->getNumURLs()),
+            ReadonlyField::create("CrawlStatus", "Crawl Status", $this->urlList()->getSpiderStatus()),
+            ReadonlyField::create("NumURIs", "Number of URIs Crawled", $this->urlList()->getNumURIs()),
             LiteralField::create(
                 'CrawlActions',
                 '<p class="message notice">Before loading this content into Silverstripe, all source URLs must first be crawled. '

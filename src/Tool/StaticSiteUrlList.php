@@ -235,18 +235,19 @@ class StaticSiteUrlList
     }
 
     /**
-     * Return the number of URLs crawled so far
+     * Return the number of URLs crawled so far. If the urlcache is incomplete or
+     * doesn't exist, assumes zero.
      *
-     * @return null | number
+     * @return mixed integer
      */
-    public function getNumURLs()
+    public function getNumURIs(): int
     {
         if (!$urls = $this->getRawCacheData()) {
-            return null;
+            return 0;
         }
 
         if (!isset($urls['regular']) || !isset($urls['regular'])) {
-            return null;
+            return 0;
         }
 
         $_regular = [];

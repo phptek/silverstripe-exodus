@@ -6,6 +6,7 @@ use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\CurrentPageIdentifier;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Control\Controller;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\View\Requirements;
 use SilverStripe\Core\ClassInfo;
@@ -333,7 +334,8 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 	 *
 	 * @param array $request
 	 */
-	public function migrate($request) {
+	public function migrate($request)
+    {
 		$migrationTarget 		= isset($request['MigrationTarget']) ? $request['MigrationTarget'] : '';
 		$fileMigrationTarget 	= isset($request['FileMigrationTarget']) ? $request['FileMigrationTarget'] : '';
 		$includeSelected 		= isset($request['IncludeSelected']) ? $request['IncludeSelected'] : 0;
@@ -341,12 +343,12 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		$duplicates 			= isset($request['DuplicateMethod']) ? $request['DuplicateMethod'] : ExternalContentTransformer::DS_OVERWRITE;
 		$selected 				= isset($request['ID']) ? $request['ID'] : 0;
 
-		if(!$selected){
+		if (!$selected) {
 			$messageType = 'bad';
 			$message = _t('ExternalContent.NOITEMSELECTED', 'No item selected to import into.');
 		}
 
-		if(!$migrationTarget || !$fileMigrationTarget){
+		if (!$migrationTarget || !$fileMigrationTarget) {
 			$messageType = 'bad';
 			$message = _t('ExternalContent.NOTARGETSELECTED', 'No target selected to import into.');
 		}
@@ -377,10 +379,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 				$message = _t('ExternalContent.CONTENTMIGRATEQUEUED', 'Import job queued.');
 			} else {
 				$importer = $from->getContentImporter($targetType);
+
 				if ($importer) {
 					$result = $importer->import($from, $target, $includeSelected, $includeChildren, $duplicates, $request);
-
 					$messageType = 'good';
+
 					if ($result instanceof QueuedExternalContentImporter) {
 						$message = _t('ExternalContent.CONTENTMIGRATEQUEUED', 'Import job queued.');
 					} else {
@@ -390,10 +393,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 			}
 		}
 
-        if ($session = $this->getRequest()->getSession()) {
-			$session->set("FormInfo.Form_EditForm.formError.message",$message);
-			$session->set("FormInfo.Form_EditForm.formError.type", $messageType);
-		}
+        $this->getEditForm()->sessionError($message, $messageType);
 
 		return $this->getResponseNegotiator()->respond($this->request);
 	}
@@ -542,14 +542,14 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 				$migrateButton = FormAction::create('migrate', _t('ExternalContent.IMPORT', 'Start Importing'))
 					->setAttribute('data-icon', 'arrow-circle-double')
-                    ->addExtraClass('migrate btn btn-primary tool-button font-icon-plus')
+                    ->addExtraClass('btn action btn btn-primary tool-button font-icon-plus')
 					->setUseButtonTag(true);
 
 				$fields->addFieldToTab(
                     'Root.Import',
                     LiteralField::create(
                         'MigrateActions',
-                        "<div class='Actions'>{$migrateButton->forTemplate()}</div>"
+                        '<div class="btn-toolbar">' . $migrateButton->forTemplate() . '</div>'
                     )
                 );
 			}
@@ -682,25 +682,18 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 		// 	return $this->returnItemToUser($p);
 		// }
 
+        $message = sprintf(_t('ExternalContent.SourceAdded', 'Successfully created %s'), $type);
+        $messageType = 'good';
+
 		try {
 			$record->write();
 		} catch(ValidationException $ex) {
-			//$form->sessionMessage($ex->getResult()->message(), 'bad');
-			return $this->getResponseNegotiator()->respond($this->request);
+            $message = sprintf(_t('ExternalContent.SourceAddedFailed', 'Not successfully created %s'), $type);
+			$messageType = 'bad';
 		}
 
 		$this->setCurrentPageID($record->ID);
-
-		if ($session = $this->getRequest()->getSession()) {
-			$session->set(
-				"FormInfo.Form_EditForm.formError.message",
-				sprintf(_t('ExternalContent.SourceAdded', 'Successfully created %s'), $type)
-			);
-			$session->set("FormInfo.Form_EditForm.formError.type", 'good');
-		}
-
-		$msg = "New " . FormField::name_to_label($type) . " created";
-		$this->response->addHeader('X-Status', rawurlencode(_t('ExternalContent.PROVIDERADDED', $msg)));
+        $this->getEditForm()->sessionError($message, $messageType);
 
 		return $this->getResponseNegotiator()->respond($this->request);
 	}
@@ -914,11 +907,9 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 		$type = $record->ClassName;
 		$record->delete();
-
-        if ($session = $this->getRequest()->getSession()) {
-			$session->set("FormInfo.Form_EditForm.formError.message", "Deleted $type");
-			$session->set("FormInfo.Form_EditForm.formError.type", 'bad');
-		}
+        $message = "Deleted $type successfully.";
+        $messageType = 'bad';
+        $this->getEditForm()->sessionError($message, $messageType);
 
 		$this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.DELETED', 'Deleted.')));
 

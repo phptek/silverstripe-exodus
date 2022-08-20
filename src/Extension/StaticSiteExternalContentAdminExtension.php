@@ -4,6 +4,7 @@ namespace PhpTek\Exodus\Extension;
 
 use \ExternalContent;
 use \ExternalContentSource;
+use SilverStripe\Control\Controller;
 use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Control\HTTPRequest;
@@ -37,6 +38,7 @@ class StaticSiteExternalContentAdminExtension extends Extension
     }
 
     /**
+     * Controller method which starts a crawl.
      *
      * @param array $data
      * @throws Exception
@@ -57,7 +59,7 @@ class StaticSiteExternalContentAdminExtension extends Extension
             }
 
             $messageType = 'good';
-            $message = _t('ExternalContent.CONTENTMIGRATED', 'Crawling successful.');
+            $message = _t('ExternalContent.CONTENTMIGRATED', 'Crawl successful.');
 
             try {
                 $source->crawl();
@@ -67,11 +69,10 @@ class StaticSiteExternalContentAdminExtension extends Extension
             }
         }
 
-        $session = $this->getOwner()->getRequest()->getSession();
-        $session->set("FormInfo.Form_EditForm.formError.message", $message);
-        $session->set("FormInfo.Form_EditForm.formError.type", $messageType);
+        $owner = $this->getOwner();
+        $owner->getEditForm()->sessionError($message, $messageType);
 
-        return $this->owner->getResponseNegotiator()->respond($this->owner->getRequest());
+        return $owner->getResponseNegotiator()->respond($owner->getRequest());
     }
 
     /**
@@ -102,10 +103,9 @@ class StaticSiteExternalContentAdminExtension extends Extension
             $message = _t('StaticSiteConnector.ImportsDeleted', 'No imports were selected to clear.');
         }
 
-        $session = $this->getOwner()->getRequest()->getSession();
-        $session->set("FormInfo.Form_EditForm.formError.message", $message);
-        $session->set("FormInfo.Form_EditForm.formError.type", $messageType);
+        $owner = $this->getOwner();
+        $owner->getEditForm()->sessionError($message, $messageType);
 
-        return $this->owner->getResponseNegotiator()->respond($this->owner->getRequest());
+        return $owner->getResponseNegotiator()->respond($owner->getRequest());
     }
 }

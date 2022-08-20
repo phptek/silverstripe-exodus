@@ -11,8 +11,10 @@
         </div>
 
         <div class="flexbox-area-grow fill-height">
-            <!-- The contents of the CMS' RHS pane -->
+            <div class="panel panel--padded panel--scrollable flexbox-area-grow cms-content-fields ">
+            <!-- The contents of the CMS' RHS pane (See *_EditForm.ss) -->
             $EditForm
+            </div>
         </div>
     </div>
 </div>
