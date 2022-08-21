@@ -2,7 +2,7 @@
 
 namespace PhpTek\Exodus\Transform;
 
-use \ExternalContentImporter;
+use ExternalContentImporter;
 use PhpTek\Exodus\Transform\StaticSitePageTransformer;
 use PhpTek\Exodus\Model\StaticSiteImportDataObject;
 use SilverStripe\Control\Controller;

@@ -32,115 +32,113 @@ OF SUCH DAMAGE.
  */
 class WebApiClientTest extends SapphireTest
 {
-	/**
-	 * Dummy web methods to use
-	 *
-	 * @var array
-	 */
-	static $methods = array(
-		'firstMethod' => array(
-			'auth' => '',
-			'contentType' => 'text/plain',
-			'url' => '/path/to',
-			'params' => array('arg', 'another'),
-			'enctype' => Zend_Http_Client::ENC_URLENCODED,
-			'return' => 'raw',
-			'cache' => 0
-		),
-		'secondMethod' => array(
-			'url' => '/path/{replacement}/to',
-			'params' => array('arg', 'another'),
-			'return' => 'json',
-			'cache' => 0
-		)
-	);
+    /**
+     * Dummy web methods to use
+     *
+     * @var array
+     */
+    public static $methods = array(
+        'firstMethod' => array(
+            'auth' => '',
+            'contentType' => 'text/plain',
+            'url' => '/path/to',
+            'params' => array('arg', 'another'),
+            'enctype' => Zend_Http_Client::ENC_URLENCODED,
+            'return' => 'raw',
+            'cache' => 0
+        ),
+        'secondMethod' => array(
+            'url' => '/path/{replacement}/to',
+            'params' => array('arg', 'another'),
+            'return' => 'json',
+            'cache' => 0
+        )
+    );
 
-	const SERVICE_URL = 'http://localhost/service';
+    public const SERVICE_URL = 'http://localhost/service';
 
-	public function testMakeRequest()
-	{
-		$client = $this->getMock('Zend_Http_Client', array('request'));
-		$response = $this->getMock('Zend_Http_Response', array('isSuccessful', 'getBody'), array(200, array()));
+    public function testMakeRequest()
+    {
+        $client = $this->getMock('Zend_Http_Client', array('request'));
+        $response = $this->getMock('Zend_Http_Response', array('isSuccessful', 'getBody'), array(200, array()));
 
-		// set up the fake response
-		$response->expects($this->once())
-				->method('isSuccessful')
-				->will($this->returnValue(true));
+        // set up the fake response
+        $response->expects($this->once())
+                ->method('isSuccessful')
+                ->will($this->returnValue(true));
 
-		$response->expects($this->once())
-				->method('getBody')
-				->will($this->returnValue('rawbody'));
+        $response->expects($this->once())
+                ->method('getBody')
+                ->will($this->returnValue('rawbody'));
 
-		$client->expects($this->once())
-				->method('request')
-				->will($this->returnValue($response));
+        $client->expects($this->once())
+                ->method('request')
+                ->will($this->returnValue($response));
 
-		// now bind it into the api client
-		$api = new DummyApiClient(self::SERVICE_URL, self::$methods, null, $client);
+        // now bind it into the api client
+        $api = new DummyApiClient(self::SERVICE_URL, self::$methods, null, $client);
 
-		$return = $api->callMethod('firstMethod', array());
+        $return = $api->callMethod('firstMethod', array());
 
-		// make sure that the relevant things on the client are set and that
-		// our return value is as expected
-		$this->assertEquals('rawbody', $return);
-	}
+        // make sure that the relevant things on the client are set and that
+        // our return value is as expected
+        $this->assertEquals('rawbody', $return);
+    }
 
-	// Tests whether the client is recreated when we want it to be
-	public function testHttpClientState()
-	{
-		$api = new DummyApiClient(self::SERVICE_URL, self::$methods, null);
+    // Tests whether the client is recreated when we want it to be
+    public function testHttpClientState()
+    {
+        $api = new DummyApiClient(self::SERVICE_URL, self::$methods, null);
 
-		$client = $api->returnClient(self::SERVICE_URL);
-		$other = $api->returnClient(self::SERVICE_URL);
+        $client = $api->returnClient(self::SERVICE_URL);
+        $other = $api->returnClient(self::SERVICE_URL);
 
-		// they shouldn't be the same
-		$this->assertFalse($client === $other);
+        // they shouldn't be the same
+        $this->assertFalse($client === $other);
 
-		// set it to be a sticky client
-		$api->setMaintainSession(true);
+        // set it to be a sticky client
+        $api->setMaintainSession(true);
 
-		$client = $api->returnClient(self::SERVICE_URL);
-		$this->assertTrue($client === $other);
-	}
+        $client = $api->returnClient(self::SERVICE_URL);
+        $this->assertTrue($client === $other);
+    }
 
-	public function testClientUriReset()
-	{
-		$api = new DummyApiClient(self::SERVICE_URL, self::$methods, null);
-		$api->setMaintainSession(true);
+    public function testClientUriReset()
+    {
+        $api = new DummyApiClient(self::SERVICE_URL, self::$methods, null);
+        $api->setMaintainSession(true);
 
-		$client1 = $api->returnClient('http://uri1');
-		$c1uri = $client1->getUri();
+        $client1 = $api->returnClient('http://uri1');
+        $c1uri = $client1->getUri();
 
-		$client2 = $api->returnClient('http://uri2');
-		$c2uri = $client2->getUri();
+        $client2 = $api->returnClient('http://uri2');
+        $c2uri = $client2->getUri();
 
-		$this->assertFalse($c1uri == $c2uri);
-	}
+        $this->assertFalse($c1uri == $c2uri);
+    }
 }
 
 
 class DummyApiClient extends WebApiClient
 {
-	protected $clientMock;
+    protected $clientMock;
 
-	public function __construct($url, $methods=null, $globalParams=null, $mock=null)
-	{
-		$this->clientMock = $mock;
-		parent::__construct($url, $methods, $globalParams);
-	}
+    public function __construct($url, $methods=null, $globalParams=null, $mock=null)
+    {
+        $this->clientMock = $mock;
+        parent::__construct($url, $methods, $globalParams);
+    }
 
-	protected function getClient($uri)
-	{
-		if (!$this->clientMock) {
-			return parent::getClient($uri);
-		}
-		return $this->clientMock;
-	}
+    protected function getClient($uri)
+    {
+        if (!$this->clientMock) {
+            return parent::getClient($uri);
+        }
+        return $this->clientMock;
+    }
 
-	public function returnClient($uri)
-	{
-		return $this->getClient($uri);
-	}
+    public function returnClient($uri)
+    {
+        return $this->getClient($uri);
+    }
 }
-
-?>

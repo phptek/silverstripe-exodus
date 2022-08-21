@@ -9,10 +9,10 @@ use SilverStripe\Assets\Upload;
  * @author Marcus Nyeholt <marcus@silverstripe.com.au>
  * @license BSD License http://silverstripe.org/bsd-license
  */
-class FileLoader extends Upload {
-
-	public function validate($tmpFile) {
-		return true;
-	}
-
+class FileLoader extends Upload
+{
+    public function validate($tmpFile)
+    {
+        return true;
+    }
 }

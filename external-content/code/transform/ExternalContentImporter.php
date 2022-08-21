@@ -12,118 +12,124 @@ use Symbiote\QueuedJobs\Jobs\AbstractQueuedJob;
  * @license BSD License http://silverstripe.org/bsd-license
  *
  */
-abstract class ExternalContentImporter {
-
+abstract class ExternalContentImporter
+{
     use Injectable;
     use Configurable;
 
-	protected $contentTransforms = array();
-	protected $params = array();
+    protected $contentTransforms = array();
+    protected $params = array();
 
-	private static $use_queue = true;
+    private static $use_queue = true;
 
-	/**
-	 * @return array
-	 */
-	public function getParams() {
-		return $this->params;
-	}
+    /**
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
 
-	/**
-	 * Import from a content source to a particular target
-	 *
-	 * @param ExternalContentItem $contentItem
-	 * @param SiteTree $target
-	 * @param boolean $includeParent
-	 * 			Whether to include the selected item in the import or not
-	 * @param String $duplicateStrategy
-	 * 			How to handle duplication
-	 * @param array $params All parameters passed with the import request.
-	 */
-	public function import($contentItem, $target, $includeParent = false, $includeChildren = true, $duplicateStrategy='Overwrite', $params = array()) {
-		$this->runOnImportStart();
-		$this->params = $params;
+    /**
+     * Import from a content source to a particular target
+     *
+     * @param ExternalContentItem $contentItem
+     * @param SiteTree $target
+     * @param boolean $includeParent
+     * 			Whether to include the selected item in the import or not
+     * @param String $duplicateStrategy
+     * 			How to handle duplication
+     * @param array $params All parameters passed with the import request.
+     */
+    public function import($contentItem, $target, $includeParent = false, $includeChildren = true, $duplicateStrategy='Overwrite', $params = array())
+    {
+        $this->runOnImportStart();
+        $this->params = $params;
 
-		// if the queuedjobs module exists, use that
-		$queuedVersion = 'Queued' . get_class($this);
-		if ($this->config()->use_queue && ClassInfo::exists(AbstractQueuedJob::class) && ClassInfo::exists($queuedVersion)) {
-			$importer = new $queuedVersion(
-							$contentItem,
-							$target,
-							$includeParent,
-							$includeChildren,
-							$duplicateStrategy,
-							$params);
+        // if the queuedjobs module exists, use that
+        $queuedVersion = 'Queued' . get_class($this);
+        if ($this->config()->use_queue && ClassInfo::exists(AbstractQueuedJob::class) && ClassInfo::exists($queuedVersion)) {
+            $importer = new $queuedVersion(
+                $contentItem,
+                $target,
+                $includeParent,
+                $includeChildren,
+                $duplicateStrategy,
+                $params
+            );
 
-			$service = singleton(QueuedJobService::class);
-			$service->queueJob($importer);
-			return $importer;
-		}
+            $service = singleton(QueuedJobService::class);
+            $service->queueJob($importer);
+            return $importer;
+        }
 
-		$children = null;
-		if ($includeParent) {
-			// Get the children of a particular node
-			$children = ArrayList::create();
-			$children->push($contentItem);
-		} else {
-			$children = $contentItem->stageChildren();
-		}
+        $children = null;
+        if ($includeParent) {
+            // Get the children of a particular node
+            $children = ArrayList::create();
+            $children->push($contentItem);
+        } else {
+            $children = $contentItem->stageChildren();
+        }
 
-		$this->importChildren($children, $target, $includeChildren, $duplicateStrategy);
-		$this->runOnImportEnd();
-		return true;
-	}
+        $this->importChildren($children, $target, $includeChildren, $duplicateStrategy);
+        $this->runOnImportEnd();
+        return true;
+    }
 
-	/**
-	 * Execute the importing of several children
-	 *
-	 * @param DataObjectSet $children
-	 * @param SiteTree $parent
-	 */
-	protected function importChildren($children, $parent, $includeChildren, $duplicateStrategy) {
-		if (!$children) {
-			return;
-		}
+    /**
+     * Execute the importing of several children
+     *
+     * @param DataObjectSet $children
+     * @param SiteTree $parent
+     */
+    protected function importChildren($children, $parent, $includeChildren, $duplicateStrategy)
+    {
+        if (!$children) {
+            return;
+        }
 
-		// get the importer to use, import, then see if there's any
-		foreach ($children as $child) {
-			$pageType = $this->getExternalType($child);
-			if (isset($this->contentTransforms[$pageType])) {
-				$transformer = $this->contentTransforms[$pageType];
-				$result = $transformer->transform($child, $parent, $duplicateStrategy);
+        // get the importer to use, import, then see if there's any
+        foreach ($children as $child) {
+            $pageType = $this->getExternalType($child);
+            if (isset($this->contentTransforms[$pageType])) {
+                $transformer = $this->contentTransforms[$pageType];
+                $result = $transformer->transform($child, $parent, $duplicateStrategy);
 
-				$this->extend('onAfterImport', $result);
+                $this->extend('onAfterImport', $result);
 
-				// if there's more, then transform them
-				if ($includeChildren && $result && $result->children && count($result->children)) {
-					// import the children
-					$this->importChildren($result->children, $result->page, $includeChildren, $duplicateStrategy);
-				}
-			}
-		}
-	}
+                // if there's more, then transform them
+                if ($includeChildren && $result && $result->children && count($result->children)) {
+                    // import the children
+                    $this->importChildren($result->children, $result->page, $includeChildren, $duplicateStrategy);
+                }
+            }
+        }
+    }
 
-	/**
-	 * Get the type of the item as far as the remote system
-	 * is concerned. This should match up with what is defined
-	 * in the contentTransforms array
-	 *
-	 * @return String
-	 * 			The type of the ExternalContentItem
-	 */
-	protected abstract function getExternalType($item);
+    /**
+     * Get the type of the item as far as the remote system
+     * is concerned. This should match up with what is defined
+     * in the contentTransforms array
+     *
+     * @return String
+     * 			The type of the ExternalContentItem
+     */
+    abstract protected function getExternalType($item);
 
-	/**
-	 * Allow subclasses to run custom logic immediately prior to import start.
-	 * Not declared abstract so method can be optionally defined on subclasses.
-	 */
-	public function runOnImportStart() {
-	}
+    /**
+     * Allow subclasses to run custom logic immediately prior to import start.
+     * Not declared abstract so method can be optionally defined on subclasses.
+     */
+    public function runOnImportStart()
+    {
+    }
 
-	/**
-	 * Allow subclasses to run custom logic immediately after to import end.
-	 * Not declared abstract so method can be optionally defined on subclasses.
-	 */
-	public function runOnImportEnd() {
-	}
+    /**
+     * Allow subclasses to run custom logic immediately after to import end.
+     * Not declared abstract so method can be optionally defined on subclasses.
+     */
+    public function runOnImportEnd()
+    {
+    }
 }

@@ -2,8 +2,8 @@
 
 namespace PhpTek\Exodus\Extension;
 
-use \ExternalContent;
-use \ExternalContentSource;
+use ExternalContent;
+use ExternalContentSource;
 use PhpTek\Exodus\Model\StaticSiteImportDataObject;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Extension;
@@ -17,7 +17,6 @@ use SilverStripe\Control\HTTPRequest;
  */
 class StaticSiteExternalContentAdminExtension extends Extension
 {
-
     /**
      *
      * @var array
@@ -35,7 +34,7 @@ class StaticSiteExternalContentAdminExtension extends Extension
      */
     public function init()
     {
-       // Requirements::css('phptek/silverstripe-exodus:css/StaticSiteConnector.css');
+        // Requirements::css('phptek/silverstripe-exodus:css/StaticSiteConnector.css');
     }
 
     /**

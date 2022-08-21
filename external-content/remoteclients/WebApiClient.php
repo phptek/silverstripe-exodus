@@ -48,399 +48,404 @@ OF SUCH DAMAGE.
  */
 class WebApiClient
 {
-	public static $cache_length = 1200;
+    public static $cache_length = 1200;
 
-	/**
-	 * The base URL to use for all the calls
-	 * @var String
-	 */
-	protected $baseUrl;
+    /**
+     * The base URL to use for all the calls
+     * @var String
+     */
+    protected $baseUrl;
 
-	public function setBaseUrl($u)
-	{
-		$this->baseUrl = $u;
-	}
+    public function setBaseUrl($u)
+    {
+        $this->baseUrl = $u;
+    }
 
-	public function getBaseUrl()
-	{
-		return $this->baseUrl;
-	}
+    public function getBaseUrl()
+    {
+        return $this->baseUrl;
+    }
 
-	protected $methods;
+    protected $methods;
 
-	/**
-	 * The methods to call
-	 *
-	 * @param array $v
-	 */
-	public function setMethods($v)
-	{
-		$this->methods = $v;
-	}
+    /**
+     * The methods to call
+     *
+     * @param array $v
+     */
+    public function setMethods($v)
+    {
+        $this->methods = $v;
+    }
 
-	/**
-	 * An array of parameters that should ALWAYS be
-	 * passed through on each request.
-	 *
-	 * @var array
-	 */
-	protected $globalParams = null;
+    /**
+     * An array of parameters that should ALWAYS be
+     * passed through on each request.
+     *
+     * @var array
+     */
+    protected $globalParams = null;
 
-	/**
-	 * Sets the global parameters
-	 */
-	public function setGlobalParams($v)
-	{
-		$this->globalParams = $v;
-	}
+    /**
+     * Sets the global parameters
+     */
+    public function setGlobalParams($v)
+    {
+        $this->globalParams = $v;
+    }
 
-	/**
-	 * Set a single param
-	 *
-	 * @param string $key
-	 * @param mixed $value
-	 */
-	public function setGlobalParam($key, $value)
-	{
-		$this->globalParams[$key] = $value;
-	}
+    /**
+     * Set a single param
+     *
+     * @param string $key
+     * @param mixed $value
+     */
+    public function setGlobalParam($key, $value)
+    {
+        $this->globalParams[$key] = $value;
+    }
 
-	protected $returnHandlers = array();
+    protected $returnHandlers = array();
 
-	/**
-	 * Adds a new return handler to the list of handlers.
-	 *
-	 * Handlers must implement the 'handleReturn' method,
-	 * the result of which is returned to the caller
-	 *
-	 * @param $name
-	 * 				The name of the handler, which should match the
-	 * 				'return' param of the method definition
-	 * @param $object
-	 * 				The object which will handle the return
-	 * @return array
-	 */
-	public function addReturnHandler($name, ReturnHandler $object)
-	{
-		$this->returnHandlers[$name] = $object;
-	}
+    /**
+     * Adds a new return handler to the list of handlers.
+     *
+     * Handlers must implement the 'handleReturn' method,
+     * the result of which is returned to the caller
+     *
+     * @param $name
+     * 				The name of the handler, which should match the
+     * 				'return' param of the method definition
+     * @param $object
+     * 				The object which will handle the return
+     * @return array
+     */
+    public function addReturnHandler($name, ReturnHandler $object)
+    {
+        $this->returnHandlers[$name] = $object;
+    }
 
-	/**
-	 * Whether or not to persist cookies (eg in a login situation
-	 *
-	 * @var boolean
-	 */
-	protected $useCookies = false;
+    /**
+     * Whether or not to persist cookies (eg in a login situation
+     *
+     * @var boolean
+     */
+    protected $useCookies = false;
 
-	public function setUseCookies($b)
-	{
-		$this->useCookies = $b;
-	}
+    public function setUseCookies($b)
+    {
+        $this->useCookies = $b;
+    }
 
-	protected $maintainSession = false;
+    protected $maintainSession = false;
 
-	public function setMaintainSession($b)
-	{
-		$this->maintainSession = true;
-	}
+    public function setMaintainSession($b)
+    {
+        $this->maintainSession = true;
+    }
 
-	/**
-	 * Basic HTTP Auth details
-	 *
-	 * @var array
-	 */
-	protected $authInfo;
+    /**
+     * Basic HTTP Auth details
+     *
+     * @var array
+     */
+    protected $authInfo;
 
-	public function setAuthInfo($username, $password)
-	{
-		$this->authInfo = array(
-			'user' => $username,
-			'pass' => $password,
-		);
-	}
+    public function setAuthInfo($username, $password)
+    {
+        $this->authInfo = array(
+            'user' => $username,
+            'pass' => $password,
+        );
+    }
 
-	/**
-	 * Create a new webapi client
-	 *
-	 */
-	public function __construct($url, $methods=null, $globalParams=null)
-	{
-		$this->baseUrl = $url;
-		$this->methods = $methods;
-		$this->globalParams = $globalParams;
+    /**
+     * Create a new webapi client
+     *
+     */
+    public function __construct($url, $methods=null, $globalParams=null)
+    {
+        $this->baseUrl = $url;
+        $this->methods = $methods;
+        $this->globalParams = $globalParams;
 
-		$this->addReturnHandler('xml', new XmlReturnHandler());
-		$this->addReturnHandler('dom', new DomReturnHandler());
-		$this->addReturnHandler('json', new JsonReturnHandler());
-	}
+        $this->addReturnHandler('xml', new XmlReturnHandler());
+        $this->addReturnHandler('dom', new DomReturnHandler());
+        $this->addReturnHandler('json', new JsonReturnHandler());
+    }
 
-	public function __call($method, $args) {
-		$arg = is_array($args) && count($args) ? $args[0] : null;
-		return $this->callMethod($method, $arg);
-	}
+    public function __call($method, $args)
+    {
+        $arg = is_array($args) && count($args) ? $args[0] : null;
+        return $this->callMethod($method, $arg);
+    }
 
-	/**
-	 * Call a method with the passed in arguments
-	 *
-	 * @param String $method
-	 * @param array $args - a mapping of argumentName => argumentValue
-	 * @param array $getParams
-	 *				Specific get params to add in
-	 * @param array $postParams
-	 *				Specific post params to append
-	 * @return mixed
-	 */
-	public function callMethod($method, $args)
-	{
-		$methodDetails = isset($this->methods[$method]) ? $this->methods[$method] : null;
-		if (!$methodDetails) {
-			throw new Exception("$method does not have an appropriate mapping");
-		}
+    /**
+     * Call a method with the passed in arguments
+     *
+     * @param String $method
+     * @param array $args - a mapping of argumentName => argumentValue
+     * @param array $getParams
+     *				Specific get params to add in
+     * @param array $postParams
+     *				Specific post params to append
+     * @return mixed
+     */
+    public function callMethod($method, $args)
+    {
+        $methodDetails = isset($this->methods[$method]) ? $this->methods[$method] : null;
+        if (!$methodDetails) {
+            throw new Exception("$method does not have an appropriate mapping");
+        }
 
-		$body = null;
+        $body = null;
 
-		// use the method params to try caching the results
-		// need to add in the baseUrl we're connecting to, and any global params
-		// because the cache might be connecting via different users, and the
-		// different users will have different sessions. This might need to be
-		// tweaked to handle separate user logins at a later point in time
-		$uri = $this->baseUrl . (isset($methodDetails['url']) ? $methodDetails['url'] : '');
-		// 	check for any replacements that are required
-		if (preg_match_all('/{(\w+)}/', $uri, $matches)) {
-			foreach ($matches[1] as $match) {
-				if (isset($args[$match])) {
-					$uri = str_replace('{'.$match.'}', $args[$match], $uri);
-				}
-			}
-		}
+        // use the method params to try caching the results
+        // need to add in the baseUrl we're connecting to, and any global params
+        // because the cache might be connecting via different users, and the
+        // different users will have different sessions. This might need to be
+        // tweaked to handle separate user logins at a later point in time
+        $uri = $this->baseUrl . (isset($methodDetails['url']) ? $methodDetails['url'] : '');
+        // 	check for any replacements that are required
+        if (preg_match_all('/{(\w+)}/', $uri, $matches)) {
+            foreach ($matches[1] as $match) {
+                if (isset($args[$match])) {
+                    $uri = str_replace('{'.$match.'}', $args[$match], $uri);
+                }
+            }
+        }
 
-		$cacheKey = md5($uri . $method . var_export($args, true) . var_export($this->globalParams, true));
+        $cacheKey = md5($uri . $method . var_export($args, true) . var_export($this->globalParams, true));
 
-		$requestType = isset($methodDetails['method']) ? $methodDetails['method'] : 'GET';
-		$cache = isset($methodDetails['cache']) ? $methodDetails['cache'] : self::$cache_length;
-		if (mb_strtolower($requestType) == 'get' && $cache) {
-			$body = CacheService::inst()->get($cacheKey);
-		}
+        $requestType = isset($methodDetails['method']) ? $methodDetails['method'] : 'GET';
+        $cache = isset($methodDetails['cache']) ? $methodDetails['cache'] : self::$cache_length;
+        if (mb_strtolower($requestType) == 'get' && $cache) {
+            $body = CacheService::inst()->get($cacheKey);
+        }
 
-		if (!$body) {
+        if (!$body) {
 
 
-			// Note that case is important! Some servers won't respond correctly
-			// to get or Get requests
-			$requestType = isset($methodDetails['method']) ? $methodDetails['method'] : 'GET';
+            // Note that case is important! Some servers won't respond correctly
+            // to get or Get requests
+            $requestType = isset($methodDetails['method']) ? $methodDetails['method'] : 'GET';
 
-			$client = $this->getClient($uri);
-			$client->setMethod($requestType);
+            $client = $this->getClient($uri);
+            $client->setMethod($requestType);
 
-			// set the encoding type
-			$client->setEncType(isset($methodDetails['enctype']) ? $methodDetails['enctype'] : Zend_Http_Client::ENC_URLENCODED);
+            // set the encoding type
+            $client->setEncType(isset($methodDetails['enctype']) ? $methodDetails['enctype'] : Zend_Http_Client::ENC_URLENCODED);
 
-			$paramMethod = $requestType == 'GET' ? 'setParameterGet' : 'setParameterPost';
-			if ($this->globalParams) {
-				foreach ($this->globalParams as $key => $value) {
-					$client->$paramMethod($key, $value);
-				}
-			}
+            $paramMethod = $requestType == 'GET' ? 'setParameterGet' : 'setParameterPost';
+            if ($this->globalParams) {
+                foreach ($this->globalParams as $key => $value) {
+                    $client->$paramMethod($key, $value);
+                }
+            }
 
-			if (isset($methodDetails['params'])) {
-				$paramNames = $methodDetails['params'];
-				foreach ($paramNames as $index => $pname) {
+            if (isset($methodDetails['params'])) {
+                $paramNames = $methodDetails['params'];
+                foreach ($paramNames as $index => $pname) {
+                    if (isset($args[$pname])) {
+                        $client->$paramMethod($pname, $args[$pname]);
+                    } elseif (isset($args[$index])) {
+                        $client->$paramMethod($pname, $args[$index]);
+                    }
+                }
+            }
 
-					if (isset($args[$pname])) {
-						$client->$paramMethod($pname, $args[$pname]);
-					} else if (isset($args[$index])) {
-						$client->$paramMethod($pname, $args[$index]);
-					}
-				}
-			}
+            if (isset($methodDetails['get'])) {
+                foreach ($methodDetails['get'] as $k => $v) {
+                    $client->setParameterGet($k, $v);
+                }
+            }
 
-			if (isset($methodDetails['get'])) {
-				foreach ($methodDetails['get'] as $k => $v) {
-					$client->setParameterGet($k, $v);
-				}
-			}
+            if (isset($methodDetails['post'])) {
+                foreach ($methodDetails['post'] as $k => $v) {
+                    $client->setParameterPost($k, $v);
+                }
+            }
 
-			if (isset($methodDetails['post'])) {
-				foreach ($methodDetails['post'] as $k => $v) {
-					$client->setParameterPost($k, $v);
-				}
-			}
+            if (isset($methodDetails['raw']) && $methodDetails['raw']) {
+                $client->setRawData($args['raw_body']);
+            }
 
-			if (isset($methodDetails['raw']) && $methodDetails['raw']) {
-				$client->setRawData($args['raw_body']);
-			}
+            // request away
+            $response = $client->request();
 
-			// request away
-			$response = $client->request();
+            if ($response->isSuccessful()) {
+                $body = $response->getBody();
+                if ($cache) {
+                    CacheService::inst()->store($cacheKey, $body, $cache);
+                }
+            } else {
+                if ($response->getStatus() == 500) {
+                    error_log("Failure: ".$response->getBody());
+                    error_log(var_export($client, true));
+                }
+                throw new FailedRequestException("Failed executing $method: ".$response->getMessage()." for request to $uri (".$client->getUri(true).')', $response->getBody());
+            }
+        }
 
-			if ($response->isSuccessful()) {
-				$body = $response->getBody();
-				if ($cache) {
-					CacheService::inst()->store($cacheKey, $body, $cache);
-				}
-			} else {
-				if ($response->getStatus() == 500) {
-					error_log("Failure: ".$response->getBody());
-					error_log(var_export($client, true));
-				}
-				throw new FailedRequestException("Failed executing $method: ".$response->getMessage()." for request to $uri (".$client->getUri(true).')', $response->getBody());
-			}
-		}
+        $returnType = isset($methodDetails['return']) ? $methodDetails['return'] : 'raw';
 
-		$returnType = isset($methodDetails['return']) ? $methodDetails['return'] : 'raw';
+        // see what we need to do with it
+        if (isset($this->returnHandlers[$returnType])) {
+            $handler = $this->returnHandlers[$returnType];
+            return $handler->handleReturn($body);
+        } else {
+            return $body;
+        }
+    }
 
-		// see what we need to do with it
-		if (isset($this->returnHandlers[$returnType])) {
-			$handler = $this->returnHandlers[$returnType];
-			return $handler->handleReturn($body);
-		} else {
-			return $body;
-		}
-	}
+    /**
+     * Call a URL directly, without it being mapped to a configured web method.
+     *
+     * This differs from the above in that the caller already knows what
+     * URL is trying to be called, so we can bypass the business of mapping
+     * arguments all over the place.
+     *
+     * We still maintain the globalParams for this client though
+     *
+     * @param $url
+     * 			The URL to call
+     * @param $args
+     * 			Parameters to be passed on the call
+     * @return mixed
+     */
+    public function callUrl($url, $args = array(), $returnType = 'raw', $requestType = 'GET', $cache = 300, $enctype = Zend_Http_Client::ENC_URLENCODED)
+    {
+        $body = null;
+        // use the method params to try caching the results
+        // need to add in the baseUrl we're connecting to, and any global params
+        // because the cache might be connecting via different users, and the
+        // different users will have different sessions. This might need to be
+        // tweaked to handle separate user logins at a later point in time
+        $cacheKey = md5($url . $requestType . var_export($args, true) . var_export($this->globalParams, true));
 
-	/**
-	 * Call a URL directly, without it being mapped to a configured web method.
-	 *
-	 * This differs from the above in that the caller already knows what
-	 * URL is trying to be called, so we can bypass the business of mapping
-	 * arguments all over the place.
-	 *
-	 * We still maintain the globalParams for this client though
-	 *
-	 * @param $url
-	 * 			The URL to call
-	 * @param $args
-	 * 			Parameters to be passed on the call
-	 * @return mixed
-	 */
-	public function callUrl($url, $args = array(), $returnType = 'raw', $requestType = 'GET', $cache = 300, $enctype = Zend_Http_Client::ENC_URLENCODED)
-	{
-		$body = null;
-		// use the method params to try caching the results
-		// need to add in the baseUrl we're connecting to, and any global params
-		// because the cache might be connecting via different users, and the
-		// different users will have different sessions. This might need to be
-		// tweaked to handle separate user logins at a later point in time
-		$cacheKey = md5($url . $requestType . var_export($args, true) . var_export($this->globalParams, true));
+        $requestType = isset($methodDetails['method']) ? $methodDetails['method'] : 'GET';
 
-		$requestType = isset($methodDetails['method']) ? $methodDetails['method'] : 'GET';
+        if (mb_strtolower($requestType) == 'get' && $cache) {
+            $body = CacheService::inst()->get($cacheKey);
+        }
 
-		if (mb_strtolower($requestType) == 'get' && $cache) {
-			$body = CacheService::inst()->get($cacheKey);
-		}
+        if (!$body) {
+            $uri = $url;
+            $client = $this->getClient($uri);
+            $client->setMethod($requestType);
+            // set the encoding type
+            $client->setEncType($enctype);
+            $paramMethod = 'setParameter'.$requestType;
+            // make sure to add the alfTicket parameter
+            if ($this->globalParams) {
+                foreach ($this->globalParams as $key => $value) {
+                    $client->$paramMethod($key, $value);
+                }
+            }
 
-		if (!$body) {
-			$uri = $url;
-			$client = $this->getClient($uri);
-			$client->setMethod($requestType);
-			// set the encoding type
-			$client->setEncType($enctype);
-			$paramMethod = 'setParameter'.$requestType;
-			// make sure to add the alfTicket parameter
-			if ($this->globalParams) {
-				foreach ($this->globalParams as $key => $value) {
-					$client->$paramMethod($key, $value);
-				}
-			}
+            foreach ($args as $index => $pname) {
+                $client->$paramMethod($index, $pname);
+            }
 
-			foreach ($args as $index => $pname) {
-				$client->$paramMethod($index, $pname);
-			}
+            // request away
+            $response = $client->request();
 
-			// request away
-			$response = $client->request();
+            if ($response->isSuccessful()) {
+                $body = $response->getBody();
+                if ($cache) {
+                    CacheService::inst()->store($cacheKey, $body, $cache);
+                }
+            } else {
+                if ($response->getStatus() == 500) {
+                    error_log("Failure: ".$response->getBody());
+                    error_log(var_export($client, true));
+                }
+                throw new FailedRequestException("Failed executing $url: ".$response->getMessage()." for request to $uri (".$client->getUri(true).')', $response->getBody());
+            }
+        }
 
-			if ($response->isSuccessful()) {
-				$body = $response->getBody();
-				if ($cache) {
-					CacheService::inst()->store($cacheKey, $body, $cache);
-				}
-			} else {
-				if ($response->getStatus() == 500) {
-					error_log("Failure: ".$response->getBody());
-					error_log(var_export($client, true));
-				}
-				throw new FailedRequestException("Failed executing $url: ".$response->getMessage()." for request to $uri (".$client->getUri(true).')', $response->getBody());
-			}
-		}
+        // see what we need to do with it
+        if (isset($this->returnHandlers[$returnType])) {
+            $handler = $this->returnHandlers[$returnType];
+            return $handler->handleReturn($body);
+        } else {
+            return $body;
+        }
+    }
 
-		// see what we need to do with it
-		if (isset($this->returnHandlers[$returnType])) {
-			$handler = $this->returnHandlers[$returnType];
-			return $handler->handleReturn($body);
-		} else {
-			return $body;
-		}
-	}
+    /**
+     * The HTTP Client being used during the life of this request
+     *
+     * @var Zend_Http_Client
+     */
+    protected $httpClient = null;
 
-	/**
-	 * The HTTP Client being used during the life of this request
-	 *
-	 * @var Zend_Http_Client
-	 */
-	protected $httpClient = null;
+    /**
+     * Create and return the http client, defined in a separate method
+     * for testing purposes
+     *
+     * @return Zend_Http_Client
+     */
+    protected function getClient($uri)
+    {
+        // TODO For some reason the Alfresco client goes into an infinite loop when returning
+        // the children of an item (when you call getChildren on the company home)
+        // it returns itself as its own child, unless you recreate the client. It seems
+        // to maintain all the request body... or something weird.
+        if (!$this->httpClient || !$this->maintainSession) {
+            $this->httpClient = new Zend_Http_Client(
+                $uri,
+                array(
+                    'maxredirects' => 0,
+                    'timeout'      => 10
+                )
+            );
 
-	/**
-	 * Create and return the http client, defined in a separate method
-	 * for testing purposes
-	 *
-	 * @return Zend_Http_Client
-	 */
-	protected function getClient($uri)
-	{
-		// TODO For some reason the Alfresco client goes into an infinite loop when returning
-		// the children of an item (when you call getChildren on the company home)
-		// it returns itself as its own child, unless you recreate the client. It seems
-		// to maintain all the request body... or something weird.
-		if (!$this->httpClient || !$this->maintainSession) {
-			$this->httpClient = new Zend_Http_Client($uri, array(
-	    			'maxredirects' => 0,
-	    			'timeout'      => 10
-				)
-			);
+            if ($this->useCookies) {
+                $this->httpClient->setCookieJar();
+            }
+        } else {
+            $this->httpClient->setUri($uri);
+        }
 
-			if ($this->useCookies) {
-				$this->httpClient->setCookieJar();
-			}
-		} else {
-			$this->httpClient->setUri($uri);
-		}
+        // clear it out
+        if ($this->maintainSession) {
+            $this->httpClient->resetParameters();
+        }
 
-		// clear it out
-		if ($this->maintainSession) {
-			$this->httpClient->resetParameters();
-		}
+        if ($this->authInfo) {
+            $this->httpClient->setAuth($this->authInfo['user'], $this->authInfo['pass']);
+        }
 
-		if ($this->authInfo) {
-			$this->httpClient->setAuth($this->authInfo['user'], $this->authInfo['pass']);
-		}
-
-		return $this->httpClient;
-	}
+        return $this->httpClient;
+    }
 }
 
 class FailedRequestException extends Exception
 {
-	private $response;
-	public function getResponse() { return $this->response; }
+    private $response;
+    public function getResponse()
+    {
+        return $this->response;
+    }
 
-	public function __construct($message, $response)
-	{
-		$this->response = $response;
+    public function __construct($message, $response)
+    {
+        $this->response = $response;
 
-		parent::__construct($message);
-	}
+        parent::__construct($message);
+    }
 }
 
 interface ReturnHandler
 {
-	/**
-	 * Handle the processing of a return response in a particular manner
-	 *
-	 * @param $rawResponse
-	 * @return mixed
-	 */
-	public function handleReturn($rawResponse);
+    /**
+     * Handle the processing of a return response in a particular manner
+     *
+     * @param $rawResponse
+     * @return mixed
+     */
+    public function handleReturn($rawResponse);
 }
 
 /**
@@ -451,27 +456,27 @@ interface ReturnHandler
  */
 class XmlReturnHandler implements ReturnHandler
 {
-	public function handleReturn($rawResponse)
-	{
-		$rawResponse = trim($rawResponse);
-		if (strpos($rawResponse, '<?xml') === 0) {
-			// get rid of the xml prolog
-			$rawResponse = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $rawResponse);
-		}
+    public function handleReturn($rawResponse)
+    {
+        $rawResponse = trim($rawResponse);
+        if (strpos($rawResponse, '<?xml') === 0) {
+            // get rid of the xml prolog
+            $rawResponse = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $rawResponse);
+        }
 
-		return new SimpleXMLElement($rawResponse);
-	}
+        return new SimpleXMLElement($rawResponse);
+    }
 }
 
 class DomReturnHandler implements ReturnHandler
 {
-	public function handleReturn($rawResponse)
-	{
-		$rawResponse = trim($rawResponse);
+    public function handleReturn($rawResponse)
+    {
+        $rawResponse = trim($rawResponse);
 
 
-		return new DOMDocument($rawResponse);
-	}
+        return new DOMDocument($rawResponse);
+    }
 }
 
 /**
@@ -481,10 +486,8 @@ class DomReturnHandler implements ReturnHandler
  */
 class JsonReturnHandler implements ReturnHandler
 {
-	public function handleReturn($rawResponse)
-	{
-		return json_decode($rawResponse);
-	}
+    public function handleReturn($rawResponse)
+    {
+        return json_decode($rawResponse);
+    }
 }
-
-?>

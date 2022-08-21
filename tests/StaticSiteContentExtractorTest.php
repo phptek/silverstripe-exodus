@@ -8,32 +8,31 @@ use PhpTek\Exodus\Tool\StaticSiteContentExtractor;
 /**
  *
  * @author Russell Michell <russ@theruss.com>
- * @package staticsiteconnector
+ * @package phptek/silverstripe-exodus
  */
 class StaticSiteContentExtractorTest extends SapphireTest
 {
-	public function testPrepareContentNoRootTag()
-	{
-		$badContent = '<head></head><body><p>test.</p></body>';
-		$url = '/test/test.html';
-		$mime = 'text/html';
-		$extractor = StaticSiteContentExtractor::create($url, $mime, $badContent);
-		$extractor->prepareContent();
-		$matcher = array('tag' => 'html');
+    public function testPrepareContentNoRootTag()
+    {
+        $badContent = '<head></head><body><p>test.</p></body>';
+        $url = '/test/test.html';
+        $mime = 'text/html';
+        $extractor = StaticSiteContentExtractor::create($url, $mime, $badContent);
+        $extractor->prepareContent();
+        $matcher = array('tag' => 'html');
 
-		$this->assertTag($matcher, $extractor->getContent());
-	}
+        $this->assertTag($matcher, $extractor->getContent());
+    }
 
-	public function testPrepareContentRootTag()
-	{
-		$goodContent = '<html><head></head><body><p>test.</p></body></html>';
-		$url = '/test/test.html';
-		$mime = 'text/html';
-		$extractor = StaticSiteContentExtractor::create($url, $mime, $goodContent);
-		$extractor->prepareContent();
-		$matcher = array('tag' => 'html');
+    public function testPrepareContentRootTag()
+    {
+        $goodContent = '<html><head></head><body><p>test.</p></body></html>';
+        $url = '/test/test.html';
+        $mime = 'text/html';
+        $extractor = StaticSiteContentExtractor::create($url, $mime, $goodContent);
+        $extractor->prepareContent();
+        $matcher = array('tag' => 'html');
 
-		$this->assertTag($matcher, $extractor->getContent());
-	}
+        $this->assertTag($matcher, $extractor->getContent());
+    }
 }
-

@@ -2,9 +2,9 @@
 
 namespace PhpTek\Exodus\Tool;
 
-use \phpQuery;
-use \DOMDocument;
-use \DOMElement;
+use phpQuery;
+use DOMDocument;
+use DOMElement;
 use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
 use SilverStripe\Core\Injector\Injectable;
@@ -359,7 +359,6 @@ class StaticSiteContentExtractor
             $this->setTmpFileName($tmp_name); // Set a tmp filename
 
             return 'file';
-
         }
 
         $fullResponseBody = curl_exec($ch);

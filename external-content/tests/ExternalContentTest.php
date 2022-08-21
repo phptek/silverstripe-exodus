@@ -26,16 +26,15 @@ OF SUCH DAMAGE.
 
 class ExternalContentTest extends SapphireTest
 {
-	public function setUp() {
-		parent::setUp();
-		if (!class_exists('FileSystemContentSource')) {
-			throw new Exception("You must have the filesystem connector installed to use for testing");
-		}
-	}
+    public function setUp()
+    {
+        parent::setUp();
+        if (!class_exists('FileSystemContentSource')) {
+            throw new Exception("You must have the filesystem connector installed to use for testing");
+        }
+    }
 
-	public function testGetObject() {
-
-	}
+    public function testGetObject()
+    {
+    }
 }
-
-?>

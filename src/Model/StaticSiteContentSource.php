@@ -166,7 +166,9 @@ class StaticSiteContentSource extends ExternalContentSource
         $importRules->getConfig()->removeComponentsByType(GridFieldAddNewButton::class);
         $importRules->getConfig()->addComponent($addNewButton);
         $fields->removeFieldFromTab("Root", "Schemas");
-        $fields->addFieldToTab('Root.Main', LiteralField::create('SchemaIntro', ''
+        $fields->addFieldToTab('Root.Main', LiteralField::create(
+            'SchemaIntro',
+            ''
             . '<p class="message notice">Schemas define'
             . ' rules for importing crawled content into database fields'
             . ' with the use of CSS selectors. If more than one schema exists for a field, then they will be'
@@ -179,12 +181,12 @@ class StaticSiteContentSource extends ExternalContentSource
             case StaticSiteUrlList::CRAWL_STATUS_NOTSTARTED:
                 $crawlButtonText = _t('StaticSiteContentSource.CRAWL_SITE', 'Crawl');
                 break;
-                case StaticSiteUrlList::CRAWL_STATUS_PARTIAL:
+            case StaticSiteUrlList::CRAWL_STATUS_PARTIAL:
                 $crawlButtonText = _t('StaticSiteContentSource.RESUME_CRAWLING', 'Resume Crawl');
                 break;
-                case StaticSiteUrlList::CRAWL_STATUS_COMPLETE;
-                $crawlButtonText = _t('StaticSiteContentSource.RECRAWL_SITE', 'Re-Crawl');
-                break;
+            case StaticSiteUrlList::CRAWL_STATUS_COMPLETE:
+            $crawlButtonText = _t('StaticSiteContentSource.RECRAWL_SITE', 'Re-Crawl');
+            break;
             default:
                 throw new \LogicException("Invalid getSpiderStatus() value '".$this->urlList()->getSpiderStatus().";");
         }
@@ -592,7 +594,9 @@ class StaticSiteContentSourceImportSchema extends DataObject
         array_shift($dataObjects);
         natcasesort($dataObjects);
 
-        $fields->insertBefore('Order', LiteralField::create('ImportIntro', ''
+        $fields->insertBefore('Order', LiteralField::create(
+            'ImportIntro',
+            ''
             . '<p class="message notice">An Import Schema maps a source URI regex and Mime-Type'
             . ' to a target content-type (Usually a SiteTree subclass, but could be an ElementalBlock).'
             . ' Content that matches will be saved as the selected Data Type.</p>'
@@ -872,7 +876,7 @@ class StaticSiteContentSourceImportRule extends DataObject
             $fields->dataFieldByName('CSSSelector')
                 ->setDescription('A list of valid CSS selectors (separated by a space) whose content'
                 . ' is written to the "Target Field" above');
-                $fields->dataFieldByName('ExcludeCSSSelector')
+            $fields->dataFieldByName('ExcludeCSSSelector')
                 ->setDescription('A list of valid CSS selectors (separated by a space) whose content'
                 . ' should be ignored. This is useful for fine-tuning what is returned in an import.');
         } else {

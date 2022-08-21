@@ -43,70 +43,72 @@ use Symbiote\QueuedJobs\Services\QueuedJobService;
  */
 class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier, PermissionProvider
 {
-	/**
-	 * The URL format to get directly to this controller
-	 * @var unknown_type
-	 */
-	const URL_STUB = 'extadmin';
+    /**
+     * The URL format to get directly to this controller
+     * @var unknown_type
+     */
+    public const URL_STUB = 'extadmin';
 
-	/**
-	 * The directory that the module is assuming it's installed in to.
-	 */
-	static $directory = 'external-content';
+    /**
+     * The directory that the module is assuming it's installed in to.
+     */
+    public static $directory = 'external-content';
 
-	/**
-	 * URL segment used by the backend
-	 *
-	 * @var string
-	 */
-	private static $url_segment = 'external-content';
-	private static $url_rule = '$Action//$ID';
-	private static $menu_title = 'External Content';
-	private static $tree_class = ExternalContentSource::class;
-	private static $allowed_actions = [
-		'addprovider',
-		'deleteprovider',
-		'deletemarked',
-		'CreateProviderForm',
-		'DeleteItemsForm',
-		'getsubtree',
-		'save',
-		'migrate',
-		'download',
-		'view',
-		'treeview',
-		'EditForm',
-		'AddForm',
-		'updateSources',
-		'updatetreenodes'
+    /**
+     * URL segment used by the backend
+     *
+     * @var string
+     */
+    private static $url_segment = 'external-content';
+    private static $url_rule = '$Action//$ID';
+    private static $menu_title = 'External Content';
+    private static $tree_class = ExternalContentSource::class;
+    private static $allowed_actions = [
+        'addprovider',
+        'deleteprovider',
+        'deletemarked',
+        'CreateProviderForm',
+        'DeleteItemsForm',
+        'getsubtree',
+        'save',
+        'migrate',
+        'download',
+        'view',
+        'treeview',
+        'EditForm',
+        'AddForm',
+        'updateSources',
+        'updatetreenodes'
     ];
 
-	public function init()
-	{
-		parent::init();
+    public function init()
+    {
+        parent::init();
 
-		Requirements::customCSS($this->generatePageIconsCss());
-		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external-content-admin.js');
-		Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external-content-reload.js');
-	}
+        Requirements::customCSS($this->generatePageIconsCss());
+        Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external-content-admin.js');
+        Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external-content-reload.js');
+    }
 
-	/**
-	 * Overridden to properly output a value and end, instead of
-	 * letting further headers (X-Javascript-Include) be output
-	 */
-	public function pageStatus() {
-		// If no ID is set, we're merely keeping the session alive
-		if (!isset($_REQUEST['ID'])) {
-			echo '{}';
-			return;
-		}
+    /**
+     * Overridden to properly output a value and end, instead of
+     * letting further headers (X-Javascript-Include) be output
+     */
+    public function pageStatus()
+    {
+        // If no ID is set, we're merely keeping the session alive
+        if (!isset($_REQUEST['ID'])) {
+            echo '{}';
+            return;
+        }
 
-		parent::pageStatus();
-	}
+        parent::pageStatus();
+    }
 
-	public function LinkTreeViewDeferred() {
-		return $this->Link('treeview');
-	}
+    public function LinkTreeViewDeferred()
+    {
+        return $this->Link('treeview');
+    }
 
     /**
      * Copied directly from {@link CMSMain}. It appears this method used to be on {@link LeftAndMain}
@@ -251,245 +253,252 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         return trim($classes);
     }
 
-	/**
-	 *
-	 * If there's no ExternalContentSource ID available from Session or Request data then instead of
-	 * LeftAndMain::currentPageID() returning just `null`, "extend" its range to use the first sub-class
-	 * of {@link ExternalContentSource} the system can find, either via config or introspection.
-	 *
-	 * @return number | null
-	 */
-	public function getCurrentPageID() {
-		if(!$id = $this->currentPageID()) {
-			// Try an id from an ExternalContentSource Subclass
-			$defaultSources = ClassInfo::getValidSubClasses(ExternalContentSource::class);
-			array_shift($defaultSources);
-			// Use one if defined in config, otherwise use first one found through reflection
-			$defaultSourceConfig = ExternalContentSource::config()->get('default_source');
-
-			if($defaultSourceConfig) {
-				$class = $defaultSourceConfig;
-			} else if(isset($defaultSources[0])) {
-				$class = $defaultSources[0];
-			} else {
-				$class = null;
-			}
-
-			if($class && $source = DataObject::get($class)->first()) {
-				return $source->ID;
-			}
-
-			return null;
-		}
-
-		return $id;
-	}
-
-    public function currentPageID() {
-		$session = $this->getRequest()->getSession();
-
-		if($this->getRequest()->requestVar('ID') && preg_match(ExternalContent::ID_FORMAT, $this->getRequest()->requestVar('ID')))	{
-			return $this->getRequest()->requestVar('ID');
-		} elseif (isset($this->urlParams['ID']) && preg_match(ExternalContent::ID_FORMAT, $this->urlParams['ID'])) {
-			return $this->urlParams['ID'];
-		} elseif($session && $session->get($this->sessionNamespace() . ".currentPage")) {
-			return $session->get($this->sessionNamespace() . ".currentPage");
-		}
-
-		return null;
-	}
-
-	/**
-	 * Custom currentPage() method to handle opening the 'root' node
-	 *
-	 * @return DataObject
-	 */
-	public function currentPage()
+    /**
+     *
+     * If there's no ExternalContentSource ID available from Session or Request data then instead of
+     * LeftAndMain::currentPageID() returning just `null`, "extend" its range to use the first sub-class
+     * of {@link ExternalContentSource} the system can find, either via config or introspection.
+     *
+     * @return number | null
+     */
+    public function getCurrentPageID()
     {
-		$id = $this->getCurrentPageID();
+        if (!$id = $this->currentPageID()) {
+            // Try an id from an ExternalContentSource Subclass
+            $defaultSources = ClassInfo::getValidSubClasses(ExternalContentSource::class);
+            array_shift($defaultSources);
+            // Use one if defined in config, otherwise use first one found through reflection
+            $defaultSourceConfig = ExternalContentSource::config()->get('default_source');
 
-		if (preg_match(ExternalContent::ID_FORMAT, (string) $id)) {
-			return ExternalContent::getDataObjectFor($id);
-		}
+            if ($defaultSourceConfig) {
+                $class = $defaultSourceConfig;
+            } elseif (isset($defaultSources[0])) {
+                $class = $defaultSources[0];
+            } else {
+                $class = null;
+            }
 
-		if ($id == 'root') {
-			return singleton($this->config()->get('tree_class'));
-		}
-	}
+            if ($class && $source = DataObject::get($class)->first()) {
+                return $source->ID;
+            }
 
+            return null;
+        }
 
-	/**
-	 * Is the passed in ID a valid
-	 * format?
-	 *
-	 * @return boolean
-	 */
-	public static function isValidId($id) {
-		return preg_match(ExternalContent::ID_FORMAT, $id);
-	}
+        return $id;
+    }
 
-
-	/**
-	 * Action to migrate a selected object through to SS
-	 *
-	 * @param array $request
-	 */
-	public function migrate($request)
+    public function currentPageID()
     {
-		$migrationTarget 		= isset($request['MigrationTarget']) ? $request['MigrationTarget'] : '';
-		$fileMigrationTarget 	= isset($request['FileMigrationTarget']) ? $request['FileMigrationTarget'] : '';
-		$includeSelected 		= isset($request['IncludeSelected']) ? $request['IncludeSelected'] : 0;
-		$includeChildren 		= isset($request['IncludeChildren']) ? $request['IncludeChildren'] : 0;
-		$duplicates 			= isset($request['DuplicateMethod']) ? $request['DuplicateMethod'] : ExternalContentTransformer::DS_OVERWRITE;
-		$selected 				= isset($request['ID']) ? $request['ID'] : 0;
+        $session = $this->getRequest()->getSession();
 
-		if (!$selected) {
-			$messageType = 'bad';
-			$message = _t('ExternalContent.NOITEMSELECTED', 'No item selected to import into.');
-		}
+        if ($this->getRequest()->requestVar('ID') && preg_match(ExternalContent::ID_FORMAT, $this->getRequest()->requestVar('ID'))) {
+            return $this->getRequest()->requestVar('ID');
+        } elseif (isset($this->urlParams['ID']) && preg_match(ExternalContent::ID_FORMAT, $this->urlParams['ID'])) {
+            return $this->urlParams['ID'];
+        } elseif ($session && $session->get($this->sessionNamespace() . ".currentPage")) {
+            return $session->get($this->sessionNamespace() . ".currentPage");
+        }
 
-		if (!$migrationTarget || !$fileMigrationTarget) {
-			$messageType = 'bad';
-			$message = _t('ExternalContent.NOTARGETSELECTED', 'No target selected to import into.');
-		}
+        return null;
+    }
 
-		if ($selected && ($migrationTarget || $fileMigrationTarget)) {
-			// get objects and start stuff
-			$target = null;
-			$targetType = SiteTree::class;
+    /**
+     * Custom currentPage() method to handle opening the 'root' node
+     *
+     * @return DataObject
+     */
+    public function currentPage()
+    {
+        $id = $this->getCurrentPageID();
 
-			if ($migrationTarget) {
-				$target = DataObject::get_by_id(SiteTree::class, $migrationTarget);
-			} else {
-				$targetType = File::class;
-				$target = DataObject::get_by_id(File::class, $fileMigrationTarget);
-			}
+        if (preg_match(ExternalContent::ID_FORMAT, (string) $id)) {
+            return ExternalContent::getDataObjectFor($id);
+        }
 
-			$from = ExternalContent::getDataObjectFor($selected);
-
-			if ($from instanceof ExternalContentSource) {
-				$selected = false;
-			}
-
-			if (isset($request['Repeat']) && $request['Repeat'] > 0) {
-				$job = ScheduledExternalImportJob::create($request['Repeat'], $from, $target, $includeSelected, $includeChildren, $targetType, $duplicates, $request);
-				singleton(QueuedJobService::class)->queueJob($job);
-
-				$messageType = 'good';
-				$message = _t('ExternalContent.CONTENTMIGRATEQUEUED', 'Import job queued.');
-			} else {
-				$importer = $from->getContentImporter($targetType);
-
-				if ($importer) {
-					$result = $importer->import($from, $target, $includeSelected, $includeChildren, $duplicates, $request);
-					$messageType = 'good';
-
-					if ($result instanceof QueuedExternalContentImporter) {
-						$message = _t('ExternalContent.CONTENTMIGRATEQUEUED', 'Import job queued.');
-					} else {
-						$message = _t('ExternalContent.CONTENTMIGRATED', 'Import Successful.');
-					}
-				}
-			}
-		}
-
-        $this->getEditForm()->sessionError($message, $messageType);
-
-		return $this->getResponseNegotiator()->respond($this->request);
-	}
-
-	/**
-	 * Return the record corresponding to the given ID.
-	 *
-	 * Both the numeric IDs of ExternalContentSource records and the composite IDs of ExternalContentItem entries
-	 * are supported.
-	 *
-	 * @param  string $id The ID
-	 * @return Dataobject The relevant object
-	 */
-	public function getRecord($id, $versionID = null) {
-		if(is_numeric($id)) {
-			return parent::getRecord($id);
-		} else {
-			return ExternalContent::getDataObjectFor($id);
-		}
-	}
+        if ($id == 'root') {
+            return singleton($this->config()->get('tree_class'));
+        }
+    }
 
 
     /**
-	 * Return the edit form
-	 * @see cms/code/LeftAndMain#EditForm()
-	 */
-	public function EditForm($request = null)
+     * Is the passed in ID a valid
+     * format?
+     *
+     * @return boolean
+     */
+    public static function isValidId($id)
     {
-		$cur = $this->getCurrentPageID();
+        return preg_match(ExternalContent::ID_FORMAT, $id);
+    }
 
-		if ($cur) {
-			$record = $this->currentPage();
 
-			if (!$record) {
-				return false;
+    /**
+     * Action to migrate a selected object through to SS
+     *
+     * @param array $request
+     */
+    public function migrate($request)
+    {
+        $migrationTarget 		= isset($request['MigrationTarget']) ? $request['MigrationTarget'] : '';
+        $fileMigrationTarget 	= isset($request['FileMigrationTarget']) ? $request['FileMigrationTarget'] : '';
+        $includeSelected 		= isset($request['IncludeSelected']) ? $request['IncludeSelected'] : 0;
+        $includeChildren 		= isset($request['IncludeChildren']) ? $request['IncludeChildren'] : 0;
+        $duplicates 			= isset($request['DuplicateMethod']) ? $request['DuplicateMethod'] : ExternalContentTransformer::DS_OVERWRITE;
+        $selected 				= isset($request['ID']) ? $request['ID'] : 0;
+
+        if (!$selected) {
+            $messageType = 'bad';
+            $message = _t('ExternalContent.NOITEMSELECTED', 'No item selected to import into.');
+        }
+
+        if (!$migrationTarget || !$fileMigrationTarget) {
+            $messageType = 'bad';
+            $message = _t('ExternalContent.NOTARGETSELECTED', 'No target selected to import into.');
+        }
+
+        if ($selected && ($migrationTarget || $fileMigrationTarget)) {
+            // get objects and start stuff
+            $target = null;
+            $targetType = SiteTree::class;
+
+            if ($migrationTarget) {
+                $target = DataObject::get_by_id(SiteTree::class, $migrationTarget);
+            } else {
+                $targetType = File::class;
+                $target = DataObject::get_by_id(File::class, $fileMigrationTarget);
+            }
+
+            $from = ExternalContent::getDataObjectFor($selected);
+
+            if ($from instanceof ExternalContentSource) {
+                $selected = false;
+            }
+
+            if (isset($request['Repeat']) && $request['Repeat'] > 0) {
+                $job = ScheduledExternalImportJob::create($request['Repeat'], $from, $target, $includeSelected, $includeChildren, $targetType, $duplicates, $request);
+                singleton(QueuedJobService::class)->queueJob($job);
+
+                $messageType = 'good';
+                $message = _t('ExternalContent.CONTENTMIGRATEQUEUED', 'Import job queued.');
+            } else {
+                $importer = $from->getContentImporter($targetType);
+
+                if ($importer) {
+                    $result = $importer->import($from, $target, $includeSelected, $includeChildren, $duplicates, $request);
+                    $messageType = 'good';
+
+                    if ($result instanceof QueuedExternalContentImporter) {
+                        $message = _t('ExternalContent.CONTENTMIGRATEQUEUED', 'Import job queued.');
+                    } else {
+                        $message = _t('ExternalContent.CONTENTMIGRATED', 'Import Successful.');
+                    }
+                }
+            }
+        }
+
+        $this->getEditForm()->sessionError($message, $messageType);
+
+        return $this->getResponseNegotiator()->respond($this->request);
+    }
+
+    /**
+     * Return the record corresponding to the given ID.
+     *
+     * Both the numeric IDs of ExternalContentSource records and the composite IDs of ExternalContentItem entries
+     * are supported.
+     *
+     * @param  string $id The ID
+     * @return Dataobject The relevant object
+     */
+    public function getRecord($id, $versionID = null)
+    {
+        if (is_numeric($id)) {
+            return parent::getRecord($id);
+        } else {
+            return ExternalContent::getDataObjectFor($id);
+        }
+    }
+
+
+    /**
+     * Return the edit form
+     * @see cms/code/LeftAndMain#EditForm()
+     */
+    public function EditForm($request = null)
+    {
+        $cur = $this->getCurrentPageID();
+
+        if ($cur) {
+            $record = $this->currentPage();
+
+            if (!$record) {
+                return false;
             }
 
             if ($record && !$record->canView()) {
                 return Security::permissionFailure($this);
             }
-		}
+        }
 
-		if ($this->hasMethod('getEditForm')) {
-			return $this->getEditForm($this->getCurrentPageID());
-		}
+        if ($this->hasMethod('getEditForm')) {
+            return $this->getEditForm($this->getCurrentPageID());
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Return the form for editing
-	 */
-	public function getEditForm($id = null, $fields = null) {
-		$record = null;
+    /**
+     * Return the form for editing
+     */
+    public function getEditForm($id = null, $fields = null)
+    {
+        $record = null;
 
-		if(!$id) {
-			$id = $this->getCurrentPageID();
-		}
+        if (!$id) {
+            $id = $this->getCurrentPageID();
+        }
 
-		if ($id && $id != "root") {
-			$record = $this->getRecord($id);
-		}
+        if ($id && $id != "root") {
+            $record = $this->getRecord($id);
+        }
 
-		if ($record) {
-			$fields = $record->getCMSFields();
+        if ($record) {
+            $fields = $record->getCMSFields();
 
-			// If we're editing an external source or item, and it can be imported
-			// then add the "Import" tab.
-			$isSource = $record instanceof ExternalContentSource;
-			$isItem = $record instanceof ExternalContentItem;
+            // If we're editing an external source or item, and it can be imported
+            // then add the "Import" tab.
+            $isSource = $record instanceof ExternalContentSource;
+            $isItem = $record instanceof ExternalContentItem;
 
             // TODO Get the crawl status and show the "Import" tab if complete
-			if (($isSource || $isItem) && $record->canImport()) {
-				$allowedTypes = $record->allowedImportTargets();
+            if (($isSource || $isItem) && $record->canImport()) {
+                $allowedTypes = $record->allowedImportTargets();
 
-				if (isset($allowedTypes['sitetree'])) {
-					$fields->addFieldToTab(
+                if (isset($allowedTypes['sitetree'])) {
+                    $fields->addFieldToTab(
                         'Root.Import',
                         TreeDropdownField::create(
                             "MigrationTarget",
                             _t('ExternalContent.MIGRATE_TARGET', 'Parent page-type to import into'),
                             SiteTree::class
-                        )->setDescription('All imported page-like content will be organised hierarchically under here.'));
-				}
+                        )->setDescription('All imported page-like content will be organised hierarchically under here.')
+                    );
+                }
 
-				if (isset($allowedTypes['file'])) {
-					$fields->addFieldToTab(
+                if (isset($allowedTypes['file'])) {
+                    $fields->addFieldToTab(
                         'Root.Import',
                         TreeDropdownField::create(
                             "FileMigrationTarget",
                             _t('ExternalContent.FILE_MIGRATE_TARGET', 'Parent folder to import into'),
                             Folder::class
-                        )->setDescription('All imported file-like content will be organised hierarchically under here.'));
-				}
+                        )->setDescription('All imported file-like content will be organised hierarchically under here.')
+                    );
+                }
 
-				$fields->addFieldToTab(
+                $fields->addFieldToTab(
                     'Root.Import',
                     CheckboxField::create(
                         "IncludeSelected",
@@ -497,7 +506,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                     )
                 );
 
-				$fields->addFieldToTab(
+                $fields->addFieldToTab(
                     'Root.Import',
                     CheckboxField::create(
                         "IncludeChildren",
@@ -506,438 +515,449 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                     )
                 );
 
-				$duplicateOptions = [
-					ExternalContentTransformer::DS_OVERWRITE => ExternalContentTransformer::DS_OVERWRITE,
-					ExternalContentTransformer::DS_DUPLICATE => ExternalContentTransformer::DS_DUPLICATE,
-					ExternalContentTransformer::DS_SKIP => ExternalContentTransformer::DS_SKIP,
+                $duplicateOptions = [
+                    ExternalContentTransformer::DS_OVERWRITE => ExternalContentTransformer::DS_OVERWRITE,
+                    ExternalContentTransformer::DS_DUPLICATE => ExternalContentTransformer::DS_DUPLICATE,
+                    ExternalContentTransformer::DS_SKIP => ExternalContentTransformer::DS_SKIP,
                 ];
 
-				$fields->addFieldToTab(
+                $fields->addFieldToTab(
                     'Root.Import',
                     OptionsetField::create(
-						"DuplicateMethod",
-						_t('ExternalContent.DUPLICATES', 'Duplicate item handling'),
-						$duplicateOptions,
-						$duplicateOptions[ExternalContentTransformer::DS_SKIP]
-					)
-				);
+                        "DuplicateMethod",
+                        _t('ExternalContent.DUPLICATES', 'Duplicate item handling'),
+                        $duplicateOptions,
+                        $duplicateOptions[ExternalContentTransformer::DS_SKIP]
+                    )
+                );
 
-				if (class_exists(QueuedJobDescriptor::class)) {
-					$repeats = [
-						0		=> 'None',
-						300		=> '5 minutes',
-						900		=> '15 minutes',
-						1800	=> '30 minutes',
-						3600	=> '1 hour',
-						33200	=> '12 hours',
-						86400	=> '1 day',
-						604800	=> '1 week',
+                if (class_exists(QueuedJobDescriptor::class)) {
+                    $repeats = [
+                        0		=> 'None',
+                        300		=> '5 minutes',
+                        900		=> '15 minutes',
+                        1800	=> '30 minutes',
+                        3600	=> '1 hour',
+                        33200	=> '12 hours',
+                        86400	=> '1 day',
+                        604800	=> '1 week',
                     ];
 
-					$fields->addFieldToTab(
+                    $fields->addFieldToTab(
                         'Root.Import',
                         DropdownField::create('Repeat', 'Repeat import each ', $repeats)
                     );
-				}
+                }
 
-				$migrateButton = FormAction::create('migrate', _t('ExternalContent.IMPORT', 'Start Importing'))
-					->setAttribute('data-icon', 'arrow-circle-double')
+                $migrateButton = FormAction::create('migrate', _t('ExternalContent.IMPORT', 'Start Importing'))
+                    ->setAttribute('data-icon', 'arrow-circle-double')
                     ->addExtraClass('btn action btn btn-primary tool-button font-icon-plus')
-					->setUseButtonTag(true);
+                    ->setUseButtonTag(true);
 
-				$fields->addFieldToTab(
+                $fields->addFieldToTab(
                     'Root.Import',
                     LiteralField::create(
                         'MigrateActions',
                         '<div class="btn-toolbar">' . $migrateButton->forTemplate() . '</div>'
                     )
                 );
-			}
+            }
 
-			$fields->push($hf = HiddenField::create("ID"));
-			$hf->setValue($id);
+            $fields->push($hf = HiddenField::create("ID"));
+            $hf->setValue($id);
 
-			$fields->push($hf = HiddenField::create("Version"));
-			$hf->setValue(1);
+            $fields->push($hf = HiddenField::create("Version"));
+            $hf->setValue(1);
 
-			$actions = FieldList::create();
+            $actions = FieldList::create();
 
-			// Only show save button if not 'assets' folder
-			if ($record->canEdit()) {
-				$actions->push(
-					FormAction::create('save',_t('ExternalContent.SAVE','Save'))
-						->addExtraClass('save btn btn-primary tool-button font-icon-plus')
-						->setAttribute('data-icon', 'accept')
-						->setUseButtonTag(true)
-				);
-			}
+            // Only show save button if not 'assets' folder
+            if ($record->canEdit()) {
+                $actions->push(
+                    FormAction::create('save', _t('ExternalContent.SAVE', 'Save'))
+                        ->addExtraClass('save btn btn-primary tool-button font-icon-plus')
+                        ->setAttribute('data-icon', 'accept')
+                        ->setUseButtonTag(true)
+                );
+            }
 
-			if($isSource && $record->canDelete()){
-				$actions->push(
-					FormAction::create('delete',_t('ExternalContent.DELETE','Delete'))
-						->addExtraClass('delete btn btn-primary tool-button font-icon-plus')
-						->setAttribute('data-icon', 'decline')
-						->setUseButtonTag(true)
-				);
-			}
+            if ($isSource && $record->canDelete()) {
+                $actions->push(
+                    FormAction::create('delete', _t('ExternalContent.DELETE', 'Delete'))
+                        ->addExtraClass('delete btn btn-primary tool-button font-icon-plus')
+                        ->setAttribute('data-icon', 'decline')
+                        ->setUseButtonTag(true)
+                );
+            }
 
-			$form = Form::create($this, "EditForm", $fields, $actions);
+            $form = Form::create($this, "EditForm", $fields, $actions);
 
-			if ($record->ID) {
-				$form->loadDataFrom($record);
-			} else {
-				$form->loadDataFrom([
-					"ID" => "root",
-					"URL" => Director::absoluteBaseURL() . self::$url_segment,
-				]);
-			}
+            if ($record->ID) {
+                $form->loadDataFrom($record);
+            } else {
+                $form->loadDataFrom([
+                    "ID" => "root",
+                    "URL" => Director::absoluteBaseURL() . self::$url_segment,
+                ]);
+            }
 
-			if (!$record->canEdit()) {
-				$form->makeReadonly();
-			}
-		} else {
-			// Create a dummy form
-			$form = Form::create($this, "EditForm", FieldList::create(), FieldList::create());
-		}
+            if (!$record->canEdit()) {
+                $form->makeReadonly();
+            }
+        } else {
+            // Create a dummy form
+            $form = Form::create($this, "EditForm", FieldList::create(), FieldList::create());
+        }
 
-		$form
+        $form
             ->addExtraClass('cms-edit-form center ss-tabset ' . $this->BaseCSSClasses())
-		    ->setTemplate($this->getTemplatesWithSuffix('_EditForm'))
+            ->setTemplate($this->getTemplatesWithSuffix('_EditForm'))
             ->setAttribute('data-pjax-fragment', 'CurrentForm');
 
-		$this->extend('updateEditForm', $form);
+        $this->extend('updateEditForm', $form);
 
-		return $form;
-	}
+        return $form;
+    }
 
-	/**
-	 * Get the form used to create a new provider
-	 *
-	 * @return Form
-	 */
-	public function AddForm() {
-		$classes = ClassInfo::subclassesFor(self::$tree_class);
-		array_shift($classes);
+    /**
+     * Get the form used to create a new provider
+     *
+     * @return Form
+     */
+    public function AddForm()
+    {
+        $classes = ClassInfo::subclassesFor(self::$tree_class);
+        array_shift($classes);
 
-		foreach ($classes as $key => $class) {
-			if (!$class::create()->canCreate()) {
-				unset($classes[$key]);
-			}
+        foreach ($classes as $key => $class) {
+            if (!$class::create()->canCreate()) {
+                unset($classes[$key]);
+            }
 
-			$visible = explode('\\', $class);
-			$classes[$key] = FormField::name_to_label($visible[count($visible)-1]);
-		}
+            $visible = explode('\\', $class);
+            $classes[$key] = FormField::name_to_label($visible[count($visible)-1]);
+        }
 
-		$fields = FieldList::create(
-			HiddenField::create("ParentID"),
-			HiddenField::create("Locale", 'Locale', i18n::get_locale()),
-			DropdownField::create("ProviderType", "", $classes)
-		);
+        $fields = FieldList::create(
+            HiddenField::create("ParentID"),
+            HiddenField::create("Locale", 'Locale', i18n::get_locale()),
+            DropdownField::create("ProviderType", "", $classes)
+        );
 
-		$actions = FieldList::create(
-			FormAction::create("addprovider", _t('ExternalContent.CREATE', "Create"))
-				->addExtraClass('btn btn-primary tool-button font-icon-plus')
-				->setAttribute('data-icon', 'accept')
-				->setUseButtonTag(true)
-		);
+        $actions = FieldList::create(
+            FormAction::create("addprovider", _t('ExternalContent.CREATE', "Create"))
+                ->addExtraClass('btn btn-primary tool-button font-icon-plus')
+                ->setAttribute('data-icon', 'accept')
+                ->setUseButtonTag(true)
+        );
 
-		$form = Form::create($this, "AddForm", $fields, $actions);
+        $form = Form::create($this, "AddForm", $fields, $actions);
 
-		$this->extend('updateEditForm', $form);
+        $this->extend('updateEditForm', $form);
 
-		return $form;
-	}
+        return $form;
+    }
 
-	/**
-	 * Add a new provider (triggered by the ExternalContentAdmin_left template)
-	 *
-	 * @return unknown_type
-	 */
-	public function addprovider() {
-		// Providers are ALWAYS at the root
-		$parent = 0;
-		$name = (isset($_REQUEST['Name'])) ?
-			basename($_REQUEST['Name']) :
-			_t('ExternalContent.NEWCONNECTOR', "New Connector");
-		$type = $_REQUEST['ProviderType'];
-		$providerClasses = array_map(
-			function($item) { return strtolower($item); },
-			ClassInfo:: subclassesFor(self::$tree_class)
-		);
+    /**
+     * Add a new provider (triggered by the ExternalContentAdmin_left template)
+     *
+     * @return unknown_type
+     */
+    public function addprovider()
+    {
+        // Providers are ALWAYS at the root
+        $parent = 0;
+        $name = (isset($_REQUEST['Name'])) ?
+            basename($_REQUEST['Name']) :
+            _t('ExternalContent.NEWCONNECTOR', "New Connector");
+        $type = $_REQUEST['ProviderType'];
+        $providerClasses = array_map(
+            function ($item) {
+                return strtolower($item);
+            },
+            ClassInfo::subclassesFor(self::$tree_class)
+        );
 
-		if (!in_array($type, $providerClasses)) {
-			throw new \Exception("Invalid connector type");
-		}
+        if (!in_array($type, $providerClasses)) {
+            throw new \Exception("Invalid connector type");
+        }
 
-		$parentObj = null;
+        $parentObj = null;
 
-		// Create object
-		$record = $type::create();
-		$record->ParentID = $parent;
-		$record->Name = $record->Title = $name;
+        // Create object
+        $record = $type::create();
+        $record->ParentID = $parent;
+        $record->Name = $record->Title = $name;
 
-		// if (isset($_REQUEST['returnID'])) {
-		// 	return $p->ID;
-		// } else {
-		// 	return $this->returnItemToUser($p);
-		// }
+        // if (isset($_REQUEST['returnID'])) {
+        // 	return $p->ID;
+        // } else {
+        // 	return $this->returnItemToUser($p);
+        // }
 
         $message = sprintf(_t('ExternalContent.SourceAdded', 'Successfully created %s'), $type);
         $messageType = 'good';
 
-		try {
-			$record->write();
-		} catch(ValidationException $ex) {
+        try {
+            $record->write();
+        } catch (ValidationException $ex) {
             $message = sprintf(_t('ExternalContent.SourceAddedFailed', 'Not successfully created %s'), $type);
-			$messageType = 'bad';
-		}
+            $messageType = 'bad';
+        }
 
-		$this->setCurrentPageID($record->ID);
+        $this->setCurrentPageID($record->ID);
         $this->getEditForm()->sessionError($message, $messageType);
 
-		return $this->getResponseNegotiator()->respond($this->request);
-	}
+        return $this->getResponseNegotiator()->respond($this->request);
+    }
 
-	/**
-	 * Copied from AssetAdmin...
-	 *
-	 * @return Form
-	 */
-	function DeleteItemsForm() {
-		$form = Form::create(
+    /**
+     * Copied from AssetAdmin...
+     *
+     * @return Form
+     */
+    public function DeleteItemsForm()
+    {
+        $form = Form::create(
             $this,
             'DeleteItemsForm',
             FieldList::create(
-                LiteralField::create('SelectedPagesNote',
-                        sprintf('<p>%s</p>', _t('ExternalContentAdmin.SELECT_CONNECTORS', 'Select the connectors that you want to delete and then click the button below'))
+                LiteralField::create(
+                    'SelectedPagesNote',
+                    sprintf('<p>%s</p>', _t('ExternalContentAdmin.SELECT_CONNECTORS', 'Select the connectors that you want to delete and then click the button below'))
                 ),
                 HiddenField::create('csvIDs')
             ),
             FieldList::create(
                 FormAction::create('deleteprovider', _t('ExternalContentAdmin.DELCONNECTORS', 'Delete the selected connectors'))
             )
-		);
+        );
 
-		$form->addExtraClass('actionparams');
+        $form->addExtraClass('actionparams');
 
-		return $form;
-	}
+        return $form;
+    }
 
-	/**
-	 * Delete a folder
-	 */
-	public function deleteprovider() {
-		$script = '';
-		$ids = explode(' *, *', $_REQUEST['csvIDs']);
-		$script = '';
+    /**
+     * Delete a folder
+     */
+    public function deleteprovider()
+    {
+        $script = '';
+        $ids = explode(' *, *', $_REQUEST['csvIDs']);
+        $script = '';
 
-		if (!$ids)
-			return false;
+        if (!$ids) {
+            return false;
+        }
 
-		foreach ($ids as $id) {
-			if (is_numeric($id)) {
-				$record = ExternalContent::getDataObjectFor($id);
+        foreach ($ids as $id) {
+            if (is_numeric($id)) {
+                $record = ExternalContent::getDataObjectFor($id);
 
-				if ($record) {
-					$script .= $this->deleteTreeNodeJS($record);
-					$record->delete();
-					$record->destroy();
-				}
-			}
-		}
+                if ($record) {
+                    $script .= $this->deleteTreeNodeJS($record);
+                    $record->delete();
+                    $record->destroy();
+                }
+            }
+        }
 
-		$size = sizeof($ids);
+        $size = sizeof($ids);
 
-		if ($size > 1) {
-			$message = $size . ' ' . _t('AssetAdmin.FOLDERSDELETED', 'folders deleted.');
-		} else {
-			$message = $size . ' ' . _t('AssetAdmin.FOLDERDELETED', 'folder deleted.');
-		}
+        if ($size > 1) {
+            $message = $size . ' ' . _t('AssetAdmin.FOLDERSDELETED', 'folders deleted.');
+        } else {
+            $message = $size . ' ' . _t('AssetAdmin.FOLDERDELETED', 'folder deleted.');
+        }
 
-		$script .= "statusMessage('$message');";
-		echo $script;
-	}
+        $script .= "statusMessage('$message');";
+        echo $script;
+    }
 
-	public function getCMSTreeTitle(){
-		return 'Connectors';
-	}
-
-	/**
-	 * @return string
-	 */
-	public function treeview() {
-		return $this->renderWith($this->getTemplatesWithSuffix('_TreeView'));
-	}
+    public function getCMSTreeTitle()
+    {
+        return 'Connectors';
+    }
 
     /**
      * @return string
      */
-	public function SiteTreeAsUL()
+    public function treeview()
     {
-		$html = $this->getSiteTreeFor($this->config()->get('tree_class'), null, null, 'NumChildren');
-		//$this->extend('updateSiteTreeAsUL', $html);
+        return $this->renderWith($this->getTemplatesWithSuffix('_TreeView'));
+    }
 
-		return $html;
-	}
+    /**
+     * @return string
+     */
+    public function SiteTreeAsUL()
+    {
+        $html = $this->getSiteTreeFor($this->config()->get('tree_class'), null, null, 'NumChildren');
+        //$this->extend('updateSiteTreeAsUL', $html);
 
-	/**
-	 * Get a subtree underneath the request param 'ID'.
-	 * If ID = 0, then get the whole tree.
-	 */
-	public function getsubtree($request) {
-		$html = $this->getSiteTreeFor(
-			ExternalContentItem::class,
-			$request->getVar('ID'),
-			null,
-			'NumChildren',
-			null,
-			$request->getVar('minNodeCount')
-		);
+        return $html;
+    }
 
-		// Trim off the outer tag
-		$html = preg_replace('/^[\s\t\r\n]*<ul[^>]*>/','', $html);
-		$html = preg_replace('/<\/ul[^>]*>[\s\t\r\n]*$/','', $html);
+    /**
+     * Get a subtree underneath the request param 'ID'.
+     * If ID = 0, then get the whole tree.
+     */
+    public function getsubtree($request)
+    {
+        $html = $this->getSiteTreeFor(
+            ExternalContentItem::class,
+            $request->getVar('ID'),
+            null,
+            'NumChildren',
+            null,
+            $request->getVar('minNodeCount')
+        );
 
-		return $html;
-	}
+        // Trim off the outer tag
+        $html = preg_replace('/^[\s\t\r\n]*<ul[^>]*>/', '', $html);
+        $html = preg_replace('/<\/ul[^>]*>[\s\t\r\n]*$/', '', $html);
+
+        return $html;
+    }
 
 
- 	/**
-	 * Include CSS for page icons. We're not using the JSTree 'types' option
-	 * because it causes too much performance overhead just to add some icons.
-	 *
-	 * @return String CSS
-	 */
-	public function generatePageIconsCss() {
-		$css = '';
+    /**
+     * Include CSS for page icons. We're not using the JSTree 'types' option
+     * because it causes too much performance overhead just to add some icons.
+     *
+     * @return String CSS
+     */
+    public function generatePageIconsCss()
+    {
+        $css = '';
 
-		$sourceClasses 	= ClassInfo::subclassesFor(ExternalContentSource::class);
-		$itemClasses 	= ClassInfo::subclassesFor(ExternalContentItem::class);
-		$classes 		= array_merge($sourceClasses, $itemClasses);
+        $sourceClasses 	= ClassInfo::subclassesFor(ExternalContentSource::class);
+        $itemClasses 	= ClassInfo::subclassesFor(ExternalContentItem::class);
+        $classes 		= array_merge($sourceClasses, $itemClasses);
 
-		foreach($classes as $class) {
-			$obj = singleton($class);
-			$iconSpec = $obj->config()->get('icon');
+        foreach ($classes as $class) {
+            $obj = singleton($class);
+            $iconSpec = $obj->config()->get('icon');
 
             if (!$iconSpec) {
                 continue;
             }
 
-			// Legacy support: We no longer need separate icon definitions for folders etc.
-			$iconFile = (is_array($iconSpec)) ? $iconSpec[0] : $iconSpec;
+            // Legacy support: We no longer need separate icon definitions for folders etc.
+            $iconFile = (is_array($iconSpec)) ? $iconSpec[0] : $iconSpec;
 
-			// Legacy support: Add file extension if none exists
+            // Legacy support: Add file extension if none exists
             if (!pathinfo($iconFile, PATHINFO_EXTENSION)) {
                 $iconFile .= '-file.gif';
             }
 
-			$iconPathInfo = pathinfo($iconFile);
+            $iconPathInfo = pathinfo($iconFile);
 
-			// Base filename
-			$baseFilename = $iconPathInfo['dirname'] . '/' . $iconPathInfo['filename'];
-			$fileExtension = $iconPathInfo['extension'];
+            // Base filename
+            $baseFilename = $iconPathInfo['dirname'] . '/' . $iconPathInfo['filename'];
+            $fileExtension = $iconPathInfo['extension'];
 
-			$selector = ".page-icon.class-$class, li.class-$class > a .jstree-pageicon";
+            $selector = ".page-icon.class-$class, li.class-$class > a .jstree-pageicon";
 
-			if(Director::fileExists($iconFile)) {
-				$css .= "$selector { background: transparent url('$iconFile') 0 0 no-repeat; }\n";
-			} else {
-				// Support for more sophisticated rules, e.g. sprited icons
-				$css .= "$selector { $iconFile }\n";
-			}
+            if (Director::fileExists($iconFile)) {
+                $css .= "$selector { background: transparent url('$iconFile') 0 0 no-repeat; }\n";
+            } else {
+                // Support for more sophisticated rules, e.g. sprited icons
+                $css .= "$selector { $iconFile }\n";
+            }
+        }
 
-		}
+        $css .= "li.type-file > a .jstree-pageicon { background: transparent url('framework/admin/images/sitetree_ss_pageclass_icons_default.png') 0 0 no-repeat; }\n}";
 
-		$css .= "li.type-file > a .jstree-pageicon { background: transparent url('framework/admin/images/sitetree_ss_pageclass_icons_default.png') 0 0 no-repeat; }\n}";
+        return $css;
+    }
 
-		return $css;
-	}
-
-	/**
-	 * Save the content source/item.
-	 */
-	public function save($urlParams, $form)
+    /**
+     * Save the content source/item.
+     */
+    public function save($urlParams, $form)
     {
-		// Retrieve the record.
-		$record = null;
+        // Retrieve the record.
+        $record = null;
 
-		if (isset($urlParams['ID'])) {
-			$record = ExternalContent::getDataObjectFor($urlParams['ID']);
-		}
+        if (isset($urlParams['ID'])) {
+            $record = ExternalContent::getDataObjectFor($urlParams['ID']);
+        }
 
-		if (!$record) {
-			return parent::save($urlParams, $form);
-		}
+        if (!$record) {
+            return parent::save($urlParams, $form);
+        }
 
-		if ($record->canEdit()) {
-			// lets load the params that have been sent and set those that have an editable mapping
-			if ($record->hasMethod('editableFieldMapping')) {
-				$editable = $record->editableFieldMapping();
-				$form->saveInto($record, array_keys($editable));
-				$record->remoteWrite();
-			} else {
-				$form->saveInto($record);
-				$record->write();
-			}
+        if ($record->canEdit()) {
+            // lets load the params that have been sent and set those that have an editable mapping
+            if ($record->hasMethod('editableFieldMapping')) {
+                $editable = $record->editableFieldMapping();
+                $form->saveInto($record, array_keys($editable));
+                $record->remoteWrite();
+            } else {
+                $form->saveInto($record);
+                $record->write();
+            }
 
-			// Set the form response.
-			$this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.SAVEDUP', 'Saved.')));
-		} else {
-			$this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.SAVEDUP', 'You don\'t have write access.')));
-		}
+            // Set the form response.
+            $this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.SAVEDUP', 'Saved.')));
+        } else {
+            $this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.SAVEDUP', 'You don\'t have write access.')));
+        }
 
-		return $this->getResponseNegotiator()->respond($this->request);
-	}
+        return $this->getResponseNegotiator()->respond($this->request);
+    }
 
-	/**
-	 * Delete the content source/item.
-	 */
-	public function delete($data, $form)
+    /**
+     * Delete the content source/item.
+     */
+    public function delete($data, $form)
     {
-		$className = $this->config()->get('tree_class');
-		$record = DataObject::get_by_id($className, Convert::raw2sql($data['ID']));
+        $className = $this->config()->get('tree_class');
+        $record = DataObject::get_by_id($className, Convert::raw2sql($data['ID']));
 
-		if($record && !$record->canDelete()) {
-			return Security::permissionFailure();
-		}
+        if ($record && !$record->canDelete()) {
+            return Security::permissionFailure();
+        }
 
-		if(!$record || !$record->ID) {
-			$this->httpError(404, "Bad record ID #" . (int)$data['ID']);
-		}
+        if (!$record || !$record->ID) {
+            $this->httpError(404, "Bad record ID #" . (int)$data['ID']);
+        }
 
-		$type = $record->ClassName;
-		$record->delete();
+        $type = $record->ClassName;
+        $record->delete();
         $message = "Deleted $type successfully.";
         $messageType = 'bad';
         $this->getEditForm()->sessionError($message, $messageType);
 
-		$this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.DELETED', 'Deleted.')));
+        $this->response->addHeader('X-Status', rawurlencode(_t('LeftAndMain.DELETED', 'Deleted.')));
 
-		return $this->getResponseNegotiator()->respond(
-			$this->request,
-			array('currentform' => array($this, 'EmptyForm'))
-		);
-	}
+        return $this->getResponseNegotiator()->respond(
+            $this->request,
+            array('currentform' => array($this, 'EmptyForm'))
+        );
+    }
 
-	/**
-	 * Retrieve the updated source list, used in an AJAX request to update the current view.
+    /**
+     * Retrieve the updated source list, used in an AJAX request to update the current view.
      *
-	 * @return string
-	 */
-	public function updateSources(): string
+     * @return string
+     */
+    public function updateSources(): string
     {
-		$HTML = $this->treeview()->value;
+        $HTML = $this->treeview()->value;
 
-		return preg_replace('/^\s+|\n|\r|\s+$/m', '', $HTML);
-	}
+        return preg_replace('/^\s+|\n|\r|\s+$/m', '', $HTML);
+    }
 
     /**
      * @param HTTPRequest $request
      * @return HTTPResponse
      */
-	public function updatetreenodes(HTTPRequest $request): HTTPResponse
-	{
-		// noop
-		return singleton(CMSMain::class)->updatetreenodes($request);
-	}
+    public function updatetreenodes(HTTPRequest $request): HTTPResponse
+    {
+        // noop
+        return singleton(CMSMain::class)->updatetreenodes($request);
+    }
 }

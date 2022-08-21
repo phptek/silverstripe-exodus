@@ -8,25 +8,26 @@
  * @license BSD License http://silverstripe.org/bsd-license
  *
  */
-interface ExternalContentTransformer {
-	const DS_OVERWRITE = 'Overwrite';
-	const DS_DUPLICATE = 'Duplicate';
-	const DS_SKIP = 'Skip';
+interface ExternalContentTransformer
+{
+    public const DS_OVERWRITE = 'Overwrite';
+    public const DS_DUPLICATE = 'Duplicate';
+    public const DS_SKIP = 'Skip';
 
-	/**
-	 * Transforms a given item, creating a new object underneath
-	 * the parent object.
-	 * @param $item
-	 * 			The object to transform
-	 * @param $parentObject
-	 * 			The object to create any new pages underneath
-	 * @param $duplicateStrategy
-	 * 			How to handle duplicates when importing
-	 *
-	 * @return TransformResult
-	 * 			The new page
-	 */
-	public function transform($item, $parentObject, $duplicateStrategy);
+    /**
+     * Transforms a given item, creating a new object underneath
+     * the parent object.
+     * @param $item
+     * 			The object to transform
+     * @param $parentObject
+     * 			The object to create any new pages underneath
+     * @param $duplicateStrategy
+     * 			How to handle duplicates when importing
+     *
+     * @return TransformResult
+     * 			The new page
+     */
+    public function transform($item, $parentObject, $duplicateStrategy);
 }
 
 /**
@@ -43,21 +44,21 @@ interface ExternalContentTransformer {
  * @author Marcus Nyeholt <marcus@silverstripe.com.au>
  *
  */
-class TransformResult {
+class TransformResult
+{
+    public function __construct($page, $children)
+    {
+        $this->page = $page;
+        $this->children = $children;
+    }
 
-	public function __construct($page, $children) {
-		$this->page = $page;
-		$this->children = $children;
-	}
+    /**
+     * @var SiteTree
+     */
+    public $page;
 
-	/**
-	 * @var SiteTree
-	 */
-	public $page;
-
-	/**
-	 * @var DataObjectSet
-	 */
-	public $children;
-
+    /**
+     * @var DataObjectSet
+     */
+    public $children;
 }

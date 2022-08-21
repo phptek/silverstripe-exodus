@@ -2,7 +2,7 @@
 
 namespace PhpTek\Exodus\Transform;
 
-use \ExternalContentTransformer;
+use ExternalContentTransformer;
 use SilverStripe\Core\Injector\Injector;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
 use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
@@ -119,8 +119,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
         $baseUrl,
         $strategy = ExternalContentTransformer::DS_SKIP,
         DataObject $parentObject = null
-    )
-    {
+    ) {
         /*
          * If import config is imported into the DB from another SS setup or imported using some future
          * import/export feature, ensure we fail cleanly if the schema requires a class that doesn't exist

@@ -2,7 +2,7 @@
 
 namespace PhpTek\Exodus\Model;
 
-use \ExternalContentItem;
+use ExternalContentItem;
 use PhpTek\Exodus\Transform\StaticSiteFileTransformer;
 use PhpTek\Exodus\Transform\StaticSitePageTransformer;
 use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
