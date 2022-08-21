@@ -4,6 +4,7 @@ namespace PhpTek\Exodus\Extension;
 
 use \ExternalContent;
 use \ExternalContentSource;
+use PhpTek\Exodus\Model\StaticSiteImportDataObject;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataObject;

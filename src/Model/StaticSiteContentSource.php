@@ -258,14 +258,15 @@ class StaticSiteContentSource extends ExternalContentSource
         if ($importCount = $hasImports->count()) {
             $clearImportButton = FormAction::create('clearimports', 'Clear selected imports')
                 ->setAttribute('data-icon', 'arrow-circle-double')
+                ->addExtraClass('btn action btn btn-primary tool-button font-icon-plus')
                 ->setUseButtonTag(true);
 
-            $clearImportField = ToggleCompositeField::create('ClearImports', 'Clear import meta-data', [
+            $clearImportField = ToggleCompositeField::create('ClearImports', 'Clear Import Metadata', [
                 LiteralField::create('ImportCountText', '<p>Each time an import is run, some meta information is stored such as an import identifier and failed-link records.<br/><br/></p>'),
-                LiteralField::create('ImportCount', '<p><strong>Total imports: </strong><span>' . $importCount . '</span></p>'),
+                LiteralField::create('ImportCount', '<p>Total imports: ' . $importCount . '</p>'),
                 ListboxField::create('ShowImports', 'Select import(s) to clear:', $_source, '', null, true),
                 CheckboxField::create('ClearAllImports', 'Clear all import meta-data', 0),
-                LiteralField::create('ImportActions', $clearImportButton->forTemplate())
+                LiteralField::create('ImportActions', '<div class="btn-toolbar">' . $clearImportButton->forTemplate() . '</div>')
             ])->addExtraClass('clear-imports');
 
             $fields->addFieldToTab('Root.Import', $clearImportField);
