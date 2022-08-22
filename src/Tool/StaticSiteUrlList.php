@@ -701,7 +701,7 @@ class StaticSiteUrlList
         }
 
         $processedURL = $this->processedURL($url);
-        $processedURL = $processedURL['url'];
+        $processedURL = $processedURL['url'] ?? '/';
 
         // Subtly different regex if the URL ends in '?' or '/'
         if (preg_match('#[/?]$#', $processedURL)) {

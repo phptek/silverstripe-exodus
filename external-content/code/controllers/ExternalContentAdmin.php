@@ -6,7 +6,6 @@ use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\CurrentPageIdentifier;
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Control\Controller;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\View\Requirements;
 use SilverStripe\Core\ClassInfo;
@@ -30,7 +29,6 @@ use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\Hierarchy\MarkedSet;
-use SilverStripe\Security\InheritedPermissions;
 use Symbiote\QueuedJobs\DataObjects\QueuedJobDescriptor;
 use Symbiote\QueuedJobs\Services\QueuedJobService;
 
@@ -105,7 +103,10 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         parent::pageStatus();
     }
 
-    public function LinkTreeViewDeferred()
+    /**
+     * @return string
+     */
+    public function LinkTreeViewDeferred(): string
     {
         return $this->Link('treeview');
     }
@@ -188,7 +189,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
     protected function getTreeNodeCustomisations()
     {
         $rootTitle = $this->getCMSTreeTitle();
-        return function (ExternalContentSource $node) use ($rootTitle) {
+        return function ($node) use ($rootTitle) {
             return [
                 'listViewLink' => $this->LinkListViewChildren($node->ID),
                 'rootTitle' => $rootTitle,
@@ -224,29 +225,22 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
     /**
      * Get extra CSS classes for a page's tree node
      *
-     * @param ExternalContentSource $node
+     * @param $node
      * @return string
      */
-    public function getTreeNodeClasses(ExternalContentSource $node)
+    public function getTreeNodeClasses($node): string
     {
         // Get classes from object
-        $classes = $node->CMSTreeClasses();
-
-        // Get status flag classes
-        // $flags = $node->getStatusFlags();
-        // if ($flags) {
-        //     $statuses = array_keys($flags);
-        //     foreach ($statuses as $s) {
-        //         $classes .= ' status-' . $s;
-        //     }
-        // }
+        $classes = $node->CMSTreeClasses() ?? '';
 
         // Get additional filter classes
         $filter = $this->getSearchFilter();
+
         if ($filter && ($filterClasses = $filter->getPageClasses($node))) {
             if (is_array($filterClasses)) {
                 $filterClasses = implode(' ', $filterClasses);
             }
+
             $classes .= ' ' . $filterClasses;
         }
 
@@ -339,7 +333,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
      *
      * @param array $request
      */
-    public function migrate($request)
+    public function migrate(array $request)
     {
         $migrationTarget 		= isset($request['MigrationTarget']) ? $request['MigrationTarget'] : '';
         $fileMigrationTarget 	= isset($request['FileMigrationTarget']) ? $request['FileMigrationTarget'] : '';
@@ -359,15 +353,12 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         }
 
         if ($selected && ($migrationTarget || $fileMigrationTarget)) {
-            // get objects and start stuff
-            $target = null;
-            $targetType = SiteTree::class;
-
             if ($migrationTarget) {
-                $target = DataObject::get_by_id(SiteTree::class, $migrationTarget);
-            } else {
+                $targetType = SiteTree::class;
+                $target = DataObject::get_by_id($targetType, $migrationTarget);
+            } elseif ($fileMigrationTarget) {
                 $targetType = File::class;
-                $target = DataObject::get_by_id(File::class, $fileMigrationTarget);
+                $target = DataObject::get_by_id($targetType, $fileMigrationTarget);
             }
 
             $from = ExternalContent::getDataObjectFor($selected);
@@ -398,7 +389,8 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
             }
         }
 
-        $this->getEditForm()->sessionError($message, $messageType);
+        $form = $this->getEditForm();
+        $form->sessionError($message, $messageType);
 
         return $this->getResponseNegotiator()->respond($this->request);
     }
@@ -423,27 +415,26 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
 
     /**
-     * Return the edit form
-     * @see cms/code/LeftAndMain#EditForm()
+     * Return the edit form or null on error.
+     *
+     * @param array $request
+     * @return mixed Form|boolean
+     * @see LeftAndMain#EditForm()
      */
     public function EditForm($request = null)
     {
-        $cur = $this->getCurrentPageID();
-
-        if ($cur) {
-            $record = $this->currentPage();
-
-            if (!$record) {
+        if ($curr = $this->getCurrentPageID()) {
+            if (!$record = $this->currentPage()) {
                 return false;
             }
 
-            if ($record && !$record->canView()) {
+            if (!$record->canView()) {
                 return Security::permissionFailure($this);
             }
         }
 
         if ($this->hasMethod('getEditForm')) {
-            return $this->getEditForm($this->getCurrentPageID());
+            return $this->getEditForm($curr);
         }
 
         return false;
@@ -454,8 +445,6 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
      */
     public function getEditForm($id = null, $fields = null)
     {
-        $record = null;
-
         if (!$id) {
             $id = $this->getCurrentPageID();
         }
@@ -464,7 +453,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
             $record = $this->getRecord($id);
         }
 
-        if ($record) {
+        if (isset($record)) {
             $fields = $record->getCMSFields();
 
             // If we're editing an external source or item, and it can be imported
@@ -472,7 +461,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
             $isSource = $record instanceof ExternalContentSource;
             $isItem = $record instanceof ExternalContentItem;
 
-            // TODO Get the crawl status and show the "Import" tab if complete
+            // TODO Get the crawl status and show the "Import" tab if crawling has completed
             if (($isSource || $isItem) && $record->canImport()) {
                 $allowedTypes = $record->allowedImportTargets();
 
@@ -481,9 +470,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                         'Root.Import',
                         TreeDropdownField::create(
                             "MigrationTarget",
-                            _t('ExternalContent.MIGRATE_TARGET', 'Parent page-type to import into'),
-                            SiteTree::class
-                        )->setDescription('All imported page-like content will be organised hierarchically under here.')
+                            _t('ExternalContent.MIGRATE_TARGET', 'Parent Page To Import Into'),
+                            SiteTree::class,
+                        )
+                            ->setValue($this->getRequest()->postVars()['MigrationTarget'] ?? null)
+                            ->setDescription('All imported page-like content will be organised hierarchically under here.')
                     );
                 }
 
@@ -492,9 +483,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                         'Root.Import',
                         TreeDropdownField::create(
                             "FileMigrationTarget",
-                            _t('ExternalContent.FILE_MIGRATE_TARGET', 'Parent folder to import into'),
-                            Folder::class
-                        )->setDescription('All imported file-like content will be organised hierarchically under here.')
+                            _t('ExternalContent.FILE_MIGRATE_TARGET', 'Parent Folder To Import Into'),
+                            Folder::class,
+                        )
+                            ->setValue($this->getRequest()->postVars()['FileMigrationTarget'] ?? null)
+                            ->setDescription('All imported file-like content will be organised hierarchically under here.')
                     );
                 }
 
@@ -525,7 +518,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                     'Root.Import',
                     OptionsetField::create(
                         "DuplicateMethod",
-                        _t('ExternalContent.DUPLICATES', 'Duplicate item handling'),
+                        _t('ExternalContent.DUPLICATES', 'Duplicate Item Handling'),
                         $duplicateOptions,
                         $duplicateOptions[ExternalContentTransformer::DS_SKIP]
                     )
@@ -545,7 +538,8 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
                     $fields->addFieldToTab(
                         'Root.Import',
-                        DropdownField::create('Repeat', 'Repeat import each ', $repeats)
+                        DropdownField::create('Repeat', 'Import Repeat Interval', $repeats)
+                            ->setValue($this->getRequest()->postVars()['Repeat'] ?? null)
                     );
                 }
 
@@ -592,7 +586,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
             $form = Form::create($this, "EditForm", $fields, $actions);
 
-            if ($record->ID) {
+            if ($record->exists()) {
                 $form->loadDataFrom($record);
             } else {
                 $form->loadDataFrom([

@@ -151,15 +151,19 @@ class StaticSiteContentSource extends ExternalContentSource
             );
         }
 
-        $fields->addFieldToTab("Root.Main", TextField::create("BaseUrl", "Base URL"), 'ExtraCrawlUrls');
-        $fields->addFieldToTab("Root.Main", OptionsetField::create("UrlProcessor", "URL Processing", $processingOptions));
-        $fields->addFieldToTab("Root.Main", $parseCss = CheckboxField::create("ParseCSS", "Fetch external CSS"));
-        $parseCss->setDescription("Fetch images defined as CSS <strong>background-image</strong> selectors which are not ordinarily reachable.");
-        $fields->addFieldToTab("Root.Main", $autoRunLinkTask = CheckboxField::create("AutoRunTask", "Automatically run link-rewrite task"));
-        $autoRunLinkTask->setDescription("This will run the built-in link-rewriter task automatically once an import has completed.");
+        $fields->addFieldsToTab(
+            'Root.Main', [
+                TextField::create("BaseUrl", "Base URL"),
+                OptionsetField::create("UrlProcessor", "URL Processing", $processingOptions),
+                CheckboxField::create("ParseCSS", "Fetch external CSS")
+                    ->setDescription("Fetch images defined as CSS <strong>background-image</strong> selectors which are not ordinarily reachable."),
+                CheckboxField::create("AutoRunTask", "Automatically run link-rewrite task")
+                    ->setDescription("This will run the built-in link-rewriter task automatically once an import has completed.")
+            ]
+        );
 
         // Schema Gridfield
-        $fields->addFieldToTab('Root.Main', HeaderField::create('ImportConfigHeader', 'Import Configuration'));
+        $fields->addFieldToTab('Root.Main', HeaderField::create('ImportConfigHeader', 'Import Schema Configuration'));
         $addNewButton = new GridFieldAddNewButton('after');
         $addNewButton->setButtonName("Add Schema");
         $importRules = $fields->dataFieldByName('Schemas');
@@ -237,7 +241,7 @@ class StaticSiteContentSource extends ExternalContentSource
                 'Root.Crawl',
                 LiteralField::create(
                     'CrawlURLList',
-                    '<p class="mesage notice">The following URLs have been identified: </p>' . $urlsAsUL
+                    '<p class="mesage notice">The following URIs have been identified: </p>' . $urlsAsUL
                 )
             );
         }

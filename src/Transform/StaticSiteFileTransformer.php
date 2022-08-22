@@ -246,6 +246,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
          */
         $parentDir = '';
         $postVars = Controller::curr()->request->postVars();
+
         if (!empty($postVars['FileMigrationTarget'])) {
             $parentDirData = DataObject::get_by_id(File::class, $postVars['FileMigrationTarget']);
             $parentDir = $parentDirData->Title;
@@ -255,15 +256,19 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $fragments = explode('/', $replaceUnused);
         $filename = pathinfo($absoluteUrl, PATHINFO_FILENAME);
         $path = [];
+
         foreach ($fragments as $fragment) {
             $dontUse = (!strlen($fragment) || preg_match("#(http|$filename|www\.)+#", $fragment));
+
             if ($dontUse) {
                 continue;
             }
+
             array_push($path, $fragment);
         }
 
         $joinedPath = Controller::join_links($parentDir, implode('/', $path));
+
         return ($full ? ASSETS_PATH . ($joinedPath ? DIRECTORY_SEPARATOR . $joinedPath : '') : $joinedPath);
     }
 

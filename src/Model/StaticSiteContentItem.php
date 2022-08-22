@@ -3,14 +3,15 @@
 namespace PhpTek\Exodus\Model;
 
 use ExternalContentItem;
+use ExternalContentTransformer;
 use PhpTek\Exodus\Transform\StaticSiteFileTransformer;
 use PhpTek\Exodus\Transform\StaticSitePageTransformer;
 use PhpTek\Exodus\Tool\StaticSiteMimeProcessor;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\ArrayList;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\ORM\Hierarchy\Hierarchy;
 use SilverStripe\View\Requirements;
 
 /**
@@ -28,11 +29,18 @@ class StaticSiteContentItem extends ExternalContentItem
     private static $table_name = 'StaticSiteContentItem';
 
     /**
-     * Default Content type, either 'sitetree', 'file' or false to disable the default
+     * Default Content type, either 'sitetree', 'file' (or false to disable the default)
      *
      * @var mixed (string | boolean)
      */
     private $default_content_type = 'sitetree';
+
+    /**
+     * @var array
+     */
+    private static $extensions = [
+        'hierarchy' => Hierarchy::class,
+    ];
 
     /**
      * @return void
@@ -82,31 +90,35 @@ class StaticSiteContentItem extends ExternalContentItem
 
     /**
      *
-     * @return number
+     * @return int
      */
-    public function numChildren()
+    public function numChildren(): int
     {
         if (!$this->source->urlList()->hasCrawled()) {
             return 0;
         }
+
         return count($this->source->urlList()->getChildren($this->externalId));
     }
 
     /**
-     * Returns the correct SS base class-type based on the curent URL's Mime-Type
+     * Returns the correct Silverstripe base class-name based on the curent URL's Mime-Type
      * and directs the module to use the correct StaticSiteXXXTransformer class.
      *
-     * @return mixed string|boolean
+     * @return mixed string
      */
-    public function getType()
+    public function getType(): string
     {
         $mimeTypeProcessor = singleton(StaticSiteMimeProcessor::class);
+
         if ($mimeTypeProcessor->isOfFileOrImage($this->ProcessedMIME)) {
             return "file";
         }
+
         if ($mimeTypeProcessor->isOfHtml($this->ProcessedMIME)) {
             return "sitetree";
         }
+
         // Log everything that doesn't fit:
         singleton(StaticSiteUtils::class)->log('UNKNOWN Schema not configured for Mime & URL:', $this->AbsoluteURL, $this->ProcessedMIME);
         return $this->default_content_type;
@@ -115,21 +127,23 @@ class StaticSiteContentItem extends ExternalContentItem
     /**
      * Returns the correct content-object transformation class.
      *
-     * @return \ExternalContentTransformer
+     * @return ExternalContentTransformer
      */
-    public function getTransformer()
+    public function getTransformer(): ExternalContentTransformer
     {
         $type = $this->getType();
+
         if ($type == 'file') {
             return StaticSiteFileTransformer::create();
         }
+
         if ($type == 'sitetree') {
             return StaticSitePageTransformer::create();
         }
     }
 
     /**
-     * @return \FieldList $fields
+     * @return FieldList $fields
      */
     public function getCMSFields()
     {
@@ -159,7 +173,6 @@ class StaticSiteContentItem extends ExternalContentItem
         }
 
         Requirements::javascript('phptek/silverstripe-exodus:js/StaticSiteContentItem.js');
-        //Requirements::css('phptek/silverstripe-exodus:css/StaticSiteConnector.css');
 
         return $fields;
     }

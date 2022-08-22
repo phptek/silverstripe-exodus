@@ -79,10 +79,10 @@ class StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
      * @param array $urlData
      * @return array
      */
-    public function processURL($urlData)
+    public function processURL(array $urlData): array
     {
         if (!is_array($urlData) || empty($urlData['url'])) {
-            return false;
+            return [];
         }
 
         $url = '';
@@ -158,10 +158,10 @@ class StaticSiteMOSSURLProcessor extends StaticSiteURLProcessorDropExtensions im
      * @param array $urlData
      * @return array
      */
-    public function processURL($urlData)
+    public function processURL(array $urlData): array
     {
         if (!is_array($urlData) || empty($urlData['url'])) {
-            return false;
+            return [];
         }
 
         $url = str_ireplace('/Pages/', '/', $urlData['url']);
@@ -169,6 +169,7 @@ class StaticSiteMOSSURLProcessor extends StaticSiteURLProcessorDropExtensions im
             'url' => $url,
             'mime' => $urlData['mime'],
         ];
+
         return parent::processURL($urlData);
     }
 }

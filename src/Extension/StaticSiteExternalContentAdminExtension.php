@@ -5,10 +5,9 @@ namespace PhpTek\Exodus\Extension;
 use ExternalContent;
 use ExternalContentSource;
 use PhpTek\Exodus\Model\StaticSiteImportDataObject;
-use SilverStripe\Control\Controller;
 use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\HTTPResponse;
 
 /**
  * @package phptek/silverstripe-exodus
@@ -22,29 +21,18 @@ class StaticSiteExternalContentAdminExtension extends Extension
      * @var array
      */
     private static $allowed_actions = [
-        "crawlsite",
-        "clearimports",
+        'crawlsite',
+        'clearimports',
     ];
-
-    /**
-     * Load module-wide CSS
-     *
-     * @return void
-     * @todo Is this needed?
-     */
-    public function init()
-    {
-        // Requirements::css('phptek/silverstripe-exodus:css/StaticSiteConnector.css');
-    }
 
     /**
      * Controller method which starts a crawl.
      *
-     * @param array $data
+     * @param array $request
      * @throws Exception
      * @return HTTPResponse
      */
-    public function crawlsite(array $request)
+    public function crawlsite(array $request): HTTPResponse
     {
         $selected = $request['ID'] ?? 0;
 
@@ -65,7 +53,7 @@ class StaticSiteExternalContentAdminExtension extends Extension
                 $source->crawl();
             } catch (\Exception $e) {
                 $messageType = 'bad';
-                $message = "Error crawling: " . $e->getMessage();
+                $message = "Error crawling. Crawler said: " . $e->getMessage();
             }
         }
 
@@ -79,10 +67,10 @@ class StaticSiteExternalContentAdminExtension extends Extension
      *
      * Delete all StaticSiteImportDataObject's and related logic.
      *
-     * @param HTTPRequest $request
+     * @param array $request
      * @return HTTPResponse
      */
-    public function clearimports($request)
+    public function clearimports(array $request): HTTPResponse
     {
         if (!empty($request['ClearAllImports'])) {
             $imports = DataObject::get(StaticSiteImportDataObject::class);

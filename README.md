@@ -16,12 +16,23 @@ by obscure CMS's.
 
 ## How it works
 
-Importing a site is a __2__ or __3__ step process (Depending on user-selection).
+Importing a site is a __3__ stage process:
 
- 1. Crawl
- 2. Import
- 3. Rewrite Links (Automatic, if selected in step 2.)
- 
+ 1. Extract
+ 2. Transform
+ 3. Load
+
+The "Extract" phase involves configuring the tool with "schemas" where you tell it how to **extract** content from the source and map it to a Silverstripe class with a URL pattern, a Mime-Type and one or more CSS selectors mapped to fields on the selected class. Expect to spend a decent amount of time analysing your source website-content and tweaking these settings.
+
+"Transform" is the process of modifying URL patterns found in source systems which are unique to particular systems such as Drupal, Wordpress or Plone for example. This is automatic and occurs with the selection made in the main "URL Processing" selection. This may be trial and error until the crawl process completes.
+
+**Note:** 
+
+* _Developers_ keep an eye on your browser's developer-tools' "Network" tab. Not all errors are reported directly in Silverstripe's UI. Please [report any issues you find](https://github.com/phptek/silverstripe-exodus/issues).  
+* You may need to re-run a crawl if the selected URL Processing option fails with an on-screen error message. Each option is designed for websites with fairly specific features and URL patterns and may return prematurely.
+
+"Load" is currently denoted as "Import" within the tool (this will change as work is ongoing) and is where the hard work of tweaking your crawl settings pays off and you can import the extracted content into your site-tree.
+
 A list of URLs are fetched and extracted from the site via [PHPCrawl](http://cuab.de/),
 and cached in a text file under the assets directory.
 
@@ -36,6 +47,10 @@ which is leveraged for this purpose.
 
 See the included [migration documentation](docs/en/migration.md) for detailed
 instruction on migrating a legacy site into SilverStripe using the module.
+
+## Gotchas
+
+1. If you know the site to be crawled will redirect, use the redirected URL as the value of the "Base URL" field.
 
 ## Installation
 

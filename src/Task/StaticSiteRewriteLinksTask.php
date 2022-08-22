@@ -276,7 +276,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
             }
 
             if ($modified) {
-                Versioned::set_reading_mode('Stage');
+                Versioned::set_reading_mode('Stage.Stage');
                 $page->write();
                 $page->publishRecursive();
             }

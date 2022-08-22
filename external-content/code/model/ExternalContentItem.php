@@ -28,13 +28,19 @@ use SilverStripe\Forms\ReadonlyField;
  */
 class ExternalContentItem extends DataObject
 {
+    /**
+     * @var array
+     */
     private static $db = [];
 
+    /**
+     * @var string
+     */
     private static $table_name = 'ExternalContentItem';
 
     /**
-     * @var string - icon for cms tree
-     **/
+     * @var string The icon for cms tree
+     */
     private static $icon = null;
 
     protected $ownerId;
@@ -502,7 +508,7 @@ class ExternalContentItem extends DataObject
     {
         $classes = sprintf('class-%s', $this->class);
         // Ensure that classes relating to whether there are further nodes to download are included
-        $classes .= $this->markingClasses();
+       // $classes .= $this->markingClasses();
         return $classes;
     }
 

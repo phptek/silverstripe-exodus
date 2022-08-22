@@ -3,6 +3,7 @@
 namespace PhpTek\Exodus\Tool;
 
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injectable;
 

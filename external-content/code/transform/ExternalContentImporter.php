@@ -2,6 +2,7 @@
 
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\ArrayList;
 use Symbiote\QueuedJobs\Jobs\AbstractQueuedJob;
@@ -16,6 +17,7 @@ abstract class ExternalContentImporter
 {
     use Injectable;
     use Configurable;
+    use Extensible;
 
     protected $contentTransforms = array();
     protected $params = array();
