@@ -1,3 +1,4 @@
+<!-- The Edit form located in the CMS' RHS pane -->
 <form $FormAttributes data-layout-type="border">
     <% if $Message %>
         <p id="{$FormName}_error" class="message $AlertType">$Message</p>

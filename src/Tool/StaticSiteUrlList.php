@@ -269,7 +269,7 @@ class StaticSiteUrlList
      *
      * @return array
      */
-    public function getProcessedURLs()
+    public function getProcessedURLs(): array
     {
         if ($this->hasCrawled() || $this->autoCrawl) {
             if ($this->urls === null) {
@@ -282,12 +282,14 @@ class StaticSiteUrlList
             foreach ($this->urls['regular'] as $key => $urlData) {
                 $_regular[$key] = $urlData['url'];
             }
+
             if ($this->urls['inferred']) {
                 $_inferred = [];
                 foreach ($this->urls['inferred'] as $key => $urlData) {
                     $_inferred[$key] = $urlData['url'];
                 }
             }
+
             return array_merge(
                 $_regular,
                 $_inferred ? array_combine($_inferred, $_inferred) : []

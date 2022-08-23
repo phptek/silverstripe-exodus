@@ -36,6 +36,7 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObjectSchema;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\View\ArrayData;
 
 /**
  * Define the overarching content-sources, schemas etc.
@@ -123,6 +124,32 @@ class StaticSiteContentSource extends ExternalContentSource
         parent::__construct($record, $isSingleton, $model);
         $this->staticSiteCacheDir = sprintf('%s%s', self::CACHE_DIR_PREFIX, $this->ID);
         $this->utils = singleton(StaticSiteUtils::class);
+    }
+
+    /**
+     * Template method used to display the results of a successful crawl into the central
+     * column of the CMS.
+     *
+     * @return string
+     */
+    public function listofCrawledItems(): string
+    {
+        $list = $this->urlList();
+        $ulist = '';
+
+        if ($list->getSpiderStatus() !== 'Complete') {
+            return '';
+        }
+
+        foreach (array_unique($list->getProcessedURLs()) as $raw => $processed) {
+            if ($raw != $processed) {
+                $ulist .= '<li>' . sprintf('%s (was: %s)', $processed, $raw) . '</li>';
+            } else {
+                $ulist .= '<li>' . $processed . '</li>';
+            }
+        }
+
+        return '<ul>' . $ulist . '</ul>';
     }
 
     /**
@@ -222,27 +249,14 @@ class StaticSiteContentSource extends ExternalContentSource
          * @todo use customise() and arrange this using an includes .ss template fragment
          */
         if ($this->urlList()->getSpiderStatus() == "Complete") {
-            $urlsAsUL = "<ul>";
-            $processedUrls = $this->urlList()->getProcessedURLs();
-            $processed = ($processedUrls ? $processedUrls : []);
-            $list = array_unique($processed);
-
-            foreach ($list as $raw => $processed) {
-                if ($raw == $processed) {
-                    $urlsAsUL .= "<li>$processed</li>";
-                } else {
-                    $urlsAsUL .= "<li>$processed <em>(was: $raw)</em></li>";
-                }
-            }
-
-            $urlsAsUL .= "</ul>";
-
             $fields->addFieldToTab(
                 'Root.Crawl',
                 LiteralField::create(
-                    'CrawlURLList',
-                    '<p class="mesage notice">The following URIs have been identified: </p>' . $urlsAsUL
-                )
+                    'CrawlURLListUIntro',
+                    '<p class="mesage notice">Review the list of crawled URIs below. When you\'re happy with the import'
+                    . ' you can proceed to the "Import" tab and follow the instructions there.</p>'
+                ),
+                LiteralField::create('CrawlURLList', $this->listofCrawledItems())
             );
         }
 
