@@ -327,7 +327,10 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
     }
 
     /**
-     * Action to migrate a selected object through to SS
+     * Action to migrate a selected object through to SS.
+     *
+     * Note: Even if all content imports and url crawls are deleted, imports still stop prematurely and without error.
+     *       Could be to do with the select parent page to import into having been "marked"...? Nope..
      *
      * @param array $request
      */
@@ -346,10 +349,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
             $message = _t('ExternalContent.NOITEMSELECTED', 'No item selected to import into.');
 
             $form->sessionError($message, $messageType);
+
             return $this->getResponseNegotiator()->respond($this->request);
         } elseif (!($migrationTarget && $fileMigrationTarget)) {
             $messageType = 'bad';
-            $message = _t('ExternalContent.NOTARGETSELECTED', 'No target selected to import crawled content into.');
+            $message = _t('ExternalContent.NOTARGETSELECTED', 'No target(s) selected to import crawled content into.');
 
             $form->sessionError($message, $messageType);
             return $this->getResponseNegotiator()->respond($this->request);
@@ -523,7 +527,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                         _t('ExternalContent.DUPLICATES', 'Duplicate Item Handling'),
                         $duplicateOptions,
                         $duplicateOptions[ExternalContentTransformer::DS_SKIP]
-                    )
+                    )->setValue($this->getRequest()->postVars()['DuplicateMethod'] ?? ExternalContentTransformer::DS_SKIP)
                 );
 
                 if (class_exists(QueuedJobDescriptor::class)) {

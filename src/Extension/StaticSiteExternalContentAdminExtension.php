@@ -47,7 +47,7 @@ class StaticSiteExternalContentAdminExtension extends Extension
             }
 
             $messageType = 'good';
-            $message = _t('ExternalContent.CONTENTMIGRATED', 'Crawl successful.');
+            $message = _t('ExternalContent.CONTENTMIGRATED', 'Crawl successful. You can attempt an import now.');
 
             try {
                 $source->crawl();

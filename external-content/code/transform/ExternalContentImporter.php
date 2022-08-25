@@ -50,7 +50,11 @@ abstract class ExternalContentImporter
 
         // if the queuedjobs module exists, use that
         $queuedVersion = 'Queued' . get_class($this);
-        if ($this->config()->use_queue && ClassInfo::exists(AbstractQueuedJob::class) && ClassInfo::exists($queuedVersion)) {
+
+        if (
+            $this->config()->get('use_queue') &&
+            ClassInfo::exists(AbstractQueuedJob::class) &&
+            ClassInfo::exists($queuedVersion)) {
             $importer = new $queuedVersion(
                 $contentItem,
                 $target,
@@ -62,10 +66,12 @@ abstract class ExternalContentImporter
 
             $service = singleton(QueuedJobService::class);
             $service->queueJob($importer);
+
             return $importer;
         }
 
         $children = null;
+
         if ($includeParent) {
             // Get the children of a particular node
             $children = ArrayList::create();
@@ -76,6 +82,7 @@ abstract class ExternalContentImporter
 
         $this->importChildren($children, $target, $includeChildren, $duplicateStrategy);
         $this->runOnImportEnd();
+
         return true;
     }
 
