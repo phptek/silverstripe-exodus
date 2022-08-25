@@ -36,7 +36,6 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObjectSchema;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDatetime;
-use SilverStripe\View\ArrayData;
 
 /**
  * Define the overarching content-sources, schemas etc.
@@ -137,7 +136,7 @@ class StaticSiteContentSource extends ExternalContentSource
         $list = $this->urlList();
         $ulist = '';
 
-        if ($list->getSpiderStatus() !== 'Complete') {
+        if ($list->getSpiderStatus() !== StaticSiteUrlList::CRAWL_STATUS_COMPLETE) {
             return '';
         }
 
@@ -239,7 +238,7 @@ class StaticSiteContentSource extends ExternalContentSource
             ReadonlyField::create("NumURIs", "Number of URIs Crawled", $this->urlList()->getNumURIs()),
             LiteralField::create(
                 'CrawlActions',
-                '<p class="message notice">Before loading this content into Silverstripe, all source URLs must first be crawled. '
+                '<p class="message notice">Before you can load any content into Silverstripe, all source URLs must first be crawled. '
                 . $crawlMsg . '</p>'
                 . '<div class="btn-toolbar">' . $crawlButton->forTemplate() . '</div>'
             )
@@ -248,7 +247,7 @@ class StaticSiteContentSource extends ExternalContentSource
         /*
          * @todo use customise() and arrange this using an includes .ss template fragment
          */
-        if ($this->urlList()->getSpiderStatus() == "Complete") {
+        if ($this->urlList()->getSpiderStatus() == StaticSiteUrlList::CRAWL_STATUS_COMPLETE) {
             $fields->addFieldToTab(
                 'Root.Crawl',
                 LiteralField::create(
@@ -681,7 +680,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
      *
      * @return array $output. A map of field name => [CSS selector, CSS selector, ...]
      */
-    public function getImportRules()
+    public function getImportRules(): array
     {
         $output = [];
 
@@ -689,6 +688,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
             if (!isset($output[$rule->FieldName])) {
                 $output[$rule->FieldName] = [];
             }
+
             $ruleArray = [
                 'selector' => $rule->CSSSelector,
                 'attribute' => $rule->Attribute,
@@ -696,6 +696,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
                 'excludeselectors' => preg_split('/\s+/', trim($rule->ExcludeCSSSelector)),
                 'outerhtml' => $rule->OuterHTML,
             ];
+
             $output[$rule->FieldName][] = $ruleArray;
         }
 
@@ -901,6 +902,9 @@ class StaticSiteContentSourceImportRule extends DataObject
             $fields->replaceField('FieldName', $fieldName = ReadonlyField::create("FieldName", "Field Name"));
             $fieldName->setDescription('Save this rule before being able to add a field name');
         }
+
+        $fields->dataFieldByName('Attribute')->setDescription('Add the element attribute where the desired text'
+        . ' can be found (such as "alt" or "title") if not found as the selected element\'s text itself.');
 
         return $fields;
     }

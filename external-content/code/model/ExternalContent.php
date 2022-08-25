@@ -30,7 +30,7 @@ class ExternalContent
      *
      * @var string
      */
-    public const ID_FORMAT = "/(\d+)(\_.*)?/";
+    public const ID_FORMAT = '#(\d+)(\_.*)?#';
 
     /**
      * @var string
@@ -44,10 +44,10 @@ class ExternalContent
      * retrieval system doesn't really provide a nice override
      * mechanism other than useCustomObject
      *
-     * @param String $id
+     * @param string $id
      * 			The compound ID to get a data object for
      *
-     * @return DataObject
+     * @return mixed null|DataObject
      */
     public static function getDataObjectFor($id)
     {
@@ -56,6 +56,7 @@ class ExternalContent
         }
 
         $obj = null;
+        $matches = [];
 
         if (preg_match(self::ID_FORMAT, $id, $matches)) {
             $id = $matches[1];
@@ -65,7 +66,6 @@ class ExternalContent
             if ($composed && $obj) {
                 $obj = $obj->getObject($composed);
             }
-        } else {
         }
 
         return $obj;

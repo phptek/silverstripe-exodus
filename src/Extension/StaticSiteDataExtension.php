@@ -32,7 +32,7 @@ class StaticSiteDataExtension extends DataExtension
      * @var array
      */
     private static $has_one = [
-        "StaticSiteContentSource" => StaticSiteContentSource::class,
+        'StaticSiteContentSource' => StaticSiteContentSource::class,
     ];
 
     /**

@@ -13,23 +13,25 @@ use SilverStripe\Core\Injector\Injectable;
  */
 class StaticSiteCrawlURLsTask extends BuildTask
 {
-    use Injectable;
-
     /**
      *
-     * @param SS_HTTPRequest $request
+     * @param HTTPRequest $request
      * @return null
      */
     public function run($request)
     {
         $id = $request->getVar('ID');
-        if (!is_numeric($id) || !$id) {
+
+        if (!$id or !is_numeric($id)) {
             echo "<p>Specify ?ID=(number)</p>";
-            return;
+
+            return null;
         }
 
         // Find all pages
         $contentSource = StaticSiteContentSource::get()->byID($id);
         $contentSource->urllist()->crawl(false, true);
+
+        return null;
     }
 }

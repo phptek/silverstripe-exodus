@@ -181,7 +181,7 @@ abstract class QueuedExternalContentImporter extends AbstractQueuedJob
      * is concerned. This should match up with what is defined
      * in the contentTransforms array
      *
-     * @return String
+     * @return string
      * 			The type of the ExternalContentItem
      */
     abstract protected function getExternalType($item);

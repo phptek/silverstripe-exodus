@@ -52,10 +52,10 @@ instruction on migrating a legacy site into SilverStripe using the module.
 
 1. If you know the site to be crawled will redirect, use the redirected URL as the value of the "Base URL" field.
 
-## Installation
+## Installation and Setup
 
 This module requires the [PHP Sempahore](https://www.php.net/manual/en/sem.installation.php)
-functions to work.
+functions to work. (TODO: Still true in php7/8?)
 
 Once that's done, you can use [Composer](http://getcomposer.org) to add the module
 to your SilverStripe project:
@@ -63,10 +63,11 @@ to your SilverStripe project:
     #> composer require phptek/silverstripe-exodus
 
 Please see the included [Migration](docs/en/migration.md) document, that describes
-exactly how to configure the tool to perform a site-scrape / migration.
+exactly how to configure the tool to perform a content migration.
 
-There is also an [example database-dump](docs/en/example.sql) (MySQL/MariaDB only)
-provided which you can import into your DB to get you up and running quickly.
+**Notes**
+
+* If using php-fpm, you may need to tweak the settings found in `www.conf`. Contrary to popular belief, the default `pm = dynamic` may not suffice. In (limited) testing we used `pm = static` with `pm.max_children = 25` as opposed to the default `10` which helped crawling a ~250 page site. Tweaking php-fpm gives your application more system resources to call upon during larger site-crawls.
 
 ## License
 

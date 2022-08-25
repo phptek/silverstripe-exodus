@@ -19,20 +19,20 @@ use SilverStripe\Versioned\Versioned;
 use SilverStripe\Forms\FormField;
 
 /**
- * Rewrites content-links found in <img> "src" and <a> "href"
- * HTML tag-attributes, which were originally imported via {@link StaticSiteImporter}.
+ * Rewrites content-links found in `img.src` and `a.href` HTML element attributes,
+ * which were originally imported via {@link StaticSiteImporter}.
  *
  * The task takes two arguments:
  *
  * - ImportID:
- * Allows the rewriter to know which content to rewrite, when duplicate imports exist.
+ *   Allows the rewriter to know which content to rewrite, when duplicate imports exist.
  *
  * - SourceID
- * Allows the rewriter to fetch the correct content relative to the given source of scraped URLs.
+ *   Allows the rewriter to fetch the correct content relative to the given source of scraped URLs.
  *
  * - SilentRun
- * Allows the rewriter to run silently, without displaying anything to stdout. This is the
- * default for when the task is run from the front-end.
+ *   Allows the rewriter to run silently, without displaying anything to stdout. This is the
+ *   default for when the task is run from the front-end.
  *
  * All rewrite failures are written to an individual {@link FailedURLRewriteObject} DataObject to power the
  * CMS {@link FailedURLRewriteReport}. See also {@link FailedURLRewriteSummary}.
@@ -44,8 +44,6 @@ use SilverStripe\Forms\FormField;
  */
 class StaticSiteRewriteLinksTask extends BuildTask
 {
-    use Injectable;
-
     /**
      * An inexhaustive list of non http(s) URI schemes which we don't want to try to normalise.
      *

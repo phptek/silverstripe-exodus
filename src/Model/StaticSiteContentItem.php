@@ -79,8 +79,8 @@ class StaticSiteContentItem extends ExternalContentItem
         }
 
         $childrenURLs = $this->source->urlList()->getChildren($this->externalId);
-
         $children = ArrayList::create();
+
         foreach ($childrenURLs as $child) {
             $children->push($this->source->getObject($child));
         }
@@ -121,6 +121,7 @@ class StaticSiteContentItem extends ExternalContentItem
 
         // Log everything that doesn't fit:
         singleton(StaticSiteUtils::class)->log('UNKNOWN Schema not configured for Mime & URL:', $this->AbsoluteURL, $this->ProcessedMIME);
+
         return $this->default_content_type;
     }
 

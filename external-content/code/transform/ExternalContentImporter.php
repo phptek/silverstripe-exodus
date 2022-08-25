@@ -82,8 +82,10 @@ abstract class ExternalContentImporter
     /**
      * Execute the importing of several children
      *
-     * @param DataObjectSet $children
+     * @param SS_List $children
      * @param SiteTree $parent
+     * @param string $includeChildren (numeric string..)
+     * @param string $duplicateStrategy e.g. "skip"
      */
     protected function importChildren($children, $parent, $includeChildren, $duplicateStrategy)
     {
@@ -94,6 +96,7 @@ abstract class ExternalContentImporter
         // get the importer to use, import, then see if there's any
         foreach ($children as $child) {
             $pageType = $this->getExternalType($child);
+
             if (isset($this->contentTransforms[$pageType])) {
                 $transformer = $this->contentTransforms[$pageType];
                 $result = $transformer->transform($child, $parent, $duplicateStrategy);
@@ -114,7 +117,7 @@ abstract class ExternalContentImporter
      * is concerned. This should match up with what is defined
      * in the contentTransforms array
      *
-     * @return String
+     * @return string
      * 			The type of the ExternalContentItem
      */
     abstract protected function getExternalType($item);

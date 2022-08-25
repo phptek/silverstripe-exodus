@@ -3,18 +3,18 @@
 namespace PhpTek\Exodus\Transform;
 
 use ExternalContentImporter;
+use ExternalContentItem;
 use PhpTek\Exodus\Transform\StaticSitePageTransformer;
 use PhpTek\Exodus\Model\StaticSiteImportDataObject;
 use SilverStripe\Control\Controller;
 use SilverStripe\Dev\TaskRunner;
 use SilverStripe\Control\HTTPRequest;
 use PhpTek\Exodus\Task\StaticSiteRewriteLinksTask;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
 
 /**
  * Physically brings content into SilverStripe as defined by URLs fetched
- * at the crawl stage, and utilises StaticSitePageTransformer and StaticSiteFileTransformer.
+ * at the crawl stage, and utilises {@link StaticSitePageTransformer} and {@link StaticSiteFileTransformer}.
  *
  * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
@@ -36,8 +36,9 @@ class StaticSiteImporter extends ExternalContentImporter
 
     /**
      *
-     * @param StaticSiteContentItem $item
+     * @param $item
      * @return string
+     * @todo `$item` param seems to be instance of `ExternalContentSource` not `ExternalContentItem` for some reason
      */
     public function getExternalType($item)
     {
@@ -51,9 +52,10 @@ class StaticSiteImporter extends ExternalContentImporter
      *
      * @return void
      */
-    public function runOnImportStart()
+    public function runOnImportStart(): void
     {
         parent::runOnImportStart();
+
         StaticSiteImportDataObject::create()->start();
     }
 

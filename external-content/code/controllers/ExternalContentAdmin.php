@@ -298,15 +298,15 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
     }
 
     /**
-     * Custom currentPage() method to handle opening the 'root' node
+     * Custom currentPage() method to handle opening the 'root' node (which is always going to be an instance of ExternalContentSource???)
      *
      * @return DataObject
      */
     public function currentPage()
     {
-        $id = $this->getCurrentPageID();
+        $id = (string) $this->getCurrentPageID();
 
-        if (preg_match(ExternalContent::ID_FORMAT, (string) $id)) {
+        if (preg_match(ExternalContent::ID_FORMAT, $id)) {
             return ExternalContent::getDataObjectFor($id);
         }
 
@@ -314,7 +314,6 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
             return singleton($this->config()->get('tree_class'));
         }
     }
-
 
     /**
      * Is the passed in ID a valid
@@ -327,7 +326,6 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         return preg_match(ExternalContent::ID_FORMAT, $id);
     }
 
-
     /**
      * Action to migrate a selected object through to SS
      *
@@ -335,6 +333,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
      */
     public function migrate(array $request)
     {
+        $form = $this->getEditForm();
         $migrationTarget 		= isset($request['MigrationTarget']) ? $request['MigrationTarget'] : '';
         $fileMigrationTarget 	= isset($request['FileMigrationTarget']) ? $request['FileMigrationTarget'] : '';
         $includeSelected 		= isset($request['IncludeSelected']) ? $request['IncludeSelected'] : 0;
@@ -345,14 +344,16 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         if (!$selected) {
             $messageType = 'bad';
             $message = _t('ExternalContent.NOITEMSELECTED', 'No item selected to import into.');
-        }
 
-        if (!$migrationTarget || !$fileMigrationTarget) {
+            $form->sessionError($message, $messageType);
+            return $this->getResponseNegotiator()->respond($this->request);
+        } elseif (!($migrationTarget && $fileMigrationTarget)) {
             $messageType = 'bad';
-            $message = _t('ExternalContent.NOTARGETSELECTED', 'No target selected to import into.');
-        }
+            $message = _t('ExternalContent.NOTARGETSELECTED', 'No target selected to import crawled content into.');
 
-        if ($selected && ($migrationTarget || $fileMigrationTarget)) {
+            $form->sessionError($message, $messageType);
+            return $this->getResponseNegotiator()->respond($this->request);
+        } else {
             if ($migrationTarget) {
                 $targetType = SiteTree::class;
                 $target = DataObject::get_by_id($targetType, $migrationTarget);
@@ -362,7 +363,8 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
             }
 
             $from = ExternalContent::getDataObjectFor($selected);
-
+            // Don't use an instance of ExternalContentSource which has nothing to do with site-tree's but is yet
+            // strangely selectable from Silverstripe's UI
             if ($from instanceof ExternalContentSource) {
                 $selected = false;
             }
@@ -374,24 +376,21 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                 $messageType = 'good';
                 $message = _t('ExternalContent.CONTENTMIGRATEQUEUED', 'Import job queued.');
             } else {
-                $importer = $from->getContentImporter($targetType);
-
-                if ($importer) {
+                if ($importer = $from->getContentImporter($targetType)) {
                     $result = $importer->import($from, $target, $includeSelected, $includeChildren, $duplicates, $request);
-                    $messageType = 'good';
 
                     if ($result instanceof QueuedExternalContentImporter) {
+                        $messageType = 'good';
                         $message = _t('ExternalContent.CONTENTMIGRATEQUEUED', 'Import job queued.');
                     } else {
-                        $message = _t('ExternalContent.CONTENTMIGRATED', 'Import Successful.');
+                        $messageType = 'good';
+                        $message = _t('ExternalContent.CONTENTMIGRATED', 'Import Successful. Please review the CMS site-tree.');
                     }
                 }
             }
         }
 
-        $form = $this->getEditForm();
         $form->sessionError($message, $messageType);
-
         return $this->getResponseNegotiator()->respond($this->request);
     }
 
@@ -402,15 +401,16 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
      * are supported.
      *
      * @param  string $id The ID
+     * @param string $versionID
      * @return Dataobject The relevant object
      */
     public function getRecord($id, $versionID = null)
     {
         if (is_numeric($id)) {
             return parent::getRecord($id);
-        } else {
-            return ExternalContent::getDataObjectFor($id);
         }
+
+        return ExternalContent::getDataObjectFor($id);
     }
 
 
@@ -491,12 +491,14 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                     );
                 }
 
+                // This tells the module to include the selected "SiteTee" and "Folder" subclasses
+                // to be _included_ in the import. But it throws exceptions.
                 $fields->addFieldToTab(
                     'Root.Import',
                     CheckboxField::create(
                         "IncludeSelected",
                         _t('ExternalContent.INCLUDE_SELECTED', 'Include Selected Item in Import')
-                    )
+                    )->setAttribute('disabled', true) // <-- temporary
                 );
 
                 $fields->addFieldToTab(

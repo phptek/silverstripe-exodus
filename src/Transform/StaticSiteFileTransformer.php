@@ -163,6 +163,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $path = $this->getDirHierarchy($url);
         $parentFolder = Folder::find_or_make($path);
         $assetsPath = $this->getDirHierarchy($url, true);
+
         if (!file_exists($assetsPath)) {
             $this->utils->log(" - WARNING: File-import directory hierarchy wasn't created properly: $assetsPath", $url, $mime);
             return false;
