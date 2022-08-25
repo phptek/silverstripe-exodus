@@ -26,7 +26,7 @@ class StaticSiteUtils
      */
     public function log($message, $filename = null, $mime = null)
     {
-        $logFile = '/tmp/staticsiteconnector_extract.log';
+        $logFile = '/tmp/exodus_extract.log';
 
         if (is_writable($logFile) || !file_exists($logFile) && is_writable(dirname($logFile))) {
             $message = $message . ($filename ? ' ' . $filename : '') . ($mime ? ' (' . $mime . ')' : '');
