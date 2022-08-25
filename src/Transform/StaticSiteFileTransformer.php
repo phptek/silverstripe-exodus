@@ -4,7 +4,6 @@ namespace PhpTek\Exodus\Transform;
 
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DataObject;
 
