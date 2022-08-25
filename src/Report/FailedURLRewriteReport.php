@@ -16,6 +16,7 @@ use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+use SilverStripe\ORM\FieldType\DBDatetime;
 
 /**
  * A CMS report for URLs that failed to be re-written.
@@ -43,7 +44,7 @@ TXT;
      *
      * @return string
      */
-    public function title()
+    public function title(): string
     {
         return "Imported links rewrite report";
     }
@@ -147,11 +148,11 @@ TXT;
             ],
             'Created' => [
                 'title' => 'Task run date',
-                'casting' => 'DBDatetime->Time24'
+                'casting' => 'SilverStripe\ORM\FieldType\DBDatetime->Time24'
             ],
             'Import.Created' => [
                 'title' => 'Import date',
-                'casting' => 'DBDatetime->Time24'
+                'casting' => 'SilverStripe\ORM\FieldType\DBDatetime->Time24'
             ]
         ];
     }
@@ -171,9 +172,11 @@ TXT;
 
         $lines = explode(PHP_EOL, $text->Text);
         $summaryData = '';
+
         foreach ($lines as $line) {
             $summaryData .= $line . '<br/>';
         }
+
         return $summaryData;
     }
 
@@ -211,14 +214,14 @@ TXT;
     }
 
     /**
-     * Overrides SS_Report::getReportField() with the addition of GridField Actions.
+     * Overrides SSReport::getReportField() with the addition of GridField Actions.
      *
      * @return GridField
      */
     public function getReportField()
     {
         $gridField = parent::getReportField();
-        $gridField->setModelClass('FailedURLRewriteObject');
+        $gridField->setModelClass(FailedURLRewriteObject::class);
         $config = $gridField->getConfig();
         $config->addComponent(new GridFieldDeleteAction());
 
