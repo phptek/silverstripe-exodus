@@ -33,7 +33,7 @@ class StaticSiteContentItem extends ExternalContentItem
      *
      * @var mixed (string | boolean)
      */
-    private $default_content_type = 'sitetree';
+    private $default_content_type = false;
 
     /**
      * @var array
@@ -184,7 +184,7 @@ class StaticSiteContentItem extends ExternalContentItem
      * @param string $type e.g. 'sitetree'
      * @return boolean
      */
-    public function checkIsType($type)
+    public function checkIsType(string $type): bool
     {
         if (!$type || $this->getType() != strtolower($type)) {
             return false;

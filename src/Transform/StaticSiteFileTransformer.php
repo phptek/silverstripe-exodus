@@ -43,13 +43,14 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         if (!$item->checkIsType('file')) {
             $this->utils->log(" - Item not of type \'file\'. for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+
             return false;
         }
 
         $source = $item->getSource();
 
         // Sleep for Xms to reduce load on the remote server
-        usleep((int)self::$sleep_multiplier*1000);
+        usleep((int)self::$sleep_multiplier * 1000);
 
         // Extract remote location of File
         $contentFields = $this->getContentFieldsAndSelectors($item, 'File');
@@ -60,6 +61,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         }
 
         $schema = $source->getSchemaForURL($item->AbsoluteURL, $item->ProcessedMIME);
+
         if (!$schema) {
             $this->utils->log(" - Couldn't find an import schema for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
@@ -151,7 +153,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      * Build the properties required for a safely saved SilverStripe asset.
      * Attempts to detect and fix bad file-extensions based on the available Mime-Type.
      *
-     * @param \File $file
+     * @param File $file
      * @param string $url
      * @param string $mime	Used to fixup bad-file extensions or filenames with no
      *						extension but which _do_ have a Mime-Type.
@@ -221,7 +223,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $definitiveName = basename($definitiveFilename);
 
         // Complete the construction of $file.
-        $file->setName($definitiveName);
+        $file->setField('Name', $definitiveName);
         $file->setFilename($definitiveFilename);
         $file->setParentID($parentFolder->ID);
 

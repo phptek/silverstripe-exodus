@@ -81,10 +81,12 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
         $dataType = strtolower($dataType);
         // Get the import rules from the content source
         $importSchema = $item->getSource()->getSchemaForURL($item->AbsoluteURL, $item->ProcessedMIME);
+
         if (!$importSchema) {
             $this->utils->log("Couldn't find an import schema for ", $item->AbsoluteURL, $item->ProcessedMIME, 'WARNING');
             return null;
         }
+
         $importRules = $importSchema->getImportRules();
 
         // Extract from the remote content based on those rules
@@ -171,15 +173,17 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
      *
      * @return array $exts
      */
-    public function getSSExtensions()
+    public function getSSExtensions(): array
     {
         $extensions = File::config()->get('app_categories');
         $exts = [];
+
         foreach ($extensions as $category => $extArray) {
             foreach ($extArray as $ext) {
                 $exts[] = $ext;
             }
         }
+
         return $exts;
     }
 
