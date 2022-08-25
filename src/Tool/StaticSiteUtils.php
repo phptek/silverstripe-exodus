@@ -2,8 +2,6 @@
 
 namespace PhpTek\Exodus\Tool;
 
-use SilverStripe\Control\Controller;
-use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injectable;
 
@@ -24,16 +22,11 @@ class StaticSiteUtils
      * @param string $message
      * @param string $filename
      * @param string $mime
-     * @param string $class Optional. The class passed to Config to find the value for $log_file.
      * @return null | void
      */
-    public function log($message, $filename = null, $mime = null, $class = StaticSiteContentExtractor::class)
+    public function log($message, $filename = null, $mime = null)
     {
-        $logFile = Config::inst()->get($class, 'log_file');
-
-        if (!$logFile) {
-            return;
-        }
+        $logFile = '/tmp/staticsiteconnector_extract.log';
 
         if (is_writable($logFile) || !file_exists($logFile) && is_writable(dirname($logFile))) {
             $message = $message . ($filename ? ' ' . $filename : '') . ($mime ? ' (' . $mime . ')' : '');

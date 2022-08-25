@@ -4,7 +4,6 @@ namespace PhpTek\Exodus\Transform;
 
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DataObject;
 
@@ -151,7 +150,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      * Build the properties required for a safely saved SilverStripe asset.
      * Attempts to detect and fix bad file-extensions based on the available Mime-Type.
      *
-     * @param \File $file
+     * @param File $file
      * @param string $url
      * @param string $mime	Used to fixup bad-file extensions or filenames with no
      *						extension but which _do_ have a Mime-Type.
@@ -221,7 +220,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $definitiveName = basename($definitiveFilename);
 
         // Complete the construction of $file.
-        $file->setName($definitiveName);
+        $file->setField('Name', $definitiveName);
         $file->setFilename($definitiveFilename);
         $file->setParentID($parentFolder->ID);
 
