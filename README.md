@@ -6,6 +6,8 @@ Exodus is a content migration tool that roughly follows the ETL standard (**Extr
 
 Exodus crawls and parses the source website's DOM (Extract), normalises any page-URLs (Transform) and imports content as native Silverstrioe objects into your site-tree and assets hierarchy (Load).
 
+Please [See the docs](./docs/en/index.md).
+
 ## How it works
 
 Importing a site is a __3__ stage process:
@@ -31,10 +33,11 @@ Page content is imported page-by-page using cUrl, and the desired DOM elements
 extracted via configurable CSS selectors via [phpQuery](https://github.com/electrolinux/phpquery)
 which is leveraged for this purpose.
 
+Please [See the docs](./docs/en/index.md).
+
 ## Migration
 
-See the included [migration documentation](docs/en/migration.md) for detailed
-instruction on migrating a legacy site into SilverStripe using the module.
+Please [See the docs](./docs/en/index.md).
 
 ## Installation and Setup
 
@@ -49,26 +52,8 @@ to your SilverStripe project:
 Please see the included [Migration](docs/en/migration.md) document, that describes
 exactly how to configure the tool to perform a content migration.
 
-## Troubleshooting
-
-### PHP-FPM
-
-You may need to tweak the settings found in `www.conf`. Contrary to popular belief, the default `pm = dynamic` may not suffice. In (limited) testing we used `pm = static` with `pm.max_children = 25` as opposed to the default `10` which helped crawling a ~250 page site. Tweaking php-fpm gives your application more system resources to call upon during larger site-crawls.
-
-### Docker
-
-If because of a gateway timeout for example, your app container no longer responds, you'll need to restart it. If you were in the middle of a crawl, just hit the same button which should be labelled "Re Crawl" now, and it will pickup where it left-off.
-
-### Redirects
-
-If you know the site to be crawled will redirect, use the redirected URL as the value of the "Base URL" field.
-
-### Errors
-
-* _Developers_ keep an eye on your browser's developer-tools' "Network" tab. Not all errors are reported directly in Silverstripe's UI. Please [report any issues you find](https://github.com/phptek/silverstripe-exodus/issues).  
-* You may need to re-run a crawl if the selected URL Processing option fails with an on-screen error message. Each option is designed for websites with fairly specific features and URL patterns and may return prematurely.
+Please [See the docs](./docs/en/index.md).
 
 ## License
 
-This code is available under the BSD license, with the exception of the [PHPCrawl](https://github.com/crispy-computing-machine/phpcrawl/)
-library, bundled with this module which is GPL version 2.
+This code is available under the BSD license, with the exception of the [PHPCrawl](https://github.com/crispy-computing-machine/phpcrawl/) library, bundled with this module which is GPL version 2.

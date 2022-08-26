@@ -18,7 +18,7 @@ use SilverStripe\Core\Injector\Injector;
  *
  * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
- * @author Russell Michell <russell@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @see {@link ExternalContentImporter}
  * @see {@link StaticSiteImportDataObject}
  */

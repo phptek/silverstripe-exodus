@@ -6,7 +6,7 @@ use SilverStripe\Dev\SapphireTest;
 
 /**
  *
- * @author Russell Michell <russell@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @package phptek/silverstripe-exodus
  * @todo add tests that excercise duplicationStrategy() with a non-null $parentId param
  */

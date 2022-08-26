@@ -64,19 +64,6 @@ class StaticSiteContentExtractor
     protected $tmpFileName = '';
 
     /**
-     * Set this by using the yml config system
-     *
-     * Example:
-     * <code>
-     * StaticSiteContentExtractor:
-     *    log_file:  ../logs/import-log.txt
-     * </code>
-     *
-     * @var string
-     */
-    private static $log_file = null;
-
-    /**
      * "Caches" the mime-processor for use throughout
      *
      * @var StaticSiteMimeProcessor
@@ -290,7 +277,7 @@ class StaticSiteContentExtractor
     }
 
     /**
-     * Use cURL to request a URL, and return a SS_HTTPResponse object (`SiteTree`) or write curl output directly to a tmp file
+     * Use cURL to request a URL, and return a HTTPResponse object (`SiteTree`) or write curl output directly to a tmp file
      * ready for uploading to SilverStripe via Upload#load() (`File` and `Image`)
      *
      * @param string $url
@@ -298,7 +285,7 @@ class StaticSiteContentExtractor
      * @param string $data
      * @param string $headers
      * @param array $curlOptions
-     * @return boolean | \SS_HTTPResponse
+     * @return boolean | HTTPResponse
      * @todo Add checks when fetching multi Mb images to ignore anything over 2Mb??
      */
     protected function curlRequest($url, $method, $data = null, $headers = null, $curlOptions = [])
@@ -307,12 +294,10 @@ class StaticSiteContentExtractor
 
         $ch = curl_init();
         $timeout = 10;
-        // @todo Add current version from Composer
-        $useragent = 'phptek/silverstripe-exodus';
 
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
+        curl_setopt($ch, CURLOPT_USERAGENT, $this->config()->get('user_agent'));
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLOPT_TIMEOUT, 120);

@@ -13,7 +13,7 @@ Go to the "Crawl" tab and click "Crawl Site". Leave it running. It will take som
  2. If you're using Firebug or Chrome, ensure you have the debugger open _before_ you set the crawl off. Occasionally the crawl will die for unknown reasons - usually if your localhost/container has run out of resources - but review your browser's logs which will help in debugging. Note also that there's an import/extraction log available with more information in it:
 
  ```
- tail -f /tmp/staticsiteconnector_extract.log
+ tail -f /tmp/exodus.log
  ```
 
  3. If the host you're running the module on is behind a proxy, adapt the following:

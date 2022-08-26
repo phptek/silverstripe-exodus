@@ -12,7 +12,7 @@ use SilverStripe\Core\Config\Config;
  *
  * Utility class for Mime-Type processing.
  *
- * @author Russell Michell <russell@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @package phptek/silverstripe-exodus
  */
 class StaticSiteMimeProcessor

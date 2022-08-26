@@ -7,7 +7,7 @@ use PHPCrawl\PHPCrawlerDocumentInfo;
 
 /**
  *
- * @author Russell Michell <russell@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @package phptek/silverstripe-exodus
  */
 

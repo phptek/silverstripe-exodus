@@ -12,7 +12,7 @@ use SilverStripe\Core\Injector\Injectable;
  * It subclasses {@link TransformResult} to allow dealing-to File objects also
  *
  * @package phptek/silverstripe-exodus
- * @author Russell Michell <russell@silverstripe.com>
+ * @author Russell Michell <russ@theruss.com>
  * @todo Logic should really exist in external-content module itself.
  */
 class StaticSiteTransformResult extends \TransformResult
