@@ -1,5 +1,19 @@
 ## Troubleshooting
 
+### Logging
+
+By default the module will log to the path set for the class who'se logic you want to analyse:
+
+```
+PhpTek\Exodus\Task\StaticSiteRewriteLinksTask:
+  log_file: '/tmp/exodus-failed-rewrite.log'
+
+PhpTek\Exodus\Tool\StaticSiteUtils:
+  log_file: '/tmp/exodus.log'
+```
+
+It may not be desirable to enable logging on shared or cloud hosting environments, so set the value of `log_file` to `null` in your own project's config if you wish to disable logging.
+
 ### PHP-FPM
 
 You may need to tweak the settings found in `www.conf`. Contrary to popular belief, the default `pm = dynamic` may not suffice. In (limited) testing we used `pm = static` with `pm.max_children = 25` or greater as opposed to the default `10` which helped crawling a ~250 page site. Tweaking php-fpm gives your application more system resources to call upon during larger site-crawls.

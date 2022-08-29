@@ -28,7 +28,7 @@ class StaticSiteUtils
     {
         $logFile = $this->config()->get('log_file');
 
-        if (is_writable($logFile) || !file_exists($logFile) && is_writable(dirname($logFile))) {
+        if ($logFile && is_writable($logFile) || !file_exists($logFile) && is_writable(dirname($logFile))) {
             $message = $message . ($filename ? ' ' . $filename : '') . ($mime ? ' (' . $mime . ')' : '');
             error_log($message. PHP_EOL, 3, $logFile);
         }
