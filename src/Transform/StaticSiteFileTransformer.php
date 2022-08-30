@@ -40,6 +40,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $this->utils->log("START file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
 
         if (!$item->checkIsType('file')) {
+            die('#1');
             $this->utils->log(" - Item not of type \'file\'. for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
 
@@ -62,6 +63,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $schema = $source->getSchemaForURL($item->AbsoluteURL, $item->ProcessedMIME);
 
         if (!$schema) {
+            die('#2');
             $this->utils->log(" - Couldn't find an import schema for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             return false;
@@ -70,6 +72,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $dataType = $schema->DataType;
 
         if (!$dataType) {
+            die('#3');
             $this->utils->log(" - DataType for migration schema is empty for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             throw new \Exception('DataType for migration schema is empty!');
@@ -77,12 +80,14 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
 
         // Process incoming according to user-selected duplication strategy
         if (!$file = $this->duplicationStrategy($dataType, $item, $source->BaseUrl, $strategy, $parentObject)) {
+            die('#4');
             $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             return false;
         }
 
         // Prepare $file with all the correct properties, ready for writing
         if (!$file = $this->buildFileProperties($file, $item->AbsoluteURL, $item->ProcessedMIME)) {
+            die('#5');
             $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             return false;
         }
@@ -158,7 +163,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      *						extension but which _do_ have a Mime-Type.
      * @return mixed (boolean | \File)
      */
-    public function buildFileProperties($file, $url, $mime)
+    public function buildFileProperties(File $file, string $url, string $mime)
     {
         // Build the container directory to hold imported files
         $path = $this->getDirHierarchy($url);
@@ -167,6 +172,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
 
         if (!file_exists($assetsPath)) {
             $this->utils->log(" - WARNING: File-import directory hierarchy wasn't created properly: $assetsPath", $url, $mime);
+
             return false;
         }
 
@@ -208,6 +214,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
 
             if ($this->mimeProcessor->isBadMimeType($mime)) {
                 $this->utils->log(" - WARNING: Bad mime-type: \"$mime\". Unable to assign new file-extension (#3) - DISCARDING.", $url, $mime);
+
                 return false;
             }
 
@@ -226,9 +233,12 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $definitiveName = basename($definitiveFilename);
 
         // Complete the construction of $file.
+        // TODO File::setFilename() _should_ deal with setting the 'ParentID' and 'Name' fields
         $file->setField('Name', $definitiveName);
-        $file->setFilename($definitiveFilename);
-        $file->setParentID($parentFolder->ID);
+        $file->setField('ParentID', $parentFolder->ID);
+        $file->File->Filename = $definitiveFilename;
+        //$file->setFilename($definitiveName);
+        //$file->updateFilesystem();
 
         $this->utils->log(" - NOTICE: \"File-properties built successfully for: ", $url, $mime);
 

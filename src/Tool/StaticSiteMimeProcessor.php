@@ -33,8 +33,10 @@ class StaticSiteMimeProcessor
     public function __construct()
     {
         $args = func_get_args();
+
         if (isset($args[0])) {
             $mimeTypes = $args[0];
+
             $this->setMimes($mimeTypes);
         }
     }
@@ -44,17 +46,18 @@ class StaticSiteMimeProcessor
      * from SilverStripe config.
      * Used to represent matching content or all associated mimes if no type is passed.
      *
-     * @param $ssType one of: SiteTree, File, Image
-     * @return boolean | array $mimes
+     * @param $nativeType one of: SiteTree, File, Image
+     * @return array
      */
-    public static function get_mime_for_ss_type($SSType = null)
+    public static function get_mime_for_ss_type($nativeType = null): array
     {
         $httpMimeTypes = Config::inst()->get(HTTP::class, 'MimeTypes');
+        $ssTypeMimeMap = self::ss_type_to_suffix_map();
+
         // This config file not guaranteed to always be present
         if (!$httpMimeTypes or !is_array($httpMimeTypes)) {
-            return false;
+            return [];
         }
-        $ssTypeMimeMap = self::ss_type_to_suffix_map();
 
         $mimes = [
             'sitetree' => [],
@@ -63,8 +66,8 @@ class StaticSiteMimeProcessor
         ];
 
         // Only support specific classes
-        if ($SSType && !in_array(strtolower($SSType), array_keys($mimes))) {
-            return false;
+        if ($nativeType && !in_array(strtolower($nativeType), array_keys($mimes))) {
+            return [];
         }
 
         foreach ($httpMimeTypes as $mimeKey => $mimeType) {
@@ -72,22 +75,28 @@ class StaticSiteMimeProcessor
             if (in_array($mimeKey, $ssTypeMimeMap['sitetree'])) {
                 $mimes['sitetree'][] = $mimeType;
             }
+
             // File
             if (in_array($mimeKey, $ssTypeMimeMap['file'])) {
                 // Separate treatment for csv which can either be text/plain (official) or text/csv
                 $mimeType = ($mimeKey == 'csv' ? 'text/csv' : $mimeType);
                 $mimes['file'][] = $mimeType;
             }
+
             // Image
             if (in_array($mimeKey, $ssTypeMimeMap['image'])) {
                 $mimes['image'][] = $mimeType;
             }
         }
 
-        if ($SSType) {
-            $SSType = strtolower($SSType);
-            if (isset($mimes[$SSType])) {
-                return $mimes[$SSType];
+        // Not included in Silverstripe's file-based Mime-Types
+        array_push($mimes['file'], 'text/plain');
+
+        if ($nativeType) {
+            $nativeType = strtolower($nativeType);
+
+            if (isset($mimes[$nativeType])) {
+                return array_unique($mimes[$nativeType]);
             }
         }
 
@@ -98,10 +107,10 @@ class StaticSiteMimeProcessor
      * Return a mapping of SS types (File, SiteTree etc) to suitable file-extensions
      * out of the File class.
      *
-     * @param string $ss_type
+     * @param string $nativeType
      * @return array
      */
-    public static function ss_type_to_suffix_map($ss_type = null)
+    public static function ss_type_to_suffix_map($nativeType = null)
     {
         $mimeCategories = File::config()->get('app_categories');
 
@@ -116,10 +125,7 @@ class StaticSiteMimeProcessor
 
         // Get SilverStripe supported File-ish mime categories
         // File contains values of $mimeKeysForSiteTree which we don't want
-        $mimeKeysForFile = array_merge(
-            array_splice($mimeCategories['document'], 14, 2),
-            array_splice($mimeCategories['document'], 0, 11)
-        );
+        $mimeKeysForFile = $mimeCategories['document'];
 
         // Get SilverStripe supported Image-ish mime categories
         $mimeKeysForImage = $mimeCategories['image'];
@@ -129,14 +135,15 @@ class StaticSiteMimeProcessor
             'image'		=> $mimeKeysForImage
         ];
 
-        if ($ss_type) {
-            $ss_type = strtolower($ss_type);
+        if ($nativeType) {
+            $nativeType = strtolower($nativeType);
+
             // Only support specific classes
-            if (!in_array($ss_type, array_keys($mimeCategories))) {
+            if (!in_array($nativeType, array_keys($mimeCategories))) {
                 return false;
             }
 
-            return $map[$ss_type];
+            return $map[$nativeType];
         }
 
         return $map;
@@ -214,11 +221,12 @@ class StaticSiteMimeProcessor
      * @param string $mimeType
      * @return string
      */
-    public static function cleanse($mimeType)
+    public static function cleanse($mimeType): string
     {
         if (!$mimeType) {
             return '';
         }
+
         return strtolower(trim($mimeType));
     }
 
@@ -228,17 +236,20 @@ class StaticSiteMimeProcessor
      * @param mixed $mimeTypes
      * @return boolean
      */
-    public function isOfImage($mimeTypes)
+    public function isOfImage($mimeTypes): bool
     {
         if (!is_array($mimeTypes)) {
             $mimeTypes = [self::cleanse($mimeTypes)];
         }
+
         foreach ($mimeTypes as $mime) {
             $imgMime = self::get_mime_for_ss_type('image');
+
             if ($imgMime && in_array($mime, $imgMime)) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -248,17 +259,20 @@ class StaticSiteMimeProcessor
      * @param mixed $mimeTypes
      * @return boolean
      */
-    public function isOfFile($mimeTypes)
+    public function isOfFile($mimeTypes): bool
     {
         if (!is_array($mimeTypes)) {
             $mimeTypes = [self::cleanse($mimeTypes)];
         }
+
         foreach ($mimeTypes as $mime) {
             $fileMime = self::get_mime_for_ss_type('file');
+
             if ($fileMime && in_array($mime, $fileMime)) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -268,17 +282,20 @@ class StaticSiteMimeProcessor
      * @param mixed $mimeTypes
      * @return boolean
      */
-    public function isOfHtml($mimeTypes)
+    public function isOfHtml($mimeTypes): bool
     {
         if (!is_array($mimeTypes)) {
             $mimeTypes = [self::cleanse($mimeTypes)];
         }
+
         foreach ($mimeTypes as $mime) {
             $htmlMime = self::get_mime_for_ss_type('sitetree');
+
             if ($htmlMime && in_array($mime, $htmlMime)) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -288,14 +305,16 @@ class StaticSiteMimeProcessor
      * @param mixed $mimeTypes
      * @return boolean
      */
-    public function isOfFileOrImage($mimeTypes)
+    public function isOfFileOrImage($mimeTypes): bool
     {
         if (!is_array($mimeTypes)) {
             $mimeTypes = [self::cleanse($mimeTypes)];
         }
+
         if ($this->isOfFile($mimeTypes) || $this->isOfImage($mimeTypes)) {
             return true;
         }
+
         return false;
     }
 
@@ -305,7 +324,7 @@ class StaticSiteMimeProcessor
      * @param string $mime
      * @return boolean
      */
-    public function isBadMimeType($mime)
+    public function isBadMimeType($mime): bool
     {
         return (!$this->isOfFileOrImage($mime) && !$this->isOfHtml($mime));
     }

@@ -46,7 +46,7 @@ PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema:
     Order: 1
     AppliesTo: '.*'
     MimeTypes: 'text/html'
-    ImportRules: =>StaticSiteContentSourceImportRule.Title1,=>StaticSiteContentSourceImportRule.Content1
+    ImportRules: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportRule.Title1,=>PhpTek\Exodus\Model\StaticSiteContentSourceImportRule.Content1
   SchemaSiteTree8:
     DataType: Page
     Order: 1
@@ -138,76 +138,76 @@ PhpTek\Exodus\Model\StaticSiteContentSource:
   MyContentSourceIsHTML1:
     ID: 1
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree1
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaSiteTree1
     Pages: =>Page.testPage1
   MyContentSourceIsHTML2:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree2
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaSiteTree2
     Pages: =>Page.testPage2
   MyContentSourceIsHTML3:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree3
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaSiteTree3
     Pages: =>Page.testPage3
   MyContentSourceIsHTML4:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree4,=>StaticSiteContentSourceImportSchema.SchemaSiteTree5
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaSiteTree4,=>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaSiteTree5
     Pages: =>Page.testPage3
   MyContentSourceIsHTML5:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree6
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaSiteTree6
     Pages: =>Page.testPage3
   MyContentSourceIsHTML6:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree6
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaSiteTree6
     Pages: =>Page.testPage4
   MyContentSourceIsHTML7:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree7
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaSiteTree7
     Pages: =>Page.testPage4
   MyContentSourceIsHTML8:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaSiteTree8
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaSiteTree8
     Pages: =>Page.testPage5
   MyContentSourceIsFile1:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaFile1
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaFile1
   MyContentSourceIsImage1:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage3,=>StaticSiteContentSourceImportSchema.SchemaImage4
-    Files: =>File.testFile1
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaImage3,=>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaImage4
+    Files: =>SilverStripe\Assets\File.testFile1
   MyContentSourceIsImage2:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage2,=>StaticSiteContentSourceImportSchema.SchemaImage1
-    Files: =>File.testFile2
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaImage2,=>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaImage1
+    Files: =>SilverStripe\Assets\File.testFile2
     ID: 44
   MyContentSourceIsImage3:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage1
-    Files: =>File.testFile3
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaImage1
+    Files: =>SilverStripe\Assets\File.testFile3
   MyContentSourceIsImage4:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage1
-    Files: =>File.testFile4
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaImage1
+    Files: =>SilverStripe\Assets\File.testFile4
   MyContentSourceIsImage5:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage5
-    Files: =>File.testFile5
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaImage5
+    Files: =>SilverStripe\Assets\File.testFile5
   MyContentSourceIsImage6:
     BaseUrl: http://localhost
-    UrlProcessor: StaticSiteURLProcessor_DropExtensions
-    Schemas: =>StaticSiteContentSourceImportSchema.SchemaImage6
-    Files: =>File.testFile6
+    UrlProcessor: PhpTek\Exodus\Tool\StaticSiteURLProcessorDropExtensions
+    Schemas: =>PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema.SchemaImage6
+    Files: =>SilverStripe\Assets\File.testFile6

@@ -191,11 +191,13 @@ class StaticSiteUrlList
      * Set whether the crawl should be triggered on demand.
      *
      * @param boolean $autoCrawl
-     * @return void
+     * @return StaticSiteUrlList
      */
-    public function setAutoCrawl($autoCrawl)
+    public function setAutoCrawl(bool $autoCrawl): StaticSiteUrlList
     {
         $this->autoCrawl = $autoCrawl;
+
+        return $this;
     }
 
     /**

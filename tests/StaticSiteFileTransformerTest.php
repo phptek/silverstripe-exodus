@@ -3,6 +3,14 @@
 namespace PhpTek\Exodus\Test;
 
 use SilverStripe\Dev\SapphireTest;
+use PhpTek\Exodus\Transform\StaticSiteFileTransformer;
+use PhpTek\Exodus\Tool\StaticSiteContentExtractor;
+use PhpTek\Exodus\Model\StaticSiteContentSource;
+use PhpTek\Exodus\Model\StaticSiteContentItem;
+use PhpTek\Exodus\Transform\StaticSiteTransformResult;
+use SilverStripe\Assets\File;
+use SilverStripe\Assets\Image;
+use SilverStripe\Core\Config\Config;
 
 /**
  *
@@ -13,8 +21,18 @@ use SilverStripe\Dev\SapphireTest;
 class StaticSiteFileTransformerTest extends SapphireTest
 {
     /**
+     * @var string
+     */
+    private const IMAGES_DIR = ASSETS_PATH . '/images';
+
+    /**
+     * @var string
+     */
+    private const DOCS_DIR = ASSETS_PATH . '/docs';
+
+    /**
      *
-     * @var \StaticSiteFileTransformer
+     * @var StaticSiteFileTransformer
      */
     protected $transformer;
 
@@ -31,8 +49,19 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function setUp()
     {
-        $this->transformer = singleton('StaticSiteFileTransformer');
         parent::setUp();
+
+        // The transformer
+        $this->transformer = singleton(StaticSiteFileTransformer::class);
+
+        // Cache dirs
+        if (!file_exists(self::IMAGES_DIR)) {
+            mkdir(self::IMAGES_DIR, 0777, true);
+        }
+
+        if (!file_exists(self::DOCS_DIR)) {
+            mkdir(self::DOCS_DIR, 0777, true);
+        }
     }
 
     /**
@@ -42,6 +71,7 @@ class StaticSiteFileTransformerTest extends SapphireTest
     {
         // Clear all images that have been saved during this test-run
         $this->delTree(ASSETS_PATH . '/test-graphics');
+
         parent::tearDownOnce();
     }
 
@@ -52,10 +82,12 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function delTree($dir)
     {
-        $files = array_diff(scandir($dir), array('.', '..'));
+        $files = array_diff(scandir($dir), ['.', '..']);
+
         foreach ($files as $file) {
             (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
         }
+
         return rmdir($dir);
     }
 
@@ -64,37 +96,37 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function testBuildFileProperties()
     {
-        $processFile = $this->transformer->buildFileProperties(new File(), 'http://localhost/images/test.zzz', 'image/png');
-        $this->assertEquals('assets/images/test.png', $processFile->Filename);
+        $processFile = $this->transformer->buildFileProperties(File::create(), 'http://localhost/images/test.zzz', 'image/png');
+        $this->assertEquals('images/test.png', $processFile->getFilename());
 
-        $processFile = $this->transformer->buildFileProperties(new File(), 'http://localhost/images/test.zzz', 'image/png');
-        $this->assertEquals('assets/images/test.png', $processFile->Filename);
+        $processFile = $this->transformer->buildFileProperties(File::create(), 'http://localhost/images/test.zzz', 'image/png');
+        $this->assertEquals('images/test.png', $processFile->getFilename());
 
-        $processFile = $this->transformer->buildFileProperties(new File(), 'http://localhost/images/test.png', 'image/png');
-        $this->assertEquals('assets/images/test.png', $processFile->Filename);
+        $processFile = $this->transformer->buildFileProperties(File::create(), 'http://localhost/images/test.png', 'image/png');
+        $this->assertEquals('images/test.png', $processFile->getFilename());
 
-        $processFile = $this->transformer->buildFileProperties(new File(), 'http://localhost/docs/test.zzz', 'application/pdf');
-        $this->assertEquals('assets/docs/test.pdf', $processFile->Filename);
+        $processFile = $this->transformer->buildFileProperties(File::create(), 'http://localhost/docs/test.zzz', 'application/pdf');
+        $this->assertEquals('docs/test.pdf', $processFile->getFilename());
 
         // 'unknown' is what's used as the mime-type for parent URLs that are defined by string manipulation, not actual file-analysis
-        $processFile = $this->transformer->buildFileProperties(new File(), 'http://localhost/images/test', 'unknown');
+        $processFile = $this->transformer->buildFileProperties(File::create(), 'http://localhost/images/test', 'unknown');
         $this->assertFalse($processFile);
 
-        $processFile = $this->transformer->buildFileProperties(new File(), 'http://localhost/images/test.png', 'unknown');
+        $processFile = $this->transformer->buildFileProperties(File::create(), 'http://localhost/images/test.png', 'unknown');
         $this->assertFalse($processFile);
 
         // Cannot easily match between, and therefore convert using application/msword => .doc
-        $processFile = $this->transformer->buildFileProperties(new File(), 'http://localhost/images/test.zzz', 'application/msword');
+        $processFile = $this->transformer->buildFileProperties(File::create(), 'http://localhost/images/test.zzz', 'application/msword');
         $this->assertFalse($processFile);
 
-        $processFile = $this->transformer->buildFileProperties(new File(), 'http://localhost/images/test.zzz', 'image/fake');
+        $processFile = $this->transformer->buildFileProperties(File::create(), 'http://localhost/images/test.zzz', 'image/fake');
         $this->assertFalse($processFile);
 
-        $processFile = $this->transformer->buildFileProperties(new File(), 'http://localhost/images/test.png.gif', 'image/gif');
-        $this->assertEquals('assets/images/test-png.gif', $processFile->Filename);
+        $processFile = $this->transformer->buildFileProperties(File::create(), 'http://localhost/images/test.png.gif', 'image/gif');
+        $this->assertEquals('images/test-png.gif', $processFile->getFilename());
 
-        $processFile = $this->transformer->buildFileProperties(new File(), 'http://localhost/images/test.gif.png', 'image/png');
-        $this->assertEquals('assets/images/test-gif.png', $processFile->Filename);
+        $processFile = $this->transformer->buildFileProperties(File::create(), 'http://localhost/images/test.gif.png', 'image/png');
+        $this->assertEquals('images/test-gif.png', $processFile->getFilename());
     }
 
     /**
@@ -105,8 +137,9 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function testTransformForURLNotInCacheIsFile()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsImage1');
-        $item = new StaticSiteContentItem($source, '/assets/test-1.png');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage1');
+        $source->urlList()->setAutoCrawl(true);
+        $item = StaticSiteContentItem::create($source, '/assets/test-1.png');
         $item->source = $source;
 
         // Fail becuase test.png isn't found in the url cache
@@ -123,8 +156,9 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function testTransformForURLIsInCacheNotFile()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsImage1');
-        $item = new StaticSiteContentItem($source, '/test-page-44');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage1');
+        $source->urlList()->setAutoCrawl(true);
+        $item = StaticSiteContentItem::create($source, '/test-page-44');
         $item->source = $source;
 
         // Fail becuase we're using a StaticSiteFileTransformer on a Mime-Type of text/html
@@ -141,13 +175,14 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function testTransformForURLIsInCacheIsFileStrategyDuplicate()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsImage2');
-        $item = new StaticSiteContentItem($source, '/test-graphics/my-image.png');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage2');
+        $source->urlList()->setAutoCrawl(true);
+        $item = StaticSiteContentItem::create($source, '/test-graphics/my-image.png');
         $item->source = $source;
 
         // Pass becuase we do want to perform something on the URL
-        $this->assertInstanceOf('StaticSiteTransformResult', $fileStrategyDup1 = $this->transformer->transform($item, null, 'Duplicate'));
-        $this->assertInstanceOf('StaticSiteTransformResult', $fileStrategyDup2 = $this->transformer->transform($item, null, 'Duplicate'));
+        $this->assertInstanceOf(StaticSiteTransformResult::class, $fileStrategyDup1 = $this->transformer->transform($item, null, 'Duplicate'));
+        $this->assertInstanceOf(StaticSiteTransformResult::class, $fileStrategyDup2 = $this->transformer->transform($item, null, 'Duplicate'));
 
         // Pass becuase regardless of duplication strategy, we should be getting our filenames post-processed.
         $this->assertEquals('assets/test-graphics/my-image.png', $fileStrategyDup1->file->Filename);
@@ -168,8 +203,9 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function testTransformForURLIsInCacheIsFileStrategySkip()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsImage3');
-        $item = new StaticSiteContentItem($source, '/assets/test-3.png');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage3');
+        $source->urlList()->setAutoCrawl(true);
+        $item = StaticSiteContentItem::create($source, '/assets/test-3.png');
         $item->source = $source;
 
         // Fail becuase we're simply using the "skip" strategy. Nothing else needs to be done
@@ -184,13 +220,14 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function testTransformForURLIsInCacheIsFileStrategyOverwrite()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsImage4');
-        $item = new StaticSiteContentItem($source, '/test-graphics/her-image.png');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage4');
+        $source->urlList()->setAutoCrawl(true);
+        $item = StaticSiteContentItem::create($source, '/test-graphics/her-image.png');
         $item->source = $source;
 
         // Pass becuase we do want to perform something on the URL
-        $this->assertInstanceOf('StaticSiteTransformResult', $fileStrategyOvr1 = $this->transformer->transform($item, null, 'Overwrite'));
-        $this->assertInstanceOf('StaticSiteTransformResult', $fileStrategyOvr2 = $this->transformer->transform($item, null, 'Overwrite'));
+        $this->assertInstanceOf(StaticSiteTransformResult::class, $fileStrategyOvr1 = $this->transformer->transform($item, null, 'Overwrite'));
+        $this->assertInstanceOf(StaticSiteTransformResult::class, $fileStrategyOvr2 = $this->transformer->transform($item, null, 'Overwrite'));
 
         // Pass becuase regardless of duplication strategy, we should be getting our filenames post-processed
         $this->assertEquals('assets/test-graphics/her-image.png', $fileStrategyOvr1->file->Filename);
@@ -205,12 +242,13 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function testGetContentFieldsAndSelectorsNonSSType()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsImage5');
-        $item = new StaticSiteContentItem($source, '/test-graphics/some-image.png');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage5');
+        $source->urlList()->setAutoCrawl(true);
+        $item = StaticSiteContentItem::create($source, '/test-graphics/some-image.png');
         $item->source = $source;
 
-        $this->assertInstanceOf('StaticSiteContentExtractor', $this->transformer->getContentFieldsAndSelectors($item, 'Custom'));
-        $this->assertNotInstanceOf('StaticSiteContentExtractor', $this->transformer->getContentFieldsAndSelectors($item, 'File'));
+        $this->assertInstanceOf(StaticSiteContentExtractor::class, $this->transformer->getContentFieldsAndSelectors($item, 'Custom'));
+        $this->assertNotInstanceOf(StaticSiteContentExtractor::class, $this->transformer->getContentFieldsAndSelectors($item, 'File'));
     }
 
     /**
@@ -218,7 +256,7 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function testGetDirHierarchy()
     {
-        $transformer = singleton('StaticSiteFileTransformer');
+        $transformer = singleton(StaticSiteFileTransformer::class);
         $this->assertEquals('images/subdir-1', $transformer->getDirHierarchy('http://test.com/images/subdir-1/test.png', false));
         $this->assertEquals('images/subdir-1', $transformer->getDirHierarchy('http://www.test.com/images/subdir-1/test.png', false));
         $this->assertEquals('images/subdir-1', $transformer->getDirHierarchy('https://www.test.com/images/subdir-1/test.png', false));
@@ -237,10 +275,11 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function testVersionFile()
     {
-        $transformer = singleton('StaticSiteFileTransformer');
+        $transformer = singleton(StaticSiteFileTransformer::class);
 
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsImage6');
-        $item = new StaticSiteContentItem($source, '/test-graphics/foo-image.jpg');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage6');
+        $source->urlList()->setAutoCrawl(true);
+        $item = StaticSiteContentItem::create($source, '/test-graphics/foo-image.jpg');
         $item->source = $source;
 
         // Save an initial version of an image
