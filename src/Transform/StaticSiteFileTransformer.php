@@ -176,7 +176,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
          */
         $dummy = 'unknown.zzz';
         $origFilename = pathinfo($url, PATHINFO_FILENAME);
-        $origFilename = (mb_strlen($origFilename)>0 ? $origFilename : $dummy);
+        $origFilename = (mb_strlen($origFilename) > 0 ? $origFilename : $dummy);
 
         /*
          * Some assets come through with no file-extension, which confuses SS's File logic
@@ -190,22 +190,27 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $newExt = null;
         if (!$extIsValid && !$newExt = $this->mimeProcessor->ext_to_mime_compare($oldExt, $mime, true)) {
             $this->utils->log(" - WARNING: Bad file-extension: \"$oldExt\". Unable to assign new file-extension (#1) - DISCARDING.", $url, $mime);
+
             return false;
         } elseif ($newExt) {
             $useExtension = $newExt;
             $logMessagePt1 = "NOTICE: Bad file-extension: \"$oldExt\". Assigned new file-extension: \"$newExt\" based on MimeType.";
             $logMessagePt2 = PHP_EOL."\t - FROM: \"$url\"".PHP_EOL."\t - TO: \"$origFilename.$newExt\"";
+
             $this->utils->log(' - ' . $logMessagePt1 . $logMessagePt2, '', $mime);
         } else {
             // If $newExt didn't work, check again if $oldExt is invalid and just lose it.
             if (!$extIsValid) {
                 $this->utils->log(" - WARNING: Bad file-extension: \"$oldExt\". Unable to assign new file-extension (#2) - DISCARDING.", $url, $mime);
+
                 return false;
             }
+
             if ($this->mimeProcessor->isBadMimeType($mime)) {
                 $this->utils->log(" - WARNING: Bad mime-type: \"$mime\". Unable to assign new file-extension (#3) - DISCARDING.", $url, $mime);
                 return false;
             }
+
             $useExtension = $oldExt;
         }
 
@@ -216,8 +221,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
          * FileNameFilter only removes leading dots, so lose _all_ dots and re-append the correct suffix
          * @todo add another filter expression as per \FileNameFilter to module _config instead of using str_replace() here.
          */
-        $convertDotsFileName = str_replace(".", '-', $filePath) . ".$useExtension";
-
+        $convertDotsFileName = sprintf('%s.%s', str_replace('.', '-', $filePath), $useExtension);
         $definitiveFilename = $this->versionFile($convertDotsFileName);
         $definitiveName = basename($definitiveFilename);
 
