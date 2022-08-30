@@ -92,6 +92,11 @@ class StaticSiteMimeProcessor
         // Not included in Silverstripe's file-based Mime-Types
         array_push($mimes['file'], 'text/plain');
 
+        // Included in Silverstripe's file-based Mime-Types which we don't want
+        $mimes['file'] = array_filter($mimes['file'], function($k, $v) {
+            return stristr($k, 'htm') ? false : true;
+        }, ARRAY_FILTER_USE_BOTH);
+
         if ($nativeType) {
             $nativeType = strtolower($nativeType);
 

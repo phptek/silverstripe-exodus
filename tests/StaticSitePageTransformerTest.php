@@ -3,6 +3,11 @@
 namespace PhpTek\Exodus\Test;
 
 use SilverStripe\Dev\SapphireTest;
+use PhpTek\Exodus\Transform\StaticSitePageTransformer;
+use PhpTek\Exodus\Model\StaticSiteContentSource;
+use PhpTek\Exodus\Model\StaticSiteContentItem;
+use PhpTek\Exodus\Transform\StaticSiteTransformResult;
+use PhpTek\Exodus\Tool\StaticSiteContentExtractor;
 
 /**
  *
@@ -13,7 +18,7 @@ use SilverStripe\Dev\SapphireTest;
 class StaticSitePageTransformerTest extends SapphireTest
 {
     /*
-     * @var \StaticSiteFileTransformer
+     * @var StaticSiteFileTransformer
      */
     protected $transformer;
 
@@ -29,7 +34,7 @@ class StaticSitePageTransformerTest extends SapphireTest
      */
     public function setUp()
     {
-        $this->transformer = singleton('StaticSitePageTransformer');
+        $this->transformer = singleton(StaticSitePageTransformer::class);
         parent::setUp();
     }
 
@@ -41,7 +46,8 @@ class StaticSitePageTransformerTest extends SapphireTest
      */
     public function testTransformForURLNotInCacheIsPage()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsHTML3');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML3');
+        $source->urlList()->setAutoCrawl(true);
         $item = new StaticSiteContentItem($source, '/test-1-null.html');
         $item->source = $source;
 
@@ -59,7 +65,8 @@ class StaticSitePageTransformerTest extends SapphireTest
      */
     public function testTransformForURLIsInCacheNotPage()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsHTML3');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML3');
+        $source->urlList()->setAutoCrawl(true);
         $item = new StaticSiteContentItem($source, '/images/test.png');
         $item->source = $source;
 
@@ -78,13 +85,14 @@ class StaticSitePageTransformerTest extends SapphireTest
      */
     public function testTransformForURLIsInCacheIsPageStrategyDuplicate()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsHTML7');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
+        $source->urlList()->setAutoCrawl(true);
         $item = new StaticSiteContentItem($source, '/test-about-the-team');
         $item->source = $source;
 
         // Pass becuase we do want to perform something on the URL
-        $this->assertInstanceOf('StaticSiteTransformResult', $pageStrategyDup1 = $this->transformer->transform($item, null, 'Duplicate'));
-        $this->assertInstanceOf('StaticSiteTransformResult', $pageStrategyDup2 = $this->transformer->transform($item, null, 'Duplicate'));
+        $this->assertInstanceOf(StaticSiteTransformResult::class, $pageStrategyDup1 = $this->transformer->transform($item, null, 'Duplicate'));
+        $this->assertInstanceOf(StaticSiteTransformResult::class, $pageStrategyDup2 = $this->transformer->transform($item, null, 'Duplicate'));
 
         // Pass becuase regardless of duplication strategy, we should be getting a result
         $this->assertEquals('test-about-the-team', $pageStrategyDup1->page->URLSegment);
@@ -101,13 +109,14 @@ class StaticSitePageTransformerTest extends SapphireTest
      */
     public function testTransformForURLIsInCacheIsPageStrategyOverwrite()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsHTML8');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML8');
+        $source->urlList()->setAutoCrawl(true);
         $item = new StaticSiteContentItem($source, '/test-i-am-page-5');
         $item->source = $source;
 
         // Pass becuase we do want to perform something on the URL
-        $this->assertInstanceOf('StaticSiteTransformResult', $pageStrategyOvr1 = $this->transformer->transform($item, null, 'Overwrite'));
-        $this->assertInstanceOf('StaticSiteTransformResult', $pageStrategyOvr2 = $this->transformer->transform($item, null, 'Overwrite'));
+        $this->assertInstanceOf(StaticSiteTransformResult::class, $pageStrategyOvr1 = $this->transformer->transform($item, null, 'Overwrite'));
+        $this->assertInstanceOf(StaticSiteTransformResult::class, $pageStrategyOvr2 = $this->transformer->transform($item, null, 'Overwrite'));
 
         // Pass becuase regardless of duplication strategy, we should be getting a result
         $this->assertEquals('test-i-am-page-5', $pageStrategyOvr1->page->URLSegment);
@@ -123,12 +132,13 @@ class StaticSitePageTransformerTest extends SapphireTest
      */
     public function testTransformForURLIsInCacheIsPageStrategySkip()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsHTML7');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
+        $source->urlList()->setAutoCrawl(true);
         $item = new StaticSiteContentItem($source, '/test-about-the-team');
         $item->source = $source;
 
         // Pass becuase we do want to perform something on the URL
-        $this->assertInstanceOf('StaticSiteTransformResult', $this->transformer->transform($item, null, 'Skip'));
+        $this->assertInstanceOf(StaticSiteTransformResult::class, $this->transformer->transform($item, null, 'Skip'));
         $this->assertFalse($this->transformer->transform($item, null, 'Skip'));
     }
 
@@ -138,11 +148,12 @@ class StaticSitePageTransformerTest extends SapphireTest
      */
     public function testGetContentFieldsAndSelectorsNonSSType()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsHTML7');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
+        $source->urlList()->setAutoCrawl(true);
         $item = new StaticSiteContentItem($source, '/test-about-the-team');
         $item->source = $source;
 
-        $this->assertInstanceOf('StaticSiteContentExtractor', $this->transformer->getContentFieldsAndSelectors($item, 'Custom'));
-        $this->assertNotInstanceOf('StaticSiteContentExtractor', $this->transformer->getContentFieldsAndSelectors($item, 'SiteTree'));
+        $this->assertInstanceOf(StaticSiteContentExtractor::class, $this->transformer->getContentFieldsAndSelectors($item, 'Custom'));
+        $this->assertNotInstanceOf(StaticSiteContentExtractor::class, $this->transformer->getContentFieldsAndSelectors($item, 'SiteTree'));
     }
 }
