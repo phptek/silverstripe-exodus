@@ -5,6 +5,7 @@ namespace PhpTek\Exodus\Transform;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Versioned\Versioned;
 use PhpTek\Exodus\Transform\StaticSiteDataTypeTransformer;
+use SilverStripe\CMS\Model\SiteTree;
 
 /**
  * URL transformer specific to SilverStripe's `SiteTree` class for use with the module's
@@ -46,7 +47,10 @@ class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
     /**
      * Generic function called by \ExternalContentImporter
      *
-     * @inheritdoc
+     * @param StaticSiteContentItem $item
+     * @param SilverStripe\ORM\DataObject $parentObject
+     * @param string $strategy
+     * @return mixed StaticSiteTransformResult | boolean
      */
     public function transform($item, $parentObject, $strategy)
     {
@@ -60,37 +64,39 @@ class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
         }
 
         $source = $item->getSource();
-
-        // Sleep for Xms to reduce load on the remote server
-        usleep((int)self::$sleep_multiplier*1000);
-
+        // Sleep to reduce load on the remote server
+        usleep((int) self::$sleep_multiplier * 1000);
         // Extract content from the page
         $contentFields = $this->getContentFieldsAndSelectors($item, 'SiteTree');
 
         // Default value for Title
-        if (empty($contentFields['Title'])) {
-            $contentFields['Title'] = ['content' => $item->Name];
-        }
+        if (is_array($contentFields)) {
+            if (empty($contentFields['Title'])) {
+                $contentFields['Title'] = ['content' => $item->Name];
+            }
 
-        // Default value for URLSegment
-        if (empty($contentFields['URLSegment'])) {
-            // $item->Name comes from StaticSiteContentItem::init() and is a URL
-            $name = ($item->Name == '/' ? self::$import_root : $item->Name);
-            $urlSegment = preg_replace('#\.[^.]*$#', '', $name); // Lose file-extensions e.g .html
-            $contentFields['URLSegment'] = ['content' => $urlSegment];
-        }
+            // Default value for URLSegment
+            if (empty($contentFields['URLSegment'])) {
+                // $item->Name comes from StaticSiteContentItem::init() and is a URL
+                $name = ($item->Name == '/' ? self::$import_root : $item->Name);
+                $urlSegment = preg_replace('#\.[^.]*$#', '', $name); // Lose file-extensions e.g .html
+                $contentFields['URLSegment'] = ['content' => $urlSegment];
+            }
 
-        // Default value for Content (Useful for during unit-testing)
-        if (empty($contentFields['Content'])) {
-            $contentFields['Content'] = ['content' => 'No content found'];
-            $this->utils->log(" - No content found for 'Content' field.", $item->AbsoluteURL, $item->ProcessedMIME);
+            // Default value for Content (Useful for during unit-testing)
+            if (empty($contentFields['Content'])) {
+                $contentFields['Content'] = ['content' => 'No content found'];
+                $this->utils->log(" - No content found for 'Content' field.", $item->AbsoluteURL, $item->ProcessedMIME);
+            }
         }
 
         // Get a user-defined schema suited to this URL and Mime
         $schema = $source->getSchemaForURL($item->AbsoluteURL, $item->ProcessedMIME);
+
         if (!$schema) {
             $this->utils->log(" - Couldn't find an import schema for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+
             return false;
         }
 
@@ -105,6 +111,7 @@ class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
         // Process incoming according to user-selected duplication strategy
         if (!$page = $this->duplicationStrategy($dataType, $item, $source->BaseUrl, $strategy, $parentObject)) {
             $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
+
             return false;
         }
 

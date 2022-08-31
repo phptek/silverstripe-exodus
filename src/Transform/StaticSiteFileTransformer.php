@@ -40,7 +40,6 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $this->utils->log("START file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
 
         if (!$item->checkIsType('file')) {
-            die('#1');
             $this->utils->log(" - Item not of type \'file\'. for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
 
@@ -63,7 +62,6 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $schema = $source->getSchemaForURL($item->AbsoluteURL, $item->ProcessedMIME);
 
         if (!$schema) {
-            die('#2');
             $this->utils->log(" - Couldn't find an import schema for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             return false;
@@ -72,7 +70,6 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $dataType = $schema->DataType;
 
         if (!$dataType) {
-            die('#3');
             $this->utils->log(" - DataType for migration schema is empty for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             throw new \Exception('DataType for migration schema is empty!');
@@ -80,14 +77,12 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
 
         // Process incoming according to user-selected duplication strategy
         if (!$file = $this->duplicationStrategy($dataType, $item, $source->BaseUrl, $strategy, $parentObject)) {
-            die('#4');
             $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             return false;
         }
 
         // Prepare $file with all the correct properties, ready for writing
         if (!$file = $this->buildFileProperties($file, $item->AbsoluteURL, $item->ProcessedMIME)) {
-            die('#5');
             $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             return false;
         }
@@ -296,12 +291,12 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      * @param string $relativeFilePath The path to the file relative to the 'assets' dir.
      * @return string $relativeFilePath
      */
-    public function versionFile($relativeFilePath)
+    public function versionFile(string $relativeFilePath): string
     {
         $fullPath = sprintf('%s/%s', ASSETS_PATH, $relativeFilePath);
 
         while (file_exists($fullPath)) {
-            $i = isset($i) ? ($i+1) : 2;
+            $i = isset($i) ? ($i + 1) : 2;
             $oldFilePath = $relativeFilePath;
 
             // make sure archives retain valid extensions
@@ -320,7 +315,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
 
             // We've tried and failed, so we'll just end-up returning the original, that way we get _something_
             if ($oldFilePath == $relativeFilePath && $i > 2) {
-                $this->utils->log(" - Couldn't fix $relativeFilePath with $i attempts in " . __FUNCTION__ . ' for:', $url, $mime);
+                $this->utils->log(" - Couldn't fix $relativeFilePath with $i attempts in " . __FUNCTION__);
             }
         }
 

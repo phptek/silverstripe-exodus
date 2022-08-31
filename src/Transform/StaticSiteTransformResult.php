@@ -50,6 +50,7 @@ class StaticSiteTransformResult extends \TransformResult
 
         $instanceOfSiteTree = ($object instanceof SiteTree);
         $instanceOfFile = ($object instanceof File);
+
         if (!$instanceOfSiteTree && !$instanceOfFile) {
             user_error("Incorrect type passed to class constructor.");
             exit;
@@ -58,6 +59,7 @@ class StaticSiteTransformResult extends \TransformResult
         if ($instanceOfSiteTree) {
             $this->page = $object;
         }
+
         if ($instanceOfFile) {
             $this->file = $object;
         }

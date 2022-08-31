@@ -75,6 +75,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
      * @param StaticSiteContentItem $item The item to extract
      * @param string $dataType e.g. 'File' or 'SiteTree'
      * @return null | StaticSiteContentExtractor | array Map of SS field name=>array('selector' => selector, 'content' => field content)
+     * @todo This method belongs on specific subclasses
      */
     public function getContentFieldsAndSelectors($item, $dataType)
     {
@@ -88,7 +89,6 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
         }
 
         $importRules = $importSchema->getImportRules();
-
         // Extract from the remote content based on those rules
         $contentExtractor = StaticSiteContentExtractor::create($item->AbsoluteURL, $item->ProcessedMIME);
 
@@ -120,7 +120,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
         $item,
         $baseUrl,
         $strategy = ExternalContentTransformer::DS_SKIP,
-        DataObject $parentObject = null
+        $parentObject = null
     ) {
         /*
          * If import config is imported into the DB from another SS setup or imported using some future
@@ -128,12 +128,13 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
          * in the current setup.
          */
         if (!ClassInfo::exists($dataType)) {
-            return;
+            return false;
         }
 
         // Has the object already been imported?
         $baseUrl = rtrim($baseUrl, '/');
         $existing = $dataType::get()->filter('StaticSiteURL', $baseUrl . $item->getExternalId())->first();
+
         if ($existing) {
             if ($strategy === ExternalContentTransformer::DS_OVERWRITE) {
                 // "Overwrite" == Update
@@ -147,9 +148,10 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
                 return false;
             }
         } else {
-            $object = new $dataType(array());
+            $object = $dataType::create([]);
             $object->ParentID = ($parentObject ? $parentObject->ID : $this->getParentId());
         }
+
         return $object;
     }
 

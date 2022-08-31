@@ -33,7 +33,7 @@ class StaticSiteContentItem extends ExternalContentItem
      *
      * @var mixed (string | boolean)
      */
-    private $default_content_type = false;
+    private $default_content_type = 'sitetree';
 
     /**
      * @var array
@@ -112,11 +112,11 @@ class StaticSiteContentItem extends ExternalContentItem
         $mimeTypeProcessor = singleton(StaticSiteMimeProcessor::class);
 
         if ($mimeTypeProcessor->isOfFileOrImage($this->ProcessedMIME)) {
-            return "file";
+            return 'file';
         }
 
         if ($mimeTypeProcessor->isOfHtml($this->ProcessedMIME)) {
-            return "sitetree";
+            return 'sitetree';
         }
 
         // Log everything that doesn't fit:
@@ -186,10 +186,6 @@ class StaticSiteContentItem extends ExternalContentItem
      */
     public function checkIsType(string $type): bool
     {
-        if (!$type || $this->getType() != strtolower($type)) {
-            return false;
-        }
-
-        return true;
+        return $this->getType() === strtolower($type);
     }
 }

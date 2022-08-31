@@ -153,6 +153,7 @@ class StaticSiteContentExtractor
                 break;
             }
         }
+
         return $output;
     }
 

@@ -3,6 +3,7 @@
 namespace PhpTek\Exodus\Test;
 
 use SilverStripe\Dev\SapphireTest;
+use PhpTek\Exodus\Task\StaticSiteRewriteLinksTask;
 
 /**
  *
@@ -13,7 +14,7 @@ class StaticSiteRewriteLinksTaskTest extends SapphireTest
 {
     public function testLinkIsThirdParty()
     {
-        $task = singleton('StaticSiteRewriteLinksTask');
+        $task = singleton(StaticSiteRewriteLinksTask::class);
 
         $this->assertTrue($task->linkIsThirdParty('http://test.com'));
         $this->assertTrue($task->linkIsThirdParty('http://test.com/subdir/test.html'));
@@ -24,7 +25,7 @@ class StaticSiteRewriteLinksTaskTest extends SapphireTest
 
     public function testLinkIsBadScheme()
     {
-        $task = singleton('StaticSiteRewriteLinksTask');
+        $task = singleton(StaticSiteRewriteLinksTask::class);
 
         $this->assertTrue($task->linkIsBadScheme('tel://021111111'));
         $this->assertTrue($task->linkIsBadScheme('ssh://192.168.1.1'));
@@ -33,7 +34,7 @@ class StaticSiteRewriteLinksTaskTest extends SapphireTest
 
     public function testLinkIsNotImported()
     {
-        $task = singleton('StaticSiteRewriteLinksTask');
+        $task = singleton(StaticSiteRewriteLinksTask::class);
 
         $this->assertTrue($task->linkIsNotImported('/'));
         $this->assertTrue($task->linkIsNotImported('/fluff'));
@@ -44,7 +45,7 @@ class StaticSiteRewriteLinksTaskTest extends SapphireTest
 
     public function testLinkIsAlreadyRewritten()
     {
-        $task = singleton('StaticSiteRewriteLinksTask');
+        $task = singleton(StaticSiteRewriteLinksTask::class);
 
         $this->assertFalse($task->linkIsAlreadyRewritten('/'));
         $this->assertFalse($task->linkIsAlreadyRewritten('/test.aspx'));
@@ -55,7 +56,7 @@ class StaticSiteRewriteLinksTaskTest extends SapphireTest
 
     public function testLinkIsJunk()
     {
-        $task = singleton('StaticSiteRewriteLinksTask');
+        $task = singleton(StaticSiteRewriteLinksTask::class);
 
         $this->assertTrue($task->linkIsJunk('./fluff.sh'));
         $this->assertTrue($task->linkIsJunk('.junk'));
@@ -70,7 +71,7 @@ class StaticSiteRewriteLinksTaskTest extends SapphireTest
 
     public function testBadLinkType()
     {
-        $task = singleton('StaticSiteRewriteLinksTask');
+        $task = singleton(StaticSiteRewriteLinksTask::class);
 
         $this->assertEquals('NotImported', $task->badLinkType('/'));
         $this->assertEquals('ThirdParty', $task->badLinkType('http://tampin.co.uk'));

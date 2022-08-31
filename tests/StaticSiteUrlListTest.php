@@ -3,6 +3,13 @@
 namespace PhpTek\Exodus\Test;
 
 use SilverStripe\Dev\SapphireTest;
+use PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema;
+use PhpTek\Exodus\Model\StaticSiteContentSourceImportRule;
+use PhpTek\Exodus\Model\StaticSiteContentSource;
+use PhpTek\Exodus\Processor\StaticSiteURLProcessorDropExtensions;
+use PhpTek\Exodus\Tool\StaticSiteUrlList;
+use SilverStripe\Assets\File;
+use SilverStripe\Assets\Image;
 use PHPCrawl\PHPCrawlerDocumentInfo;
 
 /**
@@ -13,10 +20,26 @@ use PHPCrawl\PHPCrawlerDocumentInfo;
 
 class StaticSiteUrlListTest extends SapphireTest
 {
-    /**
+    /*
      * @var string
      */
     public static $fixture_file = 'StaticSiteContentSource.yml';
+
+    /**
+     * @var boolean
+     */
+    protected $usesDatabase = true;
+
+    /**
+     * @var array
+     */
+    protected static $extra_dataobjects = [
+        StaticSiteContentSourceImportSchema::class,
+        StaticSiteContentSourceImportRule::class,
+        StaticSiteContentSource::class,
+        File::class,
+        Image::class,
+    ];
 
     /**
      * @var array
@@ -60,9 +83,9 @@ class StaticSiteUrlListTest extends SapphireTest
      */
     public function testInstantiateStaticSiteUrlList()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsHTML7');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
         $cacheDir = BASE_PATH . '/staticsiteconnector/tests/static-site-1/';
-        $urlList = new StaticSiteUrlList($source, $cacheDir);
+        $urlList = StaticSiteUrlList::create($source, $cacheDir);
 
         $this->assertGreaterThan(1, strlen($urlList->getProperty('baseURL')));
         $this->assertGreaterThan(1, strlen($urlList->getProperty('cacheDir')));
@@ -74,9 +97,9 @@ class StaticSiteUrlListTest extends SapphireTest
      */
     public function testSimplifyUrl()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsHTML7');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
         $cacheDir = BASE_PATH . '/staticsiteconnector/tests/static-site-1/';
-        $urlList = new StaticSiteUrlList($source, $cacheDir);
+        $urlList = StaticSiteUrlList::create($source, $cacheDir);
 
         $this->assertEquals('http://www.stuff.co.nz', $urlList->simplifyUrl('http://stuff.co.nz'));
         $this->assertEquals('http://www.stuff.co.nz', $urlList->simplifyUrl('https://stuff.co.nz'));
@@ -97,10 +120,10 @@ class StaticSiteUrlListTest extends SapphireTest
      */
     public function testHandleDocumentInfoBadServerCode_DropExtensions()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsHTML7');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
         $cacheDir = BASE_PATH . '/staticsiteconnector/tests/static-site-1/';
-        $urlList = new StaticSiteUrlList($source, $cacheDir);
-        $urlList->setUrlProcessor(new StaticSiteURLProcessorDropExtensions());
+        $urlList = StaticSiteUrlList::create($source, $cacheDir);
+        $urlList->setUrlProcessor(StaticSiteURLProcessorDropExtensions::create());
         $crawler = new StaticSiteCrawler($urlList);
 
         foreach (self::$url_patterns_for_drop_extensions as $urlFromServer => $expected) {
@@ -121,9 +144,9 @@ class StaticSiteUrlListTest extends SapphireTest
      */
     public function testHandleDocumentInfoBadServerCode_MOSS()
     {
-        $source = $this->objFromFixture('StaticSiteContentSource', 'MyContentSourceIsHTML7');
+        $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
         $cacheDir = BASE_PATH . '/staticsiteconnector/tests/static-site-1/';
-        $urlList = new StaticSiteUrlList($source, $cacheDir);
+        $urlList = StaticSiteUrlList::create($source, $cacheDir);
         $urlList->setUrlProcessor(new StaticSiteMOSSURLProcessor());
         $crawler = new StaticSiteCrawler($urlList);
 
