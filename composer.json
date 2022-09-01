@@ -43,10 +43,13 @@
   },
   "require": {
     "silverstripe/cms": "^4",
+    "silverstripe/reports": "^4",
     "brittainmedia/phpcrawl": "^0.9",
     "electrolinux/phpquery": "dev-master",
-    "silverstripe/reports": "^4",
     "symbiote/silverstripe-queuedjobs": "^4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9"
   },
   "extra": {
     "installer-name": "exodus",
