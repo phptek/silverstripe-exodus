@@ -7,7 +7,6 @@ use SilverStripe\Core\Injector\Injectable;
 
 /**
  * Processor for MOSS Standard-URLs while dropping file extensions
- * @todo Move into a "Processors" namespace
  */
 class StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
 {
@@ -17,7 +16,7 @@ class StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return "Simple clean-up (recommended)";
     }
@@ -26,7 +25,7 @@ class StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return "Removes extensions and trailing slashes.";
     }
@@ -43,6 +42,7 @@ class StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
         }
 
         $url = '';
+
         // With query string
         if (preg_match("#^([^?]*)\?(.*)$#", $urlData['url'], $matches)) {
             $url = $matches[1];
@@ -75,7 +75,7 @@ class StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
      * @todo Instead of testing for arbitrary URL irregularities,
      * can we not just clean-out chars that don't adhere to HTTP1.1 or the appropriate RFC?
      */
-    private function postProcessUrl($url)
+    private function postProcessUrl(string $url): string
     {
         // Replace all encoded slashes with non-encoded versions
         $noSlashes = str_ireplace('%2f', '/', $url);

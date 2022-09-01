@@ -98,7 +98,7 @@ class StaticSiteFileTransformerTest extends SapphireTest
      * @param type $dir
      * @return type
      */
-    public function delTree($dir)
+    private function delTree($dir)
     {
         $files = array_diff(scandir($dir), ['.', '..']);
 

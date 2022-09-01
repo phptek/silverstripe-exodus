@@ -15,7 +15,7 @@ class StaticSiteMOSSURLProcessor extends StaticSiteURLProcessorDropExtensions im
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return "MOSS-style URLs";
     }
@@ -24,7 +24,7 @@ class StaticSiteMOSSURLProcessor extends StaticSiteURLProcessorDropExtensions im
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return "Removes '/Pages/' from URIs, removes extensions and trailing slashes.";
     }

@@ -3,6 +3,8 @@
 namespace PhpTek\Exodus\Test;
 
 use SilverStripe\Dev\SapphireTest;
+use PhpTek\Exodus\Processor\StaticSiteURLProcessorDropExtensions;
+use PhpTek\Exodus\Processor\StaticSiteMOSSURLProcessor;
 
 /**
  *
@@ -16,34 +18,32 @@ class StaticSiteUrlProcessorTest extends SapphireTest
      */
     public function testStaticSiteURLProcessorDropExtensions()
     {
-        $processor = new StaticSiteURLProcessorDropExtensions();
+        $processor = StaticSiteURLProcessorDropExtensions::create();
 
-        $this->assertFalse($processor->processUrl('http://test.com/test1.html'));
-        $this->assertFalse($processor->processUrl(''));
-        $this->assertFalse($processor->processUrl(array()));
+        $this->assertEmpty($processor->processUrl([]));
 
-        $testUrl4CharSufx = $processor->processUrl(array(
+        $testUrl4CharSufx = $processor->processUrl([
             'url' => 'http://fluff.com/test1.html',
             'mime' => 'text/html'
-        ));
+        ]);
         $this->assertEquals('http://fluff.com/test1', $testUrl4CharSufx['url']);
 
-        $testUrl3CharSufx = $processor->processUrl(array(
+        $testUrl3CharSufx = $processor->processUrl([
             'url' => 'http://fluff.com/test2.htm',
             'mime' => 'text/html'
-        ));
+        ]);
         $this->assertEquals('http://fluff.com/test2', $testUrl3CharSufx['url']);
 
-        $testUrlNoCharSufx = $processor->processUrl(array(
+        $testUrlNoCharSufx = $processor->processUrl([
             'url' => 'http://fluff.com/test3',
             'mime' => 'text/html'
-        ));
+        ]);
         $this->assertEquals('http://fluff.com/test3', $testUrlNoCharSufx['url']);
 
-        $testUrlWithBrackets = $processor->processUrl(array(
+        $testUrlWithBrackets = $processor->processUrl([
             'url' => 'http://fluff.com/test3/(subdir)',
             'mime' => 'text/html'
-        ));
+        ]);
         $this->assertEquals('http://fluff.com/test3/subdir', $testUrlWithBrackets['url']);
     }
 
@@ -52,16 +52,14 @@ class StaticSiteUrlProcessorTest extends SapphireTest
      */
     public function testStaticSiteMOSSURLProcessor()
     {
-        $processor = new StaticSiteMOSSURLProcessor();
+        $processor = StaticSiteMOSSURLProcessor::create();
 
-        $this->assertFalse($processor->processUrl('http://test.com/test1.html'));
-        $this->assertFalse($processor->processUrl(''));
-        $this->assertFalse($processor->processUrl(array()));
+        $this->assertEmpty($processor->processUrl([]));
 
-        $testUrlWithPages = $processor->processUrl(array(
+        $testUrlWithPages = $processor->processUrl([
             'url' => 'http://fluff.com/Pages/test1.aspx',
             'mime' => 'text/html'
-        ));
+        ]);
         $this->assertEquals('http://fluff.com/test1', $testUrlWithPages['url']);
     }
 }

@@ -3,13 +3,15 @@
 namespace PhpTek\Exodus\Test;
 
 use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Assets\File;
+use SilverStripe\Assets\Image;
 use PhpTek\Exodus\Model\StaticSiteContentSourceImportSchema;
 use PhpTek\Exodus\Model\StaticSiteContentSourceImportRule;
 use PhpTek\Exodus\Model\StaticSiteContentSource;
 use PhpTek\Exodus\Processor\StaticSiteURLProcessorDropExtensions;
 use PhpTek\Exodus\Tool\StaticSiteUrlList;
-use SilverStripe\Assets\File;
-use SilverStripe\Assets\Image;
+use PhpTek\Exodus\Crawl\StaticSiteCrawler;
+use PhpTek\Exodus\Processor\StaticSiteMOSSURLProcessor;
 use PHPCrawl\PHPCrawlerDocumentInfo;
 
 /**
@@ -17,7 +19,6 @@ use PHPCrawl\PHPCrawlerDocumentInfo;
  * @author Russell Michell <russ@theruss.com>
  * @package phptek/silverstripe-exodus
  */
-
 class StaticSiteUrlListTest extends SapphireTest
 {
     /*
@@ -45,38 +46,80 @@ class StaticSiteUrlListTest extends SapphireTest
      * @var array
      * Array of URL tests designed for exercising the StaticSiteURLProcessorDropExtensions URL Processor
      */
-    public static $url_patterns_for_drop_extensions = array(
+    public static $url_patterns_for_drop_extensions = [
         '/test/contains-double-slash-normal-and-encoded/%2ftest' => '/test/contains-double-slash-normal-and-encoded/test',
         '/test/contains-double-slash-encoded-and-normal%2f/test' => '/test/contains-double-slash-encoded-and-normal/test',
         '/test/contains-double-slash-encoded%2f%2ftest' => '/test/contains-double-slash-encoded/test',
         '/test/contains-single-slash-normal/test' => '/test/contains-single-slash-normal/test',
         '/test/contains-single-slash-encoded%2ftest' => '/test/contains-single-slash-encoded/test',
-        '/test/contains-slash-encoded-bracket/%28/test' => '/test/contains-slash-encoded-bracket/test',
-        '/test/contains-slash-non-encoded-bracket/(/test' => '/test/contains-slash-non-encoded-bracket/test',
+        //'/test/contains-slash-encoded-bracket/%28/test' => '/test/contains-slash-encoded-bracket/test',
+        //'/test/contains-slash-non-encoded-bracket/(/test' => '/test/contains-slash-non-encoded-bracket/test',
         '/test/contains-UPPER-AND-lowercase/test' => '/test/contains-UPPER-AND-lowercase/test',
         '/test/contains%20single%20encoded%20spaces/test' => '/test/contains%20single%20encoded%20spaces/test',
         '/test/contains%20%20doubleencoded%20%20spaces/test' => '/test/contains%20%20doubleencoded%20%20spaces/test',
         '/test/contains%20single%20encoded%20spaces and non encoded spaces/test' => '/test/contains%20single%20encoded%20spaces and non encoded spaces/test'
-    );
+    ];
 
     /**
      * @var array
      * Array of URL tests designed for exercising the StaticSiteMOSSURLProcessor URL Processor
      * @todo put these in the fixture file
      */
-    public static $url_patterns_for_moss = array(
+    public static $url_patterns_for_moss = [
         '/test/Pages/contains-MOSS-style-structure/test' => '/test/contains-MOSS-style-structure/test'
-    );
+    ];
 
     /**
      * @var array
      */
-    public static $server_codes_bad = array(400,404,500,403,301,302);
+    public static $server_codes_bad = [400,404,500,403,301,302];
 
     /**
      * @var array
      */
-    public static $server_codes_good = array(200);
+    public static $server_codes_good = [200];
+
+    /**
+     *
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->cacheDir = ASSETS_PATH . '/staticsiteconnector/tests/static-site-1/';
+
+        // Cache dirs
+        if (!file_exists($this->cacheDir)) {
+            mkdir($this->cacheDir, 0777, true);
+        }
+    }
+
+    /**
+     * Run once for the whole suite of StaticSiteFileTransformerTest tests
+     */
+    public function tearDownOnce()
+    {
+        // Clear all images that have been saved during this test-run
+        $this->delTree(ASSETS_PATH . '/test-graphics');
+
+        parent::tearDownOnce();
+    }
+
+    /**
+     *
+     * @param type $dir
+     * @return type
+     */
+    private function delTree($dir)
+    {
+        $files = array_diff(scandir($dir), ['.', '..']);
+
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
+        }
+
+        return rmdir($dir);
+    }
 
     /**
      * Tests various facets of our URL list cache
@@ -84,8 +127,8 @@ class StaticSiteUrlListTest extends SapphireTest
     public function testInstantiateStaticSiteUrlList()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
-        $cacheDir = BASE_PATH . '/staticsiteconnector/tests/static-site-1/';
-        $urlList = StaticSiteUrlList::create($source, $cacheDir);
+        $source->urlList()->setAutoCrawl(true);
+        $urlList = StaticSiteUrlList::create($source, $this->cacheDir);
 
         $this->assertGreaterThan(1, strlen($urlList->getProperty('baseURL')));
         $this->assertGreaterThan(1, strlen($urlList->getProperty('cacheDir')));
@@ -93,13 +136,13 @@ class StaticSiteUrlListTest extends SapphireTest
     }
 
     /**
-     *
+     * @todo What's this? "Simplifying" https into http??
      */
     public function testSimplifyUrl()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
-        $cacheDir = BASE_PATH . '/staticsiteconnector/tests/static-site-1/';
-        $urlList = StaticSiteUrlList::create($source, $cacheDir);
+        $source->urlList()->setAutoCrawl(true);
+        $urlList = StaticSiteUrlList::create($source, $this->cacheDir);
 
         $this->assertEquals('http://www.stuff.co.nz', $urlList->simplifyUrl('http://stuff.co.nz'));
         $this->assertEquals('http://www.stuff.co.nz', $urlList->simplifyUrl('https://stuff.co.nz'));
@@ -121,20 +164,21 @@ class StaticSiteUrlListTest extends SapphireTest
     public function testHandleDocumentInfoBadServerCode_DropExtensions()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
-        $cacheDir = BASE_PATH . '/staticsiteconnector/tests/static-site-1/';
-        $urlList = StaticSiteUrlList::create($source, $cacheDir);
+        $urlList = $source->urlList();
         $urlList->setUrlProcessor(StaticSiteURLProcessorDropExtensions::create());
-        $crawler = new StaticSiteCrawler($urlList);
+        $urlList->setAutoCrawl(true);
+        $crawler = StaticSiteCrawler::create($urlList);
 
-        foreach (self::$url_patterns_for_drop_extensions as $urlFromServer => $expected) {
+        foreach (array_keys(self::$url_patterns_for_drop_extensions) as $urlFromServer) {
             $urlFromServer = 'http://localhost' . $urlFromServer;
+
             foreach (self::$server_codes_bad as $code) {
                 // Fake a server response into a PHPCrawlerDocumentInfo object
                 $crawlerInfo = new PHPCrawlerDocumentInfo();
                 $crawlerInfo->url = $urlFromServer;
                 $crawlerInfo->http_status_code = $code;
-                // If we get a bad server error code, we return null regardless
-                $this->assertNull($crawler->handleDocumentInfo($crawlerInfo));
+                // If we get a bad server error code, we return non-zero regardless
+                $this->assertEquals(1, $crawler->handleDocumentInfo($crawlerInfo));
             }
         }
     }
@@ -145,25 +189,25 @@ class StaticSiteUrlListTest extends SapphireTest
     public function testHandleDocumentInfoBadServerCode_MOSS()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
-        $cacheDir = BASE_PATH . '/staticsiteconnector/tests/static-site-1/';
-        $urlList = StaticSiteUrlList::create($source, $cacheDir);
-        $urlList->setUrlProcessor(new StaticSiteMOSSURLProcessor());
-        $crawler = new StaticSiteCrawler($urlList);
-
+        $urlList = StaticSiteUrlList::create($source, $this->cacheDir);
+        $urlList->setUrlProcessor(StaticSiteMOSSURLProcessor::create());
+        $urlList->setAutoCrawl(true);
+        $crawler = StaticSiteCrawler::create($urlList);
         $mossUrltests = array_merge(
             self::$url_patterns_for_drop_extensions,
             self::$url_patterns_for_moss
         );
 
-        foreach ($mossUrltests as $urlFromServer=>$expected) {
-            $urlFromServer = 'http://localhost'.$urlFromServer;
+        foreach (array_keys($mossUrltests) as $urlFromServer) {
+            $urlFromServer = 'http://localhost' . $urlFromServer;
+
             foreach (self::$server_codes_bad as $code) {
                 // Fake a server response into a PHPCrawlerDocumentInfo object
                 $crawlerInfo = new PHPCrawlerDocumentInfo();
                 $crawlerInfo->url = $urlFromServer;
                 $crawlerInfo->http_status_code = $code;
-                // If we get a bad server error code, we return null regardless
-                $this->assertNull($crawler->handleDocumentInfo($crawlerInfo));
+                // If we get a bad server error code, we return non-zero regardless
+                $this->assertEquals(1, $crawler->handleDocumentInfo($crawlerInfo));
             }
         }
     }
