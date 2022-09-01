@@ -52,7 +52,7 @@ class StaticSitePageTransformerTest extends SapphireTest
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->transformer = singleton(StaticSitePageTransformer::class);
         parent::setUp();
@@ -102,6 +102,7 @@ class StaticSitePageTransformerTest extends SapphireTest
      * - We don't want to overwrite duplicates, we want to duplicate them.
      *
      * @todo employ some proper mocking
+     * @todo Fix commented tests
      */
     public function testTransformForURLIsInCacheIsPageStrategyDuplicate()
     {
@@ -112,11 +113,11 @@ class StaticSitePageTransformerTest extends SapphireTest
 
         // Pass becuase we do want to perform something on the URL
         $this->assertInstanceOf(StaticSiteTransformResult::class, $pageStrategyDup1 = $this->transformer->transform($item, null, 'Duplicate'));
-        //$this->assertInstanceOf(StaticSiteTransformResult::class, $pageStrategyDup2 = $this->transformer->transform($item, null, 'Duplicate'));
+        $this->assertInstanceOf(StaticSiteTransformResult::class, $pageStrategyDup2 = $this->transformer->transform($item, null, 'Duplicate'));
 
         // Pass becuase regardless of duplication strategy, we should be getting a result
         //$this->assertEquals('test-about-the-team', $pageStrategyDup1->page->URLSegment);
-       // $this->assertEquals('test-about-the-team-2', $pageStrategyDup2->page->URLSegment);
+        //$this->assertEquals('test-about-the-team-2', $pageStrategyDup2->page->URLSegment);
     }
 
     /**

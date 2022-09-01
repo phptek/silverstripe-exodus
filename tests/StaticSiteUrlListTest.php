@@ -80,9 +80,9 @@ class StaticSiteUrlListTest extends SapphireTest
     public static $server_codes_good = [200];
 
     /**
-     *
+     * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -96,8 +96,10 @@ class StaticSiteUrlListTest extends SapphireTest
 
     /**
      * Run once for the whole suite of StaticSiteFileTransformerTest tests
+     *
+     * @return void
      */
-    public function tearDownOnce()
+    public function tearDownOnce(): void
     {
         // Clear all images that have been saved during this test-run
         $this->delTree(ASSETS_PATH . '/test-graphics');

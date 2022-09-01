@@ -65,7 +65,7 @@ class StaticSiteFileTransformerTest extends SapphireTest
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -85,7 +85,7 @@ class StaticSiteFileTransformerTest extends SapphireTest
     /**
      * Run once for the whole suite of StaticSiteFileTransformerTest tests
      */
-    public function tearDownOnce()
+    public function tearDownOnce(): void
     {
         // Clear all images that have been saved during this test-run
         $this->delTree(ASSETS_PATH . '/test-graphics');

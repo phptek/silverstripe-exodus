@@ -42,7 +42,7 @@ class StaticSiteMimeProcessorTest extends SapphireTest
     /**
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->mimeProcessor = StaticSiteMimeProcessor::create();
 
