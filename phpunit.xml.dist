@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Standard module phpunit configuration.
+Requires PHPUnit ^9
+-->
+<phpunit bootstrap="vendor/silverstripe/framework/tests/bootstrap.php" colors="true">
+    <testsuites>
+        <testsuite name="default">
+            <directory>tests</directory>
+        </testsuite>
+        <testsuite name="exodus">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

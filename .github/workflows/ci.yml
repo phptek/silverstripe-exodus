@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  # Every Tuesday at 1:20pm UTC
+  schedule:
+    - cron: '20 13 * * 2'
+
+jobs:
+  ci:
+    name: CI
+    if: (github.event_name == 'schedule' && github.repository_owner == 'phptek') || (github.event_name != 'schedule')
+    uses: silverstripe/gha-ci/.github/workflows/ci.yml@v1
+    with:
+      phplinting: false
+      dynamic_matrix: false
+      extra_jobs: |
+        - php: '7.4'
+          db: mysql
+          phpunit: true
+        - php: '8.0'
+          db: mysql
+          phpunit: true
+        - php: '8.1'
+          db: mysql
+          phpunit: true

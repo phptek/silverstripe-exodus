@@ -8,6 +8,7 @@ use SilverStripe\ORM\FieldType\DBText;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\DataObjectSchema;
 
 /**
  * A single import rule that forms part of an ImportSchema
