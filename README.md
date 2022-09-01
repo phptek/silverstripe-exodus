@@ -1,5 +1,7 @@
 # Silverstripe Exodus
 
+[![CI](https://github.com/phptek/silverstripe-exodus/actions/workflows/ci.yml/badge.svg)](https://github.com/phptek/silverstripe-exodus/actions/workflows/ci.yml)
+
 ## Introduction
 
 Exodus is a content migration tool that roughly follows the ETL standard ([**Extract. Transform. Load.**](https://en.wikipedia.org/wiki/Extract,_transform,_load)). It will extract content from virtually any website, regardless of its underlying CMS technology and import it as native content objects into a Silverstripe instance.
