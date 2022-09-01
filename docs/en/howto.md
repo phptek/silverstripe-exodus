@@ -1,16 +1,16 @@
 # Migration
 
-WIth the modules installed you should be able to se a new menu-item labelled "External Content". Select this and observe a dropdown menu and a 'Create' button. Select the 'Static Site Content Source' option and click 'Create', you'll see 'New Connector' in the list of Connectors, click it to open.
+With the module installed, login to the CMS and observe a new Model Admin menu-item labelled "External Content". Select this and observe a dropdown menu and a 'Create' button. Select the 'Static Site Content Source' optionin the dropdown and select 'Create', you'll see 'New Connector' in the list of Connectors, click it to open.
 
-Give it a name and enter the base URL, eg, `https://www.example.org`. If the site you wish to import is a MOSS (Microsoft Office Sharepoint Server) site with `/Pages/some-page.aspx` styled URLs, select 'MOSS-style URLs' under URL processing, then click 'Save'.
+Fill in the fields, referring to the field-decriptions for context. The Base URL should be of the form e.g. `https://www.example.org`. If the site you wish to import is a MOSS (Microsoft Office Sharepoint Server) site with `/Pages/some-page.aspx` styled URLs, select 'MOSS-style URLs' under URL processing, then select the 'Save' button.
 
-Go to the "Crawl" tab and click "Crawl Site". Leave it running. It will take some time, depending on the number of pages and assets in the site being crawled.
+Go to the "Crawl" tab and select "Crawl Site". Leave it running. It will take some time to complete depending on the number of pages and assets in the site being crawled.
 
 ## Protips
 
  1. If you reopen the Connector admin in a different browser (so that it has a different session cookie), you can see the current status of the crawling process.
 
- 2. If you're using Firebug or Chrome, ensure you have the debugger open _before_ you set the crawl off. Occasionally the crawl will die for unknown reasons - usually if your localhost/container has run out of resources - but review your browser's logs which will help in debugging. Note also that there's an import/extraction log available with more information in it:
+ 2. Ensure you have your browser's developer tools open _before_ you set the crawl off. Occasionally the crawl will die for unknown reasons - usually if your localhost/container has run out of resources - but review your browser's logs which will help in debugging. Note also that there's an import/extraction log available with more information in it:
 
  ```
  tail -f /tmp/exodus.log
@@ -22,16 +22,16 @@ Go to the "Crawl" tab and click "Crawl Site". Leave it running. It will take som
 
 ```
 PhpTek\Exodus\Extract\StaticSiteContentExtractor:
-    curl_opts_proxy:
-        hostname: 'my-gateway.co.nz'
-        port: 1234
+  curl_opts_proxy:
+    hostname: my-gateway.co.nz
+    port: 1234
 ```
 
 ## Next Steps
 
-Once the crawling is complete (A message will show in the CMS UI), you'll see all the URLs laid out underneath the connector in a tree hierarchy. The URL structure (i.e., where the slashes are) is used to build a hierarchy of URLs. (**TODO** this doesn't work - no hierarchy is displayed)
+Once the crawling is complete (a message will show in the CMS UI), you'll see all the URLs laid out underneath the connector in a tree hierarchy. The URL structure (i.e. where the slashes are) is used to build a hierarchy of URLs. (**TODO** this doesn't work - no hierarchy is displayed in the central CMS pane).
 
-Now it's time to write some CSS selectors to query different pieces of content foe the import. Go to the "Main" tab and click the "Add Schema" button.
+Now it's time to write some CSS selectors to query different pieces of content for the import. Go to the "Main" tab and selected the "Add Schema" button.
 
 Fill out the fields as follows:
 
@@ -39,34 +39,32 @@ Fill out the fields as follows:
 * URLs applied to: .*
 * DataType: Page
 
-Now click the "Add Rule" button, then immediately click "Save" - this allows you to select from the "Field Name" dropdown menu.
+Now select the "Add Rule" button and immediately select "Save" - this allows you to select from the "Field Name" dropdown menu.
 
 * Specify a field to import into - usually "Title" or "Content"
-* Specify a CSS selector e.g. `#content h1`
-* If you have different CSS selectors for different pages, create multiple Import Rules. The first one that actually returns content will be used.
+* Specify a CSS selector e.g. `body#content h1` or `#body#content section.main` respectively
+* If you have different CSS selectors for different pages, create multiple Import Rules. Just note that the first one rule that actually returns content will be used.
   
-Open sample pages in the tree on the left and you will be able to preview whether the Import Rules have worked as expected. If they don't work, debug them, modify your import rules and schema and re-try.
+Open sample pages in the tree on the left for review. Here you can assess whether or not the Import Rules have worked as expected. If they don't work, debug them, modify your import rules and schema then re-try.
 
-Using simple CSS selectors you can control the parts of each remote page that are mapped to a particular field within the `SiteTree` class.
+Using simple CSS selectors you can control the parts of source page that are mapped to a particular field within the `SiteTree` class.
 
 Select a base page to import onto. Sometimes it's helpful to create an "imported content" parent page in the Pages section of the CMS first.
 
-Press "Start Importing" (See Protip #2, above). This will also take a long while and doesn't have a robust resume functionality. That's on the to-do list.
+Select the "Start Importing" button (See Protip #2, above). This will also take a long while and doesn't have a robust resume functionality. That's on the to-do list.
 
 That's it! There are quite a few steps but it's easier than copy & pasting all those pages!
 
 ### Schema
 
-_Schema_ is the name given to the collection of rules that comprise how a crawled website has its markup formatted and stored in SilverStripe's DataObjects during an import.
+_Schema_ is the name given to a collection of rules that instruct the module how a crawled website should have its markup formatted and stored as/in Silverstripe objects during an import.
 
-Each rule in a schema is predicated on a CSS selector that defines the exact DOM fragment on a specific page of the crawled site to transform, and the respective DataObject field within Silverstripe where this transformed content should be stored.
+Each rule in a schema is predicated on a CSS selector which defines the exact DOM fragment on a specific page of the crawled site to transform, and the respective DataObject-subclass field within Silverstripe where this transformed content should be stored.
 
 #### Schema Urls
 
-The schema field 'URLs Applied to' is where you define regular expressions to match urls from the legacy site to the imported DataTypes in the new site. Each url is matched against the absolute urls crawled from the legacy site, so you'll need to include the protocol _and_ domain in your Url patterns to make them
-absolute as well, e.g.
-
-		https://www.legacysite.com/news/*
+The schema field "URLs Applied to" is where you define regular expressions to match urls from the legacy site to the imported DataTypes in the new site. Each url is matched against the absolute urls crawled from the legacy site, so you'll need to include the protocol _and_ domain in your Url patterns to make them
+absolute as well, e.g. "https://www.legacysite.com/news/*".
 
 The actual regular expression is located in `src/Model/StaticSiteContentSource.php` in the function `schemaCanParseURL()`:
 
@@ -160,11 +158,9 @@ that reference static urls from the impprted, legacy site.
 
 ### Static Site Link Rewriting
 
-There is a built-in `BuildTask` which will replace urls in imported content, replacing
-the `src` & `href` attributes of links, images and files with SilverStripe CMS shortcodes that reference the imported assets and page IDs.
+There is a built-in `BuildTask` subclass which will modify urls in imported content, replacing the `src` & `href` attributes of links, images and files with Silverstripe CMS shortcodes that reference the imported assets and page IDs.
 
-If you check `Automatically run link-rewrite task` under "Main" in the CMS' UI, this
-will happen seamlessly for you.
+If you check the box `Automatically run link-rewrite task` under the "Main" tab in the CMS' UI, this will happen seamlessly for you. This should probably just be the default...
 
 See: 
 
@@ -176,10 +172,6 @@ For hints on usage, run the task from the command-lne without any arguments.
 
 #### Notes
 
-If enabled in the `external-content` "Import" section, this task can actually be run
-automatically once the import itself has completed. This is useful for Silverstripe
-setups where you may not have shell access to the server to run `BuildTasks`.
+If enabled in the `external-content` "Import" section, this task can actually be run automatically once the import itself has completed. This is useful for Silverstripe setups where you may not have shell access to the server to run `BuildTasks`.
 
-There is a comprehensive CMS report "Imported links rewrite report" which is available
-after each import. You can use the data to analyse your imports and rewritten links,
-to help you tweak your crawl and import rules and help to point out exactly what's failing and how you might fix it manually if need be.
+There is a comprehensive CMS report "Imported links rewrite report" which is available after each import. You can use the data to analyse your imports and rewritten links, to help you tweak your crawl and import rules and help to point out exactly what's failing and how you might fix it manually if need be.
