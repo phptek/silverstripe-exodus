@@ -62,3 +62,7 @@ In order of no. commits:
 * [Sam Minnee](https://github.com/sminnee/)
 * [Stig Lindqvist](https://github.com/stojg)
 * [Mike Parkhill](https://github.com/mparkhill)
+
+Credit also goes to [Marcus Nyholt](https://github.com/nyeholt/) for the use of the External Content module on top of which Exodus itself is built. The module in its current state actually includes the [`nyeholt/silverstripe-external-content`](https://github.com/nyeholt/silverstripe-external-content) package and bakes it in as a sub-directory rather than using Composer.
+
+...it was just easier that way.
