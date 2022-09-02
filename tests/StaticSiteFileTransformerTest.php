@@ -156,7 +156,6 @@ class StaticSiteFileTransformerTest extends SapphireTest
     public function testTransformForURLNotInCacheIsFile()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage1');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/assets/test-1.png');
         $item->source = $source;
 
@@ -175,7 +174,6 @@ class StaticSiteFileTransformerTest extends SapphireTest
     public function testTransformForURLIsInCacheNotFile()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage1');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/test-page-44');
         $item->source = $source;
 
@@ -196,7 +194,6 @@ class StaticSiteFileTransformerTest extends SapphireTest
         $this->markTestSkipped('Skipped: Something not working between fixture and tests');
 
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage2');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/test-graphics/my-image.png');
         $item->source = $source;
 
@@ -224,7 +221,6 @@ class StaticSiteFileTransformerTest extends SapphireTest
     public function testTransformForURLIsInCacheIsFileStrategySkip()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage3');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/assets/test-3.png');
         $item->source = $source;
 
@@ -243,7 +239,6 @@ class StaticSiteFileTransformerTest extends SapphireTest
         $this->markTestSkipped('Skipped: Something not working between fixture and tests');
 
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage4');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/test-graphics/her-image.png');
         $item->source = $source;
 
@@ -265,7 +260,6 @@ class StaticSiteFileTransformerTest extends SapphireTest
     public function testGetContentFieldsAndSelectorsNonSSType()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage5');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/test-graphics/some-image.png');
         $item->source = $source;
 
@@ -301,7 +295,6 @@ class StaticSiteFileTransformerTest extends SapphireTest
 
         $transformer = singleton(StaticSiteFileTransformer::class);
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage6');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/test-graphics/foo-image.jpg');
         $item->source = $source;
 

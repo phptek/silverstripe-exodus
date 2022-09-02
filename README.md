@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/phptek/silverstripe-exodus/actions/workflows/ci.yml/badge.svg)](https://github.com/phptek/silverstripe-exodus/actions/workflows/ci.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phptek/silverstripe-exodus/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/phptek/silverstripe-exodus/?branch=master)
-[![License](https://poser.pugx.org/phptek/exodus/license.svg)](https://github.com/phptek/silverstripe-exodus/blob/master/LICENSE.md)
+[![License](https://poser.pugx.org/phptek/silverstripe-exodus/license.svg)](https://github.com/phptek/silverstripe-exodus/blob/master/LICENSE.md)
 
 ## Introduction
 

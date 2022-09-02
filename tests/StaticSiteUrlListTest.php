@@ -129,7 +129,6 @@ class StaticSiteUrlListTest extends SapphireTest
     public function testInstantiateStaticSiteUrlList()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
-        $source->urlList()->setAutoCrawl(true);
         $urlList = StaticSiteUrlList::create($source, $this->cacheDir);
 
         $this->assertGreaterThan(1, strlen($urlList->getProperty('baseURL')));
@@ -143,7 +142,6 @@ class StaticSiteUrlListTest extends SapphireTest
     public function testSimplifyUrl()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
-        $source->urlList()->setAutoCrawl(true);
         $urlList = StaticSiteUrlList::create($source, $this->cacheDir);
 
         $this->assertEquals('http://www.stuff.co.nz', $urlList->simplifyUrl('http://stuff.co.nz'));
@@ -168,7 +166,6 @@ class StaticSiteUrlListTest extends SapphireTest
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
         $urlList = $source->urlList();
         $urlList->setUrlProcessor(StaticSiteURLProcessorDropExtensions::create());
-        $urlList->setAutoCrawl(true);
         $crawler = StaticSiteCrawler::create($urlList);
 
         foreach (array_keys(self::$url_patterns_for_drop_extensions) as $urlFromServer) {
@@ -193,7 +190,6 @@ class StaticSiteUrlListTest extends SapphireTest
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
         $urlList = StaticSiteUrlList::create($source, $this->cacheDir);
         $urlList->setUrlProcessor(StaticSiteMOSSURLProcessor::create());
-        $urlList->setAutoCrawl(true);
         $crawler = StaticSiteCrawler::create($urlList);
         $mossUrltests = array_merge(
             self::$url_patterns_for_drop_extensions,

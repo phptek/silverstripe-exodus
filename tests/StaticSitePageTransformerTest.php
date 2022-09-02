@@ -67,7 +67,6 @@ class StaticSitePageTransformerTest extends SapphireTest
     public function testTransformForURLNotInCacheIsPage()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML3');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/test-1-null.html');
         $item->source = $source;
 
@@ -86,7 +85,6 @@ class StaticSitePageTransformerTest extends SapphireTest
     public function testTransformForURLIsInCacheNotPage()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML3');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/images/test.png');
         $item->source = $source;
 
@@ -107,7 +105,6 @@ class StaticSitePageTransformerTest extends SapphireTest
     public function testTransformForURLIsInCacheIsPageStrategyDuplicate()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/test-about-the-team');
         $item->source = $source;
 
@@ -133,7 +130,6 @@ class StaticSitePageTransformerTest extends SapphireTest
         $this->markTestSkipped('Skipped: Something not working between fixture and tests');
 
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML8');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/test-i-am-page-5');
         $item->source = $source;
         $pageStrategyOvr1 = $this->transformer->transform($item, null, 'Overwrite');
@@ -157,7 +153,6 @@ class StaticSitePageTransformerTest extends SapphireTest
     public function testTransformForURLIsInCacheIsPageStrategySkip()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/test-about-the-team');
         $item->source = $source;
 
@@ -173,7 +168,6 @@ class StaticSitePageTransformerTest extends SapphireTest
     public function testGetContentFieldsAndSelectorsNonSSType()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
-        $source->urlList()->setAutoCrawl(true);
         $item = StaticSiteContentItem::create($source, '/test-about-the-team');
         $item->source = $source;
 
