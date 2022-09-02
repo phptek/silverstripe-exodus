@@ -24,7 +24,7 @@ class StaticSiteContentExtractorTest extends SapphireTest
         $extractor->prepareContent();
         $content = $extractor->getContent();
 
-        $this->assertContains('<html', $content);
+        $this->assertStringContainsString('<html', $content);
         $this->assertEquals(1, count(preg_split('#<html#', $content, -1, PREG_SPLIT_NO_EMPTY)));
     }
 
@@ -41,7 +41,7 @@ class StaticSiteContentExtractorTest extends SapphireTest
         $extractor->prepareContent();
         $content = $extractor->getContent();
 
-        $this->assertContains('<html', $content);
+        $this->assertStringContainsString('<html', $content);
         $this->assertEquals(1, count(preg_split('#<html#', $content, -1, PREG_SPLIT_NO_EMPTY)));
     }
 }

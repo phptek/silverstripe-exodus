@@ -1,6 +1,8 @@
 # Silverstripe Exodus
 
 [![CI](https://github.com/phptek/silverstripe-exodus/actions/workflows/ci.yml/badge.svg)](https://github.com/phptek/silverstripe-exodus/actions/workflows/ci.yml)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phptek/silverstripe-exodus/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/phptek/silverstripe-exodus/?branch=master)
+[![License](https://poser.pugx.org/phptek/exodus/license.svg)](https://github.com/phptek/silverstripe-exodus/blob/master/LICENSE.md)
 
 ## Introduction
 
@@ -44,6 +46,19 @@ Please see the included [Migration](docs/en/howto.md) document, that describes e
 
 Please [See the docs](./docs/en/index.md).
 
-## License
+## History
 
-This code is available under the BSD license, with the exception of the [PHPCrawl](https://github.com/crispy-computing-machine/phpcrawl/) library, bundled with this module which is GPL version 2.
+This module was originally written in 2012 by then Silverstripe Ltd CEO [Sam Minnee](https://github.com/sminnee/) and was known as the "Static Site Connector" module. It was used successfully on dozens of occassions to import content for new Silverstripe projects being built by the company at that time and was subsequently improved upon over the years by other Silverstripe employees.
+
+Around 2015-2016 the module was archived by Sam and subsequently picked-up and improved by [Russell Michell](https://github.com/phptek/).
+
+In 2022 Russell saw a need for the tool again for an upcoming gig and modified it once again to work with Silverstripe v4.
+
+## Contributers
+
+In order of no. commits:
+
+* [Russell Michell](https://github.com/phptek/)
+* [Sam Minnee](https://github.com/sminnee/)
+* [Stig Lindqvist](https://github.com/stojg)
+* [Mike Parkhill](https://github.com/mparkhill)
