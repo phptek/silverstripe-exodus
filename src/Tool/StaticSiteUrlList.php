@@ -331,16 +331,26 @@ class StaticSiteUrlList
         } elseif ($this->autoCrawl) {
             $this->crawl();
         } else {
-            // Tests use "static-site-0" s cache dirname
-            $isTest = file_exists(preg_replace('#[0-9]+#', '0', $this->cacheDir));
-
             // This is grim, but we get to keep the useful check
-            if (!$isTest) {
+            if (!$this->isRunningTest()) {
                 // This happens if you move a cache-file out of the way during a real (non-test) run...
                 $msg = 'Crawl hasn\'t been executed yet and autoCrawl is false. Has the cache file been moved?';
                 throw new \LogicException($msg);
             }
         }
+    }
+
+    /**
+     * @return boolean
+     */
+    private function isRunningTest(): bool
+    {
+        return (
+            // Github tests have SS_BASE_URL set as follows
+            Environment::getEnv('SS_BASE_URL') == 'http://localhost' ||
+            // Tests use "static-site-0" s cache dirname
+            file_exists(preg_replace('#[0-9]+#', '0', $this->cacheDir))
+        );
     }
 
     /**
