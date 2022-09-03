@@ -279,11 +279,11 @@ class StaticSiteFileTransformerTest extends SapphireTest
         $this->assertEquals('images/subdir-1', $transformer->getDirHierarchy('https://www.test.com/images//subdir-1/test.png', false));
         $this->assertEquals('', $transformer->getDirHierarchy('https://www.test.com/test.png', false));
 
-        $this->assertEquals(BASE_PATH . '/public/assets/images/subdir-1', $transformer->getDirHierarchy('http://test.com/images/subdir-1/test.png', true));
-        $this->assertEquals(BASE_PATH . '/public/assets/images/subdir-1', $transformer->getDirHierarchy('http://www.test.com/images/subdir-1/test.png', true));
-        $this->assertEquals(BASE_PATH . '/public/assets/images/subdir-1', $transformer->getDirHierarchy('https://www.test.com/images/subdir-1/test.png', true));
-        $this->assertEquals(BASE_PATH . '/public/assets/images/subdir-1', $transformer->getDirHierarchy('https://www.test.com/images//subdir-1/test.png', true));
-        $this->assertEquals(BASE_PATH . '/public/assets', $transformer->getDirHierarchy('https://www.test.com/test.png', true));
+        $this->assertEquals(ASSETS_PATH . '/images/subdir-1', $transformer->getDirHierarchy('http://test.com/images/subdir-1/test.png', true));
+        $this->assertEquals(ASSETS_PATH . '/images/subdir-1', $transformer->getDirHierarchy('http://www.test.com/images/subdir-1/test.png', true));
+        $this->assertEquals(ASSETS_PATH . '/images/subdir-1', $transformer->getDirHierarchy('https://www.test.com/images/subdir-1/test.png', true));
+        $this->assertEquals(ASSETS_PATH . '/images/subdir-1', $transformer->getDirHierarchy('https://www.test.com/images//subdir-1/test.png', true));
+        $this->assertEquals(ASSETS_PATH, $transformer->getDirHierarchy('https://www.test.com/test.png', true));
     }
 
     /**

@@ -345,12 +345,14 @@ class StaticSiteUrlList
      */
     private function isRunningTest(): bool
     {
-        return (
-            // Github tests have SS_BASE_URL set as follows
-            Environment::getEnv('SS_BASE_URL') == 'http://localhost' ||
-            // Tests use "static-site-0" s cache dirname
-            file_exists(preg_replace('#[0-9]+#', '0', $this->cacheDir))
-        );
+        $isGithub = Environment::getEnv('SS_BASE_URL') == 'http://localhost'; // Github tests have SS_BASE_URL set
+        $isLocal = file_exists(preg_replace('#[0-9]+#', '0', $this->cacheDir));
+
+        if ($isGithub && !file_exists(ASSETS_PATH)) {
+            mkdir(ASSETS_PATH, 0777, true);
+        }
+
+        return $isGithub || $isLocal;
     }
 
     /**
