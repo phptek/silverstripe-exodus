@@ -376,9 +376,11 @@ class StaticSiteContentSource extends ExternalContentSource
                 if ($mimeType && $schemaMimeTypes && (!in_array($mimeType, $schemaMimeTypes))) {
                     continue;
                 }
+
                 return $schema;
             }
         }
+
         return false;
     }
 

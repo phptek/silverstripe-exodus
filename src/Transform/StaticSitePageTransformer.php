@@ -48,9 +48,10 @@ class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
      * Generic function called by \ExternalContentImporter
      *
      * @param StaticSiteContentItem $item
-     * @param SilverStripe\ORM\DataObject $parentObject
+     * @param mixed SilverStripe\ORM\DataObject|null $parentObject
      * @param string $strategy
      * @return mixed StaticSiteTransformResult | boolean
+     * @throws \Exception
      */
     public function transform($item, $parentObject, $strategy)
     {
@@ -100,16 +101,15 @@ class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
             return false;
         }
 
-        $dataType = $schema->DataType;
-
-        if (!$dataType) {
+        // TODO Exception vs return false??
+        if (!$schema->DataType) {
             $this->utils->log(" - DataType for migration schema is empty for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             throw new \Exception('DataType for migration schema is empty!');
         }
 
         // Process incoming according to user-selected duplication strategy
-        if (!$page = $this->duplicationStrategy($dataType, $item, $source->BaseUrl, $strategy, $parentObject)) {
+        if (!$page = $this->duplicationStrategy($schema->DataType, $item, $source->BaseUrl, $strategy, $parentObject)) {
             $this->utils->log("END page-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
 
             return false;

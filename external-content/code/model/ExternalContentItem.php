@@ -84,7 +84,7 @@ class ExternalContentItem extends DataObject
      * 			some systems loading up entire representations when you make
      * 			a call to 'getChildren', for example.
      */
-    public function __construct($source=null, $id=null)
+    public function __construct($source = null, $id = null)
     {
         parent::__construct();
         if ($source) {
