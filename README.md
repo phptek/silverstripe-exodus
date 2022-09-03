@@ -12,6 +12,8 @@ Exodus is a content migration tool that roughly follows the ETL standard ([**Ext
 
 Please [See the docs](./docs/en/index.md).
 
+![Migration into Silverstripe CMS](./docs/exodus.png "Migration into Silverstripe CMS")
+
 ## How it works
 
 "Extract" is where you configure "schemas" which tells the module how to **extract** content from the source site and map it to a Silverstripe class with a URL pattern, a Mime-Type and one or more CSS selectors mapped to fields on the selected class. Expect to spend a decent amount of time analysing the source website's content, tweaking these settings and repeating your crawls and imports until you're happy that you've got things just about right.
