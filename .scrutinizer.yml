@@ -1,0 +1,15 @@
+inherit: true
+
+checks:
+  php:
+    code_rating: true
+    duplication: true
+
+filter:
+  paths: ["src/*"]
+
+tools:
+  php_code_sniffer:
+    config:
+      # TODO Get Scrutinizer to use phpcs.xml.dist
+      standard: "PSR12"
