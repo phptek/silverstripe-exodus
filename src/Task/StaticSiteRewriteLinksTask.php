@@ -14,7 +14,6 @@ use SilverStripe\Dev\BuildTask;
 use SilverStripe\Control\Director;
 use SilverStripe\GraphQL\Controller;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Forms\FormField;
 
@@ -77,9 +76,9 @@ class StaticSiteRewriteLinksTask extends BuildTask
 
     /**
      *
-     * @var number
+     * @var string
      */
-    public $currentPageId = null;
+    public $currentPageID = null;
 
     /**
      * Stores the dodgy URLs for later analysis
@@ -91,14 +90,14 @@ class StaticSiteRewriteLinksTask extends BuildTask
     /**
      * The ID number of the StaticSiteContentSource which has the links to be rewritten
      *
-     * @var int
+     * @var string
      */
     protected $contentSourceID;
 
     /**
      * The import identifier
      *
-     * @var int
+     * @var string
      */
     protected $contentImportID;
 
