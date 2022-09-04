@@ -68,3 +68,23 @@ In order of no. commits:
 Credit also goes to [Marcus Nyholt](https://github.com/nyeholt/) for the use of the External Content module on top of which Exodus itself is built. The module in its current state actually includes the [`nyeholt/silverstripe-external-content`](https://github.com/nyeholt/silverstripe-external-content) package and bakes it in as a sub-directory rather than using Composer.
 
 ...it was just easier that way.
+
+## Support Me
+
+If you like what you see, support me! I accept Bitcoin:
+
+<table border="0">
+    <tr border="0">
+        <td rowspan="2" border="0">
+            <img src="https://bitcoin.org/img/icons/logo_ios.png" alt="Bitcoin" width="64" height="64" />
+        </td>
+    </tr>
+    <tr border="0">
+        <td border="0">
+            <b>3KxmqFeVWoigjvXZoLGnoNzvEwnDq3dZ8Q</b>
+        </td>
+    </tr>
+</table>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
