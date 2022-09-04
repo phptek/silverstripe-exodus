@@ -115,15 +115,16 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      * @property number StaticSiteContentSourceID For imports to know which content source to reference
      * @property string StaticSiteURL For the link-rewrite task
      * @property numberStaticSiteImportID The 'pseudo' import ID. Used for FailedRewriteLinkReport
-     * @return boolean | void
+     * @return boolean
      */
-    public function write(File $file, $item, $source, $tmpPath)
+    public function write(File $file, $item, $source, $tmpPath): bool
     {
         $file->StaticSiteContentSourceID = $source->ID;
         $file->StaticSiteURL = $item->AbsoluteURL;
         $file->StaticSiteImportID = $this->getCurrentImportID();
 
         $assetsPath = $this->getDirHierarchy($item->AbsoluteURL, true);
+
         if (!is_writable($assetsPath)) {
             $this->utils->log(" - Assets path isn't writable by the webserver. Permission denied.", $item->AbsoluteURL, $item->ProcessedMIME);
             return false;
@@ -134,7 +135,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
             return false;
         }
 
-        $filePath = BASE_PATH . DIRECTORY_SEPARATOR . $file->Filename;
+        $filePath = ASSETS_PATH . DIRECTORY_SEPARATOR . $file->Filename;
 
         // Move the file to new location in assets
         if (!rename($tmpPath, $filePath)) {
@@ -146,6 +147,8 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         if (file_exists($tmpPath)) {
             unlink($tmpPath);
         }
+
+        return true;
     }
 
     /**
