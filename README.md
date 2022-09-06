@@ -3,6 +3,7 @@
 [![CI](https://github.com/phptek/silverstripe-exodus/actions/workflows/ci.yml/badge.svg)](https://github.com/phptek/silverstripe-exodus/actions/workflows/ci.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phptek/silverstripe-exodus/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/phptek/silverstripe-exodus/?branch=master)
 [![License](https://poser.pugx.org/phptek/silverstripe-exodus/license.svg)](https://github.com/phptek/silverstripe-exodus/blob/master/LICENSE.md)
+![Packagist Version](https://img.shields.io/packagist/v/phptek/silverstripe-exodus)
 
 ## Introduction
 
@@ -34,11 +35,14 @@ Please [See the docs](./docs/en/index.md).
 
 Please [See the docs](./docs/en/index.md).
 
-## Installation and Setup
+## Requirements
 
-This module requires the [PHP Sempahore](https://www.php.net/manual/en/sem.installation.php) functions to work. (TODO: Still true in php7/8?)
+* PHP ^7||^8
+* silverstripe/cms ^4
+* silverstripe/reports ^4
+* symbiote/silverstripe-queuedjobs ^4
 
-Once that's done, you can use [Composer](http://getcomposer.org) to add the module to your SilverStripe project:
+## Installation
 
 ```
 composer require phptek/silverstripe-exodus
