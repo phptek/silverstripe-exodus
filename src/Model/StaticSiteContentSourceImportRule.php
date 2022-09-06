@@ -97,17 +97,13 @@ class StaticSiteContentSourceImportRule extends DataObject
             $fieldList = singleton(DataObjectSchema::class)
                 ->fieldSpecs($dataType, DataObjectSchema::DB_ONLY);
             $fieldList = array_combine(array_keys($fieldList), array_keys($fieldList));
-            $exclusions = array_merge(
+            foreach (array_merge(
                 array_keys(DataObject::config()->get('fixed_fields')),
-                // TODO make this a regex ala #ID$##
-                [
-                    'ParentID',
-                    'WorkflowDefinitionID',
-                    'Version',
-                ]
-            );
-
-            foreach (array_combine($exclusions, $exclusions) as $exclusion) {
+                array_filter($fieldList, function($item) {
+                    return preg_match('#(^Static|ID$)#i', $item);
+                }),
+                ['Version']
+            ) as $exclusion) {
                 unset($fieldList[$exclusion]);
             }
 
