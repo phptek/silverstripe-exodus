@@ -224,7 +224,7 @@ class StaticSiteContentSource extends ExternalContentSource
             ->setAttribute('data-icon', 'arrow-circle-double')
             ->setUseButtonTag(true)
             ->addExtraClass('btn action btn btn-primary tool-button font-icon-plus');
-        $crawlMsg = 'Select the button below start or resume a crawl.';
+        $crawlMsg = 'Select the button below to start or resume a crawl.';
 
         // Disable crawl-button if assets dir isn't writable
         if (!file_exists(ASSETS_PATH) || !is_writable(ASSETS_PATH)) {

@@ -127,7 +127,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
         $mimes = TextareaField::create('MimeTypes', 'Mime-types')
             ->setRows(3)
             ->setDescription('Be sure to pick a Mime-type that the above Data Type supports'
-            . ' . e.g. text/html (<strong>SiteTree</strong>),'
+            . ' e.g. text/html (<strong>SiteTree</strong>),'
             . ' image/png or image/jpeg (<strong>Image</strong>)'
             . ' or application/pdf (<strong>File</strong>), separated by a newline.'
             );

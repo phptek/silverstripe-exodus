@@ -334,7 +334,7 @@ class StaticSiteContentExtractor
 
         // Deal to files, write to them directly and then return
         if ($this->mimeProcessor->isOfFileOrImage($this->mime)) {
-            $tmp_name = tempnam(TempFolder::getTempFolder('/') . '/' . rand(), 'tmp');
+            $tmp_name = @tempnam(TempFolder::getTempFolder('/') . '/' . rand(), 'tmp');
             $fp = fopen($tmp_name, 'w+');
             curl_setopt($ch, CURLOPT_HEADER, 0); // We do not want _any_ header info, it corrupts the file data
             curl_setopt($ch, CURLOPT_FILE, $fp); // write curl response directly to file, no messing about

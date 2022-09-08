@@ -14,11 +14,48 @@ PhpTek\Exodus\Tool\StaticSiteUtils:
 
 It may not be desirable to enable logging on shared or cloud hosting environments, so set the value of `log_file` to `null` in your own project's config if you wish to disable logging.
 
-### PHP-FPM
+### PHP
 
-You may need to tweak the settings found in `www.conf`. Contrary to popular belief, the default `pm = dynamic` may not suffice. In (limited) testing we used `pm = static` with `pm.max_children = 25` or greater, as opposed to the default `10`, which helped crawling a ~250 page site. Tweaking php-fpm gives your application more system resources to call upon during larger site-crawls.
+Tweaking PHP and Nginx/Apache is beyond the remit of advice the authors are willing to provide. What follows therefore comes with a the caveat that these are the current settings in the author's own setup which seems to work without Gateway Timeouts occurring
 
-If you have alternatives that work for you. Please [Submit them!](https://github.com/phptek/silverstripe-exodus/issues).
+#### **Gateway Timeout**
+
+You may need to tweak your dev-environment's Nginx and PHP settings found in `/etc/nginx/conf.d/default.conf`, `php.ini` and/or `www.conf` respectively (if using PHP-FPM).
+
+If using Nginx with PHP-FPM, set FPM's `fastcgi_read_timeout` to something sane like `500`:
+
+```
+location @my_site {
+    fastcgi_buffer_size 32k;
+    fastcgi_busy_buffers_size 64k;
+    fastcgi_buffers 4 32k;
+    fastcgi_keep_conn on;
+    fastcgi_pass service_php:9000;
+    fastcgi_index index.php;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+    fastcgi_param SCRIPT_NAME /public/index.php;
+    fastcgi_param QUERY_STRING url=$uri&$args;
+    fastcgi_hide_header X-Powered-By;
+    # Increase read timeout
+    fastcgi_read_timeout 500;
+}
+```
+
+Ensure that `max_execution_time` is changed in `php.ini` from the default `30s` to something like `300s` for medium sites and upwards of that for larger sites. Trial and error is the only way to know what it should be. If after some tweaking, you're still experiencing timeouts, then setting `max_execution_time` to `0` (unlimited - which is the default for the CLI SAPI anyway) may be helpful.
+
+**WARNING** It's recommended you run your crawls over **non-production sites** to prevent excessive requests slowing the target site down for its other users. Be prepared to kill the PHP process or container if it becomes necessary.
+
+Contrary to popular belief, the default FPM `pm = dynamic` may not suffice. In (limited) testing we used `pm = static` with `pm.max_children = 25` or greater, as opposed to the default `10`, which helped crawling a ~250 page site. Tweaking php-fpm gives your application more system resources to call upon during larger site-crawls.
+
+#### **PHPCrawl**
+
+There is a known issue with PHPCrawl. You'll need to hack a single line of a single file in this lib, to make craling work. See [this issue](https://github.com/phptek/silverstripe-exodus/issues/17) for more.
+
+#### **Other**
+
+If you have alternatives that work for you, please do [submit them!](https://github.com/phptek/silverstripe-exodus/issues).
 
 ### Docker
 
