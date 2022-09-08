@@ -152,9 +152,12 @@ class StaticSiteContentSource extends ExternalContentSource
     {
         $fields = parent::getCMSFields();
 
-        $fields->removeFieldFromTab("Root", "Pages");
-        $fields->removeFieldFromTab("Root", "Files");
-        $fields->removeFieldFromTab("Root", "ShowContentInMenu");
+        $fields->removeFieldsFromTab('Root', [
+            'Pages',
+            'Files',
+            'ShowContentInMenu',
+            'Name']
+        );
         $fields->insertBefore(HeaderField::create('CrawlConfigHeader', 'Import Configuration'), 'BaseUrl');
 
         // Processing Option
@@ -171,13 +174,17 @@ class StaticSiteContentSource extends ExternalContentSource
 
         $fields->addFieldsToTab(
             'Root.Main', [
-                TextField::create("BaseUrl", "Base URL"),
+                TextField::create("BaseUrl", "Base URL")
+                    ->setDescription('The main URL of the site you wish to import e.g. "https://foo.com".'),
                 OptionsetField::create("UrlProcessor", "URL Processing", $processingOptions),
                 CheckboxField::create("ParseCSS", "Fetch external CSS")
                     ->setDescription("Fetch images defined as CSS <strong>background-image</strong> selectors which are not ordinarily reachable."),
-                CheckboxField::create("AutoRunTask", "Automatically run link-rewrite task")
+                CheckboxField::create("AutoRunTask", "Automatically rewrite links into Silverstripe-aware links")
                     ->setDescription("This will run the built-in link-rewriter task automatically once an import has completed.")
             ]
+        );
+        $fields->insertBefore('BaseUrl', TextField::create('Name', 'Name')
+            ->setDescription('Allows you to differentiate between imports.')
         );
 
         // Schema Gridfield
@@ -207,8 +214,8 @@ class StaticSiteContentSource extends ExternalContentSource
                 $crawlButtonText = _t('StaticSiteContentSource.RESUME_CRAWLING', 'Resume Crawl');
                 break;
             case StaticSiteUrlList::CRAWL_STATUS_COMPLETE:
-            $crawlButtonText = _t('StaticSiteContentSource.RECRAWL_SITE', 'Re-Crawl');
-            break;
+                $crawlButtonText = _t('StaticSiteContentSource.RECRAWL_SITE', 'Re-Crawl');
+                break;
             default:
                 throw new \LogicException("Invalid getSpiderStatus() value '".$this->urlList()->getSpiderStatus().";");
         }
@@ -217,7 +224,7 @@ class StaticSiteContentSource extends ExternalContentSource
             ->setAttribute('data-icon', 'arrow-circle-double')
             ->setUseButtonTag(true)
             ->addExtraClass('btn action btn btn-primary tool-button font-icon-plus');
-        $crawlMsg = 'Select the button below start/continue:';
+        $crawlMsg = 'Select the button below start or resume a crawl.';
 
         // Disable crawl-button if assets dir isn't writable
         if (!file_exists(ASSETS_PATH) || !is_writable(ASSETS_PATH)) {
@@ -252,7 +259,7 @@ class StaticSiteContentSource extends ExternalContentSource
         }
 
         $fields->dataFieldByName("ExtraCrawlUrls")
-            ->setDescription("Add URLs that are not reachable through content scraping, eg: '/about/team'. One per line")
+            ->setDescription("Add URIs that are not reachable via links when content scraping, eg: '/about/team'. One per line")
             ->setTitle('Additional URLs');
         $fields->dataFieldByName("UrlExcludePatterns")
             ->setDescription("URLs that should be excluded. (Supports regular expressions e.g. '/about/.*'). One per line")

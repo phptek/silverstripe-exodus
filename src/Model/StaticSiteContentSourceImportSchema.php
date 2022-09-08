@@ -121,15 +121,20 @@ class StaticSiteContentSourceImportSchema extends DataObject
             . ' Content that matches will be saved as the selected Data Type.</p>'
         ));
 
-        $appliesTo = $fields->dataFieldByName('AppliesTo');
-        $appliesTo->setDescription('A full or partial URI. Supports regular expressions.');
+        $fields->dataFieldByName('AppliesTo')
+            ->setDescription('A full or partial URI. Supports regular expressions.');
         $fields->addFieldToTab('Root.Main', DropdownField::create('DataType', 'Data Type', $dataObjects));
-        $mimes = TextareaField::create('MimeTypes', 'Mime-types');
-        $mimes->setRows(3);
-        $mimes->setDescription('Be sure to pick a Mime-type that the above Data Type supports. e.g. text/html (<strong>SiteTree</strong>), image/png or image/jpeg (<strong>Image</strong>) or application/pdf (<strong>File</strong>), separated by a newline.');
+        $mimes = TextareaField::create('MimeTypes', 'Mime-types')
+            ->setRows(3)
+            ->setDescription('Be sure to pick a Mime-type that the above Data Type supports'
+            . ' . e.g. text/html (<strong>SiteTree</strong>),'
+            . ' image/png or image/jpeg (<strong>Image</strong>)'
+            . ' or application/pdf (<strong>File</strong>), separated by a newline.'
+            );
         $fields->addFieldToTab('Root.Main', $mimes);
-        $notes = TextareaField::create('Notes', 'Notes');
-        $notes->setDescription('Use this field to add any notes about this schema. (Purely informational. Data is not used in imports)');
+        $notes = TextareaField::create('Notes', 'Notes')
+            ->setDescription('Use this field to add any notes about this schema.'
+            . ' (Purely informational. Data is not used in imports).y');
         $fields->addFieldToTab('Root.Main', $notes);
 
         $importRules = $fields->dataFieldByName('ImportRules');

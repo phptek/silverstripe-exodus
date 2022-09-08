@@ -3,7 +3,6 @@
 namespace PhpTek\Exodus\Transform;
 
 use ExternalContentImporter;
-use ExternalContentItem;
 use PhpTek\Exodus\Transform\StaticSitePageTransformer;
 use PhpTek\Exodus\Model\StaticSiteImportDataObject;
 use SilverStripe\Control\Controller;
@@ -97,7 +96,7 @@ class StaticSiteImporter extends ExternalContentImporter
             ];
 
             // Skip TaskRunner. Too few docs available on its use
-            $request = HTTPRequest::create('GET', '/dev/tasks/StaticSiteRewriteLinksTask', $getVars);
+            $request = new HTTPRequest('GET', '/dev/tasks/StaticSiteRewriteLinksTask', $getVars);
             $inst = Injector::inst()->create(StaticSiteRewriteLinksTask::class);
             $inst->run($request);
         }

@@ -12,7 +12,7 @@ use PhpTek\Exodus\Report\FailedURLRewriteReport;
 use SilverStripe\Assets\File;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\Control\Director;
-use SilverStripe\GraphQL\Controller;
+use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Forms\FormField;
@@ -123,7 +123,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
     /**
      * Starts the task
      *
-     * @param SS_HTTPRequest $request The request parameter passed from the task initiator, browser or CLI
+     * @param HTTPRequest $request The request parameter passed from the task initiator, browser or CLI
      * @return null | void
      */
     public function run($request)
@@ -159,6 +159,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
                     $this->printMessage($page->ID . ' => ' . $page->StaticSiteURL);
                 }
             }
+
             if ($show == 'files') {
                 $this->printMessage('File Map');
                 foreach ($fileLookup as $url => $id) {
@@ -167,16 +168,12 @@ class StaticSiteRewriteLinksTask extends BuildTask
             }
         }
 
-        // TODO: Remove.
-        if ($request->getVar('DIE')) {
-            return;
-        }
-
         $task = $this;
         // Callback for URL rewriter, called from StaticSiteLinkRewriter and passed through $callback($url)
         $rewriter = StaticSiteLinkRewriter::create(function ($url) use ($pageLookup, $fileLookup, $task) {
             $origUrl = $url;
             $anchor = '';
+
             if (strpos($url, '#') !== false) {
                 list($url, $anchor) = explode('#', $url, 2);
             }
@@ -212,16 +209,18 @@ class StaticSiteRewriteLinksTask extends BuildTask
                 $output = '[sitetree_link,id=' . $siteTreeObject->ID . ']';
                 $task->printMessage("\tFound: SiteTree ID#" . $siteTreeObject->ID, null, $output);
                 $anchorPattern = "<[\w]+\s+(name|id)=('|\")?". $anchor ."('|\")?";
+
                 if (strlen($anchor) && preg_match("#$anchorPattern#mi", $siteTreeObject->Content)) {
                     $output = "#$anchor";
                 }
+
                 return $output;
-            }
-            // Rewrite Asset links by replacing phpQuery processed URLs with appropriate filename.
-            elseif (isset($fileLookup[$fileMapKey]) && $fileID = $fileLookup[$fileMapKey]) {
+                // Rewrite Asset links by replacing phpQuery processed URLs with appropriate filename.
+            } elseif (isset($fileLookup[$fileMapKey]) && $fileID = $fileLookup[$fileMapKey]) {
                 if ($file = DataObject::get_by_id(File::class, $fileID)) {
                     $output = $file->RelativeLink();
                     $task->printMessage("\tFound: File ID#" . $fileID, null, $output);
+
                     return $output;
                 }
             } else {
@@ -229,11 +228,13 @@ class StaticSiteRewriteLinksTask extends BuildTask
                 $this->pushFailedRewrite($task, $url);
                 $task->printMessage("\tRewriter failed. See detail below:");
             }
+
             return $origUrl;
         });
 
         // Perform rewriting
         $changedFields = 0;
+
         foreach ($pages as $i => $page) {
             // For the rewriter, so it has some context for urls that couldn't be re-writen.
             $this->currentPageID = $page->ID;
@@ -242,11 +243,13 @@ class StaticSiteRewriteLinksTask extends BuildTask
             // Get the schema that matches the page's legacy url
             if ($schema = $this->contentSource->getSchemaForURL($url, 'text/html')) {
                 $fields = [];
+
                 foreach ($schema->ImportRules() as $rule) {
                     if (!$rule->PlainText) {
                         $fields[] = $rule->FieldName;
                     }
                 }
+
                 $fields = array_unique($fields);
             } else {
                 $this->printMessage("\tNo schema found for {$page->URLSegment}", 'WARNING');
@@ -254,6 +257,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
             }
 
             $modified = false;
+
             foreach ($fields as $field) {
                 $task->printMessage("START Rewriter for links in: '$url'");
                 $newContent = $rewriter->rewriteInContent($page->$field);
@@ -269,6 +273,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
                 } else {
                     $task->printMessage("\tNothing to rewrite");
                 }
+
                 $task->printMessage("END Rewriter for links in: '$url'");
             }
 
@@ -611,7 +616,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
      * @param string $link
      * @return void
      */
-    protected function pushFailedRewrite($obj, $link)
+    protected function pushFailedRewrite($obj, $link): void
     {
         array_push($obj->listFailedRewrites, [
             'OrigUrl' => $link,

@@ -2,6 +2,7 @@
 
 namespace PhpTek\Exodus\Tool;
 
+use PHPCrawl\Enums\PHPCrawlerMultiProcessModes;
 use PHPCrawl\Enums\PHPCrawlerUrlCacheTypes;
 use PhpTek\Exodus\Model\StaticSiteContentSource;
 use PhpTek\Exodus\Tool\StaticSiteUtils;
@@ -430,7 +431,6 @@ class StaticSiteUrlList
             $crawler->resume($crawlerID);
         } else {
             $crawlerID = $crawler->getCrawlerId();
-            file_put_contents($this->cacheDir . '/crawlerid', $crawlerID);
 
             $this->urls = [
                 'regular' => [],
@@ -439,9 +439,11 @@ class StaticSiteUrlList
         }
 
         $crawler->setURL($this->baseURL);
+        $crawler->setPort(preg_match('#^https#', $this->baseURL) ? 443 : 80);
         $crawler->go();
 
-        unlink($this->cacheDir . 'crawlerid');
+        // TODO Why were we deleting this originally?
+        // unlink($this->cacheDir . 'crawlerid');
 
         // TODO Document these
         ksort($this->urls['regular']);
