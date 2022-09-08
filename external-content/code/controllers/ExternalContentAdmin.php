@@ -269,7 +269,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
             } elseif (isset($defaultSources[0])) {
                 $class = $defaultSources[0];
             } else {
-                $class = null;
+                if ($candidate = array_values($defaultSources ?? [])[0]) {
+                    $class = $candidate;
+                } else {
+                    $class = null;
+                }
             }
 
             if ($class && $source = DataObject::get($class)->first()) {
