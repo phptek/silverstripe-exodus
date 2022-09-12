@@ -26,20 +26,11 @@ If using Nginx with PHP-FPM, set FPM's `fastcgi_read_timeout` to something sane 
 
 ```
 location @my_site {
-    fastcgi_buffer_size 32k;
-    fastcgi_busy_buffers_size 64k;
-    fastcgi_buffers 4 32k;
-    fastcgi_keep_conn on;
-    fastcgi_pass service_php:9000;
-    fastcgi_index index.php;
-    fastcgi_split_path_info ^(.+\.php)(/.+)$;
-    include fastcgi_params;
-    fastcgi_param SCRIPT_FILENAME $document_root/index.php;
-    fastcgi_param SCRIPT_NAME /public/index.php;
-    fastcgi_param QUERY_STRING url=$uri&$args;
-    fastcgi_hide_header X-Powered-By;
+    ...
+    ...
     # Increase read timeout
     fastcgi_read_timeout 500;
+    ...
 }
 ```
 
