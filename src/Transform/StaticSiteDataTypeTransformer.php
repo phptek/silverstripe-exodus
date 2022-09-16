@@ -141,14 +141,14 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
                 $object = $existing;
                 $object->ParentID = $existing->ParentID;
             } elseif ($strategy === ExternalContentTransformer::DS_DUPLICATE) {
-                $object = $existing->duplicate(false);
+                $object = $existing->duplicate(true);
                 $object->ParentID = ($parentObject ? $parentObject->ID : $this->getParentId());
             } else {
-                // Deals-to "skip" and no selection
+                // Deals-to "skip" and "No Selection"
                 return false;
             }
         } else {
-            $object = $dataType::create([]);
+            $object = $dataType::create();
             $object->ParentID = ($parentObject ? $parentObject->ID : $this->getParentId());
         }
 
@@ -180,7 +180,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
         $extensions = File::config()->get('app_categories');
         $exts = [];
 
-        foreach ($extensions as $category => $extArray) {
+        foreach ($extensions as $extArray) {
             foreach ($extArray as $ext) {
                 $exts[] = $ext;
             }

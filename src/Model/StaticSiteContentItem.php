@@ -55,7 +55,7 @@ class StaticSiteContentItem extends ExternalContentItem
             strlen($parentURL['url'])
         );
 
-        if ($subURL != "/") {
+        if ($subURL != '/') {
             $subURL = trim($subURL, '/');
         }
 
@@ -102,8 +102,8 @@ class StaticSiteContentItem extends ExternalContentItem
     }
 
     /**
-     * Returns the correct Silverstripe base class-name based on the curent URL's Mime-Type
-     * and directs the module to use the correct StaticSiteXXXTransformer class.
+     * Returns the correct lowercase Silverstripe base class-name based on the current URL's Mime-Type
+     * and directs the module to use the correct StaticSiteDataTypeTransformer subclass.
      *
      * @return mixed string
      */
@@ -167,6 +167,7 @@ class StaticSiteContentItem extends ExternalContentItem
         if (count($content) === 0) {
             return $fields;
         }
+
         foreach ($content as $k => $v) {
             $readonlyField = ReadonlyField::create("Preview$k", "$k<br>\n<em>" . $v['selector'] . "</em>", $v['content']);
             $readonlyField->addExtraClass('readonly-click-toggle');

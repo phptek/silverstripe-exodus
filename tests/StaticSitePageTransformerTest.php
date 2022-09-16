@@ -51,27 +51,31 @@ class StaticSitePageTransformerTest extends SapphireTest
      * @var string
      */
     protected $cacheDir = '';
-
-    /*
+    /**
+     * Setup the tests with a faked crawl result.
+     *
      * @return void
      */
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->transformer = singleton(StaticSitePageTransformer::class);
-        $this->cacheDir = ASSETS_PATH . '/static-site-0';
+        // Write the cache dir
+        $this->cacheDir = StaticSiteContentSource::CACHE_DIR_PREFIX;
+        $cachePath = sprintf('%s/%s', ASSETS_PATH, $this->cacheDir);
 
-        // Cache dirs
-        if (!file_exists($this->cacheDir)) {
-            mkdir($this->cacheDir, 0777, true);
+        if (!file_exists($cachePath)) {
+            mkdir($cachePath);
         }
 
-        $cachFile = sprintf('%s/urls', $this->cacheDir);
-        file_put_contents($cachFile, serialize([
+        // Write a faked crawl file to the cache dir
+        file_put_contents($cachePath . '/urls', serialize([
             'regular' =>[],
             'inferred' => [],
         ]));
+
+        // The transformer
+        $this->transformer = singleton(StaticSitePageTransformer::class);
     }
 
     /**

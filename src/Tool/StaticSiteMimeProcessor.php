@@ -35,9 +35,7 @@ class StaticSiteMimeProcessor
         $args = func_get_args();
 
         if (isset($args[0])) {
-            $mimeTypes = $args[0];
-
-            $this->setMimes($mimeTypes);
+            $this->setMimes($args[0]);
         }
     }
 

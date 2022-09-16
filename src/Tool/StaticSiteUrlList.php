@@ -47,7 +47,7 @@ class StaticSiteUrlList
      *
      * @var string
      */
-    private static $undefined_mime_type = 'unknown';
+    private static $undefined_mime_type = 'unknown/unknown';
 
     /**
      *
@@ -110,6 +110,8 @@ class StaticSiteUrlList
      */
     public function __construct(StaticSiteContentSource $source, $cacheDir)
     {
+        $this->setIsRunningTest();
+
         // baseURL must not have a trailing slash
         $baseURL = $source->BaseUrl;
 
@@ -332,33 +334,28 @@ class StaticSiteUrlList
         } elseif ($this->autoCrawl) {
             $this->crawl();
         } else {
-            // This is grim, but we get to keep the useful check
-            if (!$this->isRunningTest()) {
-                // This happens if you move a cache-file out of the way during a real (non-test) run...
-                $msg = 'Crawl hasn\'t been executed yet and autoCrawl is false. Has the cache file been moved?';
-                throw new \LogicException($msg);
-            }
+            // This happens if you move a cache-file out of the way during a real (non-test) run...
+            $msg = 'Crawl hasn\'t been executed yet and autoCrawl is false. Has the cache file been moved?';
+            throw new \LogicException($msg);
         }
     }
 
     /**
-     * @return boolean
+     * @return void
      */
-    private function isRunningTest(): bool
+    private function setIsRunningTest(): void
     {
         $isGithub = Environment::getEnv('SS_BASE_URL') == 'http://localhost'; // Github tests have SS_BASE_URL set
-        $isLocal = file_exists(preg_replace('#[0-9]+#', '0', $this->cacheDir));
 
         if ($isGithub && !file_exists(ASSETS_PATH)) {
             mkdir(ASSETS_PATH, 0777, true);
         }
-
-        return $isGithub || $isLocal;
     }
 
     /**
      * Re-execute the URL processor on all the fetched URLs.
-     * If the site has been crawled and then subsequently the URLProcessor was changed, we need to ensure
+     * If the site has been crawled and then subsequently the URLProcessor was changed through
+     * user-interaction in the "external content" CMS admin, then we need to ensure that
      * URLs are re-processed using the newly selected URL Preprocessor.
      *
      * @return void
@@ -374,9 +371,14 @@ class StaticSiteUrlList
 
         // Reprocess URLs, in case the processing has changed since the last crawl
         foreach ($this->urls['regular'] as $url => $urlData) {
+            // TODO Log this in exodus.log
+            if (empty($urlData['url'])) {
+               // echo $urlData['mime'] . "\n";
+                continue;
+            }
+
             $processedURLData = $this->generateProcessedURL($urlData);
             $this->urls['regular'][$url] = $processedURLData;
-
             // Trigger parent URL back-filling on new processed URL
             $this->parentProcessedURL($processedURLData);
         }
@@ -492,12 +494,16 @@ class StaticSiteUrlList
      *
      * @param string $url
      * @param string $contentType
-     * @return void
+     * @return mixed null|void
      */
     public function addURL($url, $contentType)
     {
         if ($this->urls === null) {
             $this->loadUrls();
+        }
+
+        if (empty($url)) {
+            return null;
         }
 
         // Generate and save the processed URLs
@@ -596,20 +602,30 @@ class StaticSiteUrlList
      * Both input and output are processed URLs
      *
      * @param array $processedURLData URLData comprising a relative URL and Mime-Type
-     * @return string | array $processedURLData
+     * @return array
      */
-    public function parentProcessedURL($processedURLData)
+    public function parentProcessedURL(array $processedURLData): array
     {
         $mime = self::$undefined_mime_type;
         $processedURL = $processedURLData;
 
         if (is_array($processedURLData)) {
+            if (empty($processedURLData['url'])) {
+                $processedURLData['url'] = '/'; // This will be dealt with, with the selected duplication strategy
+            }
+
+            if (empty($processedURLData['mime'])) {
+                $processedURLData['mime'] = self::$undefined_mime_type;
+            }
+
             /*
              * If $processedURLData['url'] is not HTML, it's unlikely its parent
              * is anything useful (Prob just a directory)
              */
             $sng = singleton(StaticSiteMimeProcessor::class);
-            $mime = $sng->IsOfHtml($processedURLData['mime']) ? $processedURLData['mime'] : self::$undefined_mime_type;
+            $mime = $sng->IsOfHtml($processedURLData['mime']) ?
+                $processedURLData['mime'] :
+                self::$undefined_mime_type;
             $processedURL = $processedURLData['url'];
         }
 
@@ -652,20 +668,22 @@ class StaticSiteUrlList
      * Find the processed URL in the URL list
      *
      * @param  mixed string | array $urlData
-     * @return array $urlData
+     * @return array
+     * @todo Under what circumstances would $this->urls['regular'][$url] === true (line ~696)?
      */
-    public function processedURL($urlData)
+    public function processedURL($urlData): array
     {
-        $url = $urlData;
-        $mime = self::$undefined_mime_type;
+        // Load-up the cache into memory
+        if ($this->urls === null) {
+            $this->loadUrls();
+        }
 
         if (is_array($urlData)) {
             $url = $urlData['url'];
             $mime = $urlData['mime'];
-        }
-
-        if ($this->urls === null) {
-            $this->loadUrls();
+        } else {
+            $url = $urlData;
+            $mime = self::$undefined_mime_type;
         }
 
         $urlData = [
@@ -673,6 +691,7 @@ class StaticSiteUrlList
             'mime' => $mime,
         ];
 
+        // Cached urls use $url as the key..
         if (isset($this->urls['regular'][$url])) {
             // Generate it if missing
             if ($this->urls['regular'][$url] === true) {
@@ -680,9 +699,11 @@ class StaticSiteUrlList
             }
 
             return $this->urls['regular'][$url];
-        } elseif (isset($this->urls['inferred'][$url])) {
+        } elseif(isset($this->urls['inferred'][$url])) {
             return $this->urls['inferred'][$url];
         }
+
+        return [];
     }
 
     /**
@@ -696,7 +717,7 @@ class StaticSiteUrlList
      */
     public function generateProcessedURL(array $urlData): array
     {
-        if (!isset($urlData['url'])) {
+        if (empty($urlData['url'])) {
             throw new \LogicException("Can't pass a blank URL to generateProcessedURL");
         }
 
@@ -705,6 +726,7 @@ class StaticSiteUrlList
         }
 
         if (!$urlData) {
+            //return []; // Even if $urlData has a mime-type, it's useless without a URI
             throw new \LogicException(get_class($this->urlProcessor) . " returned a blank URL.");
         }
 

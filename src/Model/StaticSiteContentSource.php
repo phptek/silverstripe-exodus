@@ -41,7 +41,7 @@ class StaticSiteContentSource extends ExternalContentSource
     /**
      * @var string
      */
-    public const CACHE_DIR_PREFIX = 'static-site-';
+    public const CACHE_DIR_PREFIX = 'static-site-0'; // Default (zero-suffix is used by tests)
 
     /**
      * @var string
@@ -94,7 +94,7 @@ class StaticSiteContentSource extends ExternalContentSource
      *
      * @var string
      */
-    public $staticSiteCacheDir = null;
+    public $cacheDir = null;
 
     /**
      * Holds the StaticSiteUtils object on construct
@@ -113,7 +113,7 @@ class StaticSiteContentSource extends ExternalContentSource
     public function __construct($record = null, $isSingleton = false, $model = null)
     {
         parent::__construct($record, $isSingleton, $model);
-        $this->staticSiteCacheDir = sprintf('%s%s', self::CACHE_DIR_PREFIX, $this->ID);
+        $this->cacheDir = preg_replace('#[0-9]+$#', $this->ID, self::CACHE_DIR_PREFIX);
         $this->utils = singleton(StaticSiteUtils::class);
     }
 
@@ -322,7 +322,7 @@ class StaticSiteContentSource extends ExternalContentSource
     public function urlList()
     {
         if (!$this->urlList) {
-            $this->urlList = StaticSiteUrlList::create($this, ASSETS_PATH . "/{$this->staticSiteCacheDir}");
+            $this->urlList = StaticSiteUrlList::create($this, ASSETS_PATH . "/{$this->cacheDir}");
 
             if ($processorClass = $this->UrlProcessor) {
                 $this->urlList->setUrlProcessor($processorClass::create());

@@ -603,7 +603,6 @@ class StaticSiteRewriteLinksTask extends BuildTask
                 $this->printMessage("\tImportID=<number> \t\tThe ID of the import to use.");
                 $this->printMessage("\tSHOW=pages \tPrint the contents of the pages map.");
                 $this->printMessage("\tSHOW=files \tPrint the contents of the files map.");
-                $this->printMessage("\tDIE=1 \t\tStop processing after showing map contents.");
             }
             echo $newLine;
         }

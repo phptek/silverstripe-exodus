@@ -3,7 +3,9 @@
 namespace PhpTek\Exodus\Transform;
 
 use SilverStripe\Assets\File;
+use SilverStripe\Assets\Filesystem;
 use SilverStripe\Assets\Folder;
+use SilverStripe\Assets\Upload;
 use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DataObject;
 
@@ -49,7 +51,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $source = $item->getSource();
 
         // Sleep for Xms to reduce load on the remote server
-        usleep((int)self::$sleep_multiplier * 1000);
+        usleep((int) self::$sleep_multiplier * 1000);
 
         // Extract remote location of File
         $contentFields = $this->getContentFieldsAndSelectors($item, 'File');
@@ -158,15 +160,16 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      * @param File $file
      * @param string $url
      * @param string $mime	Used to fixup bad-file extensions or filenames with no
-     *						extension but which _do_ have a Mime-Type.
+     *                      extension but which _do_ have a Mime-Type.
      * @return mixed (boolean | \File)
      */
     public function buildFileProperties(File $file, string $url, string $mime)
     {
         // Build the container directory to hold imported files
         $path = $this->getDirHierarchy($url);
-        $parentFolder = Folder::find_or_make($path);
         $assetsPath = $this->getDirHierarchy($url, true);
+        Filesystem::makeFolder($assetsPath);
+        $parentFolder = Folder::find_or_make($path);
 
         if (!file_exists($assetsPath)) {
             $this->utils->log(" - WARNING: File-import directory hierarchy wasn't created properly: $assetsPath", $url, $mime);
@@ -189,9 +192,9 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
          */
         $oldExt = pathinfo($url, PATHINFO_EXTENSION);
         $extIsValid = in_array($oldExt, $this->getSSExtensions());
-
         // Only attempt to define and append a new filename ($newExt) if $oldExt is invalid
         $newExt = null;
+
         if (!$extIsValid && !$newExt = $this->mimeProcessor->ext_to_mime_compare($oldExt, $mime, true)) {
             $this->utils->log(" - WARNING: Bad file-extension: \"$oldExt\". Unable to assign new file-extension (#1) - DISCARDING.", $url, $mime);
 
@@ -234,9 +237,10 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         // TODO File::setFilename() _should_ deal with setting the 'ParentID' and 'Name' fields
         $file->setField('Name', $definitiveName);
         $file->setField('ParentID', $parentFolder->ID);
+        $file->setFilename($definitiveFilename);
         $file->File->Filename = $definitiveFilename;
-        //$file->setFilename($definitiveName);
-        //$file->updateFilesystem();
+        $file->write();
+        $file->updateFilesystem();
 
         $this->utils->log(" - NOTICE: \"File-properties built successfully for: ", $url, $mime);
 
@@ -244,15 +248,14 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
     }
 
     /**
-     *
      * Determine the correct parent directory hierarchy from the imported file's remote-path,
-     * to be located under the main SilverStripe 'assets' directory.
+     * such that it is mapped to the appropriate area under the main SilverStripe 'assets' directory.
      *
      * @param string $absolutePath The absolute path of this file on the remote server.
      * @param boolean $full Return absolute path from server's filesystem root
      * @return string The path to append to 'assets' and use as local cache dir.
      */
-    public function getDirHierarchy($absoluteUrl, $full = false)
+    public function getDirHierarchy(string $absoluteUrl, bool $full = false): string
     {
         /*
          * Determine the top-level directory under 'assets' under-which this item's
@@ -282,8 +285,9 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         }
 
         $joinedPath = Controller::join_links($parentDir, implode('/', $path));
+        $fullPath = ASSETS_PATH . ($joinedPath ? DIRECTORY_SEPARATOR . $joinedPath : '');
 
-        return ($full ? ASSETS_PATH . ($joinedPath ? DIRECTORY_SEPARATOR . $joinedPath : '') : $joinedPath);
+        return $full ? $fullPath : $joinedPath;
     }
 
     /**
@@ -293,12 +297,13 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      *
      * @param string $relativeFilePath The path to the file relative to the 'assets' dir.
      * @return string $relativeFilePath
+     * @throws LogicException
      */
     public function versionFile(string $relativeFilePath): string
     {
-        $fullPath = sprintf('%s/%s', ASSETS_PATH, $relativeFilePath);
-
-        while (file_exists($fullPath)) {
+        // A while loop provides the ability to continually add further duplicates with the right name
+		$base = ASSETS_PATH;
+		while(file_exists("$base/$relativeFilePath")) {
             $i = isset($i) ? ($i + 1) : 2;
             $oldFilePath = $relativeFilePath;
 
