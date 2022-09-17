@@ -69,10 +69,7 @@ class StaticSitePageTransformerTest extends SapphireTest
         }
 
         // Write a faked crawl file to the cache dir
-        file_put_contents($cachePath . '/urls', serialize([
-            'regular' =>[],
-            'inferred' => [],
-        ]));
+        file_put_contents($cachePath . '/urls', file_get_contents(__DIR__ . '/urls.fixture'));
 
         // The transformer
         $this->transformer = singleton(StaticSitePageTransformer::class);
@@ -87,6 +84,7 @@ class StaticSitePageTransformerTest extends SapphireTest
     public function testTransformForURLNotInCacheIsPage()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML3');
+        $source->cacheDir = $this->cacheDir;
         $item = StaticSiteContentItem::create($source, '/test-1-null.html');
 
         // Fail becuase test-1-null.html isn't found in the url cache
@@ -104,6 +102,7 @@ class StaticSitePageTransformerTest extends SapphireTest
     public function testTransformForURLIsInCacheNotPage()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML3');
+        $source->cacheDir = $this->cacheDir;
         $item = StaticSiteContentItem::create($source, '/images/test.png');
 
         // Fail becuase we're using a SiteTree/Page transformer on an image
@@ -123,6 +122,7 @@ class StaticSitePageTransformerTest extends SapphireTest
     public function testTransformForURLIsInCacheIsPageStrategyDuplicate()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
+        $source->cacheDir = $this->cacheDir;
         $item = StaticSiteContentItem::create($source, '/test-about-the-team');
 
         // Pass becuase we do want to perform something on the URL
@@ -130,8 +130,8 @@ class StaticSitePageTransformerTest extends SapphireTest
         $this->assertInstanceOf(StaticSiteTransformResult::class, $pageStrategyDup2 = $this->transformer->transform($item, null, \ExternalContentTransformer::DS_DUPLICATE));
 
         // Pass becuase regardless of duplication strategy, we should be getting a result
-        //$this->assertEquals('test-about-the-team', $pageStrategyDup1->page->URLSegment);
-        //$this->assertEquals('test-about-the-team-2', $pageStrategyDup2->page->URLSegment);
+        $this->assertEquals('test-about-the-team', $pageStrategyDup1->page->URLSegment);
+        $this->assertEquals('test-about-the-team-2', $pageStrategyDup2->page->URLSegment);
     }
 
     /**
@@ -144,11 +144,9 @@ class StaticSitePageTransformerTest extends SapphireTest
      */
     public function testTransformForURLIsInCacheIsPageStrategyOverwrite()
     {
-        $this->markTestSkipped('Skipped: Something not working between fixture and tests');
-
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML8');
+        $source->cacheDir = $this->cacheDir;
         $item = StaticSiteContentItem::create($source, '/test-i-am-page-5');
-        $pageStrategyOvr1 = $this->transformer->transform($item, null, \ExternalContentTransformer::DS_OVERWRITE);
 
         // Pass becuase we do want to perform something on the URL
         $this->assertInstanceOf(StaticSiteTransformResult::class, $pageStrategyOvr1 = $this->transformer->transform($item, null, \ExternalContentTransformer::DS_OVERWRITE));
@@ -169,6 +167,7 @@ class StaticSitePageTransformerTest extends SapphireTest
     public function testTransformForURLIsInCacheIsPageStrategySkip()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
+        $source->cacheDir = $this->cacheDir;
         $item = StaticSiteContentItem::create($source, '/test-about-the-team');
 
         // Pass becuase we do want to perform something on the URL
@@ -183,6 +182,7 @@ class StaticSitePageTransformerTest extends SapphireTest
     public function testGetContentFieldsAndSelectorsNonSSType()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsHTML7');
+        $source->cacheDir = $this->cacheDir;
         $item = StaticSiteContentItem::create($source, '/test-about-the-team');
 
         $this->assertInstanceOf(StaticSiteContentExtractor::class, $this->transformer->getContentFieldsAndSelectors($item, 'Custom'));
