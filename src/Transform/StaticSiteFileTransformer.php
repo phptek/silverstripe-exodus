@@ -303,6 +303,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
     {
         // A while loop provides the ability to continually add further duplicates with the right name
 		$base = ASSETS_PATH;
+
 		while(file_exists("$base/$relativeFilePath")) {
             $i = isset($i) ? ($i + 1) : 2;
             $oldFilePath = $relativeFilePath;

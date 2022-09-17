@@ -157,6 +157,7 @@ class StaticSiteFileTransformerTest extends SapphireTest
     public function testTransformForURLNotInCacheIsFile()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage1');
+        $source->cacheDir = $this->cacheDir;
         $item = StaticSiteContentItem::create($source, '/assets/test-1.png');
 
         // Fail becuase test.png isn't found in the url cache
@@ -174,6 +175,7 @@ class StaticSiteFileTransformerTest extends SapphireTest
     public function testTransformForURLIsInCacheNotFile()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage1');
+        $source->cacheDir = $this->cacheDir;
         $item = StaticSiteContentItem::create($source, '/test-page-44');
 
         // Fail becuase we're using a StaticSiteFileTransformer on a Mime-Type of text/html
@@ -218,6 +220,7 @@ class StaticSiteFileTransformerTest extends SapphireTest
     public function testTransformForURLIsInCacheIsFileStrategySkip()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage3');
+        $source->cacheDir = $this->cacheDir;
         $item = StaticSiteContentItem::create($source, '/assets/test-3.png');
 
         // Fail becuase we're simply using the "skip" strategy. Nothing else needs to be done
@@ -233,6 +236,7 @@ class StaticSiteFileTransformerTest extends SapphireTest
     public function testTransformForURLIsInCacheIsFileStrategyOverwrite()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage4');
+        $source->cacheDir = $this->cacheDir;
         $item = StaticSiteContentItem::create($source, '/test-graphics/her-image.png');
 
         // Pass becuase we do want to perform something on the URL
@@ -253,6 +257,7 @@ class StaticSiteFileTransformerTest extends SapphireTest
     public function testGetContentFieldsAndSelectorsNonSSType()
     {
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage5');
+        $source->cacheDir = $this->cacheDir;
         $item = StaticSiteContentItem::create($source, '/test-graphics/some-image.png');
 
         $this->assertInstanceOf(StaticSiteContentExtractor::class, $this->transformer->getContentFieldsAndSelectors($item, 'Custom'));
@@ -283,17 +288,13 @@ class StaticSiteFileTransformerTest extends SapphireTest
      */
     public function testVersionFile()
     {
-        $this->markTestSkipped('Skipped: Is this "Versioning" required??');
-
-        $transformer = singleton(StaticSiteFileTransformer::class);
         $source = $this->objFromFixture(StaticSiteContentSource::class, 'MyContentSourceIsImage6');
-        $item = StaticSiteContentItem::create($source, '/test-graphics/foo-image.jpg');
+        $source->cacheDir = $this->cacheDir;
+        $item = StaticSiteContentItem::create($source, '/test-graphics/foo-image.png');
 
         // Save an initial version of an image
         $this->transformer->transform($item, null, 'Skip');
-        // Version it
-        $versioned = $transformer->versionFile('test-graphics/foo-image.jpg');
-        // Test it
-        $this->assertEquals('test-graphics/foo-image2.jpg', $versioned);
+        $versioned = $this->transformer->versionFile('test-graphics/foo-image.png');
+        $this->assertEquals('test-graphics/foo-image2.png', $versioned);
     }
 }
