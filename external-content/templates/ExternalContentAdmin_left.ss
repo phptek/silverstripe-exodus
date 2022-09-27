@@ -4,17 +4,6 @@
 		<li class="action" id="addpage"><button class="btn btn-primary cms-content-addpage-button tool-button font-icon-plus"><% _t('CREATE','Create',PR_HIGH) %></button></li>
 		<li class="action" id="deletepage"><button class="btn btn-primary cms-content-addpage-button tool-button font-icon-plus"><% _t('DELETE', 'Delete') %></button></li>
 	</ul>
-	<!--
-	Sneaky form definition to hide the ability to select variations on the provider to create. Will
-	need to update this later to support other providers... possibly.
-
-	<form class="actionparams" id="addpage_options" style="display: none" action="admin/external-content/addprovider">
-		<div>
-			<input type="hidden" name="ParentID" />
-			<input class="action" type="submit" value="<% _t('GO','Go') %>" />
-		</div>
-	</form>
-	-->
 
 	<% loop $CreateProviderForm %>
 		<form class="actionparams" id="$FormName" action="$FormAction">

@@ -201,7 +201,7 @@ class StaticSiteContentSource extends ExternalContentSource
             . '<p class="message notice">Schemas define'
             . ' rules for importing crawled content into database fields'
             . ' with the use of CSS selectors. If more than one schema exists for a field, then they will be'
-            . ' processed in the order of Priority. The first Schema to a match a URI Pattern will be'
+            . ' processed in the order of Priority. The first Schema to match a URI Pattern will be'
             . ' the one used for that field.</p>'
         ));
         $fields->addFieldToTab("Root.Main", $importRules);

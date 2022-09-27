@@ -62,7 +62,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
      */
     public function __construct()
     {
-        $this->utils = Injector::inst()->get(StaticSiteUtils::class, true);
+        $this->utils = singleton(StaticSiteUtils::class);
         $this->mimeProcessor = Injector::inst()->get(StaticSiteMimeProcessor::class, true);
     }
 

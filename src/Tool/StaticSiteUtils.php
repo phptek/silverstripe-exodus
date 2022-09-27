@@ -4,6 +4,7 @@ namespace PhpTek\Exodus\Tool;
 
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
+use PhpTek\Exodus\Crawl\StaticSiteCrawler;
 
 /**
  * Exodus utility methods.
@@ -24,11 +25,11 @@ class StaticSiteUtils
      * @param string $mime
      * @return null | void
      */
-    public function log($message, $filename = null, $mime = null)
+    public function log(string $message, string $filename = '', string $mime = ''): void
     {
-        $logFile = $this->config()->get('log_file');
+        $logFile = $filename ?: $this->config()->get('log_file');
 
-        if ($logFile && is_writable($logFile) || !file_exists($logFile) && is_writable(dirname($logFile))) {
+        if ($logFile && is_writable($logFile)) {
             $message = $message . ($filename ? ' ' . $filename : '') . ($mime ? ' (' . $mime . ')' : '');
             error_log($message. PHP_EOL, 3, $logFile);
         }
@@ -42,12 +43,12 @@ class StaticSiteUtils
      * @param StaticSiteCrawler $crawler (Warning: Pass by reference)
      * @return array Returns an array of the config options in a format consumable by curl.
      */
-    public function defineProxyOpts($set, &$crawler = null): array
+    public function defineProxyOpts(bool $set, StaticSiteCrawler &$crawler = null): array
     {
         if ($set && is_bool($set) && $set !== false) {
             $proxyOpts = StaticSiteContentExtractor::config()->get('curl_opts_proxy');
 
-            if (!$proxyOpts || !is_array($proxyOpts) || !count($proxyOpts)>0) {
+            if (!$proxyOpts || !is_array($proxyOpts) || !count($proxyOpts) >0) {
                 return [];
             }
 

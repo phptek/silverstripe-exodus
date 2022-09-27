@@ -140,17 +140,20 @@ class StaticSiteContentSourceImportSchema extends DataObject
         $importRules = $fields->dataFieldByName('ImportRules');
         $fields->removeFieldFromTab('Root', 'ImportRules');
 
-        // Exclude File, as it doesn't use import rules
+        // Don't show for File subclasses, these onbviously don't use CSS import rules
         if ($this->DataType && in_array(File::class, ClassInfo::ancestry($this->DataType))) {
             return $fields;
         }
 
         if ($importRules) {
-            $importRules->getConfig()->removeComponentsByType(GridFieldAddExistingAutocompleter::class);
-            $importRules->getConfig()->removeComponentsByType(GridFieldAddNewButton::class);
+            $conf = $importRules->getConfig();
+            $conf->removeComponentsByType([
+                GridFieldAddExistingAutocompleter::class,
+                GridFieldAddNewButton::class
+            ]);
             $addNewButton = new GridFieldAddNewButton('after');
             $addNewButton->setButtonName("Add Rule");
-            $importRules->getConfig()->addComponent($addNewButton);
+            $conf->addComponent($addNewButton);
             $fields->addFieldToTab('Root.Main', $importRules);
         }
 

@@ -495,7 +495,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                             Folder::class,
                         )
                             ->setValue($this->getRequest()->postVars()['FileMigrationTarget'] ?? null)
-                            ->setDescription('All imported file-like content will be organised hierarchically under here.')
+                            ->setDescription('All imported file-like content will be organised hierarchically beneath here.')
                     );
                 }
 
