@@ -14,6 +14,10 @@ PhpTek\Exodus\Tool\StaticSiteUtils:
 
 It may not be desirable to enable logging on shared or cloud hosting environments, so set the value of `log_file` to `null` in your own project's config if you wish to disable logging.
 
+### Image Size
+
+You may find that images and files over a given size are not being imported. You may be subject to Silverstripe's `default_max_file_size` configuration. By default it's set to 1Mb for specific file-types. Review the Silverstripe documentation to ascertain how to increase this for each type of file affected.
+
 ### PHP
 
 Tweaking PHP and Nginx/Apache is beyond the remit of advice the authors are willing to provide. What follows therefore comes with a the caveat that these are the current settings in the author's own setup which seems to work without Gateway Timeouts occurring

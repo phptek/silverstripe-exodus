@@ -1,0 +1,21 @@
+phptek/silverstripe-exodus File-write status
+
+For each run:
+
+* Delete "Uploads" in CMS
+* Delete "Uploads" dir on F/S (public/assets/.protected/Uploads)
+* Saved F/S Prototype Should Be:
+
+1. Uploads/<dir_name(s)>/<file_hash>/<filename>.jpg
+2. Uploads/<dir_name(s)>/<file_hash>/<filename__FitMax<foo1>>.jpg
+3. Uploads/<dir_name(s)>/<file_hash>/<filename__FitMax<foo2>>.jpg
+4. Uploads/<dir_name(s)>/<file_hash>/<filename__FitMax<foo3>>.jpg
+
+Tests:
+
+Commit "WIP #1" Status:
+
+* F/S: Should be as per 1-4 above
+* CMS: Should be able to navigate between directories
+
+
