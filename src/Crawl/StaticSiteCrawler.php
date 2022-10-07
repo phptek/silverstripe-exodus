@@ -106,7 +106,7 @@ class StaticSiteCrawler extends PHPCrawler
          * when re-requesting it during the import stage, as long as we cache it correctly here.
          */
         if ($badStatusCode && !$isRecoverableUrl) {
-            $message = $info->url . " Skipped. We got a {$info->http_status_code} and URL was irrecoverable" . PHP_EOL;
+            $message = $info->url . " Skipped. We got a bad status-code and URL was irrecoverable" . PHP_EOL;
             $this->utils->log($message);
 
             return 1;

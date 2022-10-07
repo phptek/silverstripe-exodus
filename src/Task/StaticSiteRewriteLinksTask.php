@@ -304,21 +304,20 @@ class StaticSiteRewriteLinksTask extends BuildTask
      * @param string $message The message to log
      * @param string $level The log level, e.g. NOTICE or WARNING
      * @param string $url The url which was being re-written
-     * @return void
+     * @return mixed null|void
      */
     public function printMessage($message, $level = null, $url = null)
     {
-        singleton(StaticSiteUtils::class)->log("$level$message$url", null, null, __CLASS__);
+        singleton(StaticSiteUtils::class)->log("$level$message$url", '', '');
+
         if ($this->silentRun) {
             return;
         }
+
         $url = ($url ? '(' . $url . ') ' : '');
         $level = ($level ? '[' . $level .'] ' : '');
-        if (Director::is_cli()) {
-            echo "$level$message$url" . PHP_EOL;
-        } else {
-            echo "<p>$level$message$url</p>" . PHP_EOL;
-        }
+
+        echo "$level$message$url" . PHP_EOL;
     }
 
     /**
