@@ -5,7 +5,6 @@ namespace PhpTek\Exodus\Transform;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Versioned\Versioned;
 use PhpTek\Exodus\Transform\StaticSiteDataTypeTransformer;
-use SilverStripe\CMS\Model\SiteTree;
 
 /**
  * URL transformer specific to SilverStripe's `SiteTree` class for use with the module's
@@ -19,8 +18,6 @@ use SilverStripe\CMS\Model\SiteTree;
  */
 class StaticSitePageTransformer extends StaticSiteDataTypeTransformer
 {
-    use Injectable;
-
     /**
      *
      * @var string

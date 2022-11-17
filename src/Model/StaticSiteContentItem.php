@@ -151,19 +151,21 @@ class StaticSiteContentItem extends ExternalContentItem
         $fields = parent::getCMSFields();
 
         // Add the preview fields here, including rules used
-        $t = $this->getTransformer();
-
         $urlField = ReadonlyField::create(
             "PreviewSourceURL",
             "Imported from",
             "<a href=\"$this->AbsoluteURL\">" . Convert::raw2xml($this->AbsoluteURL) . "</a>"
         );
         $urlField->dontEscape = true;
-
         $fields->addFieldToTab("Root.Preview", $urlField);
 
         $dataType = $this->getType();
-        $content = $t->getContentFieldsAndSelectors($this, $dataType);
+        $content = '';
+
+        if ($t = $this->getTransformer()) {
+            $content = $t->getContentFieldsAndSelectors($this, $dataType);
+        }
+
         if (count($content) === 0) {
             return $fields;
         }

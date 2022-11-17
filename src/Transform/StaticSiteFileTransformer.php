@@ -118,6 +118,8 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      * @property string StaticSiteURL For the link-rewrite task
      * @property numberStaticSiteImportID The 'pseudo' import ID. Used for FailedRewriteLinkReport
      * @return boolean
+     *
+     * simplify the transform() and buildFileProperties() methods until things stop working
      */
     public function write(File $file, $item, $source, $tmpPath): bool
     {
@@ -126,22 +128,30 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $file->StaticSiteImportID = $this->getCurrentImportID();
 
         $assetsPath = $this->getDirHierarchy($item->AbsoluteURL, true);
+        $targetPath = $file->FileFilename;
 
-        if (!is_writable($assetsPath)) {
-            $this->utils->log(" - Assets path isn't writable by the webserver. Permission denied.", $item->AbsoluteURL, $item->ProcessedMIME);
+        // Ordinarily, this would be built from PHP's $_FILES superglobal
+        $tmpData = [
+            'name' => $file->Name,
+            'size' => filesize($tmpPath),
+            'type' => $item->ProcessedMIME,
+            'tmp_name' => $tmpPath,
+            'error' => 0,
+        ];
+
+        // Basically the equivalent of move_uploaded_file($tmpData['tmp_name'], $targetPath)
+        if (!$loaded = Upload::create()->load($tmpData, $targetPath)) {
+            $this->utils->log(" - Not imported (Upload::load() failed): ", $item->AbsoluteURL, $item->ProcessedMIME);
+
             return false;
         }
 
+        $file->FileHash = $loaded['Hash'] ?? 'NO_HASH';
+
+        // Save to DB _before_ the F/S
         if (!$file->write()) {
             $this->utils->log(" - Not imported (no write): ", $item->AbsoluteURL, $item->ProcessedMIME);
-            return false;
-        }
 
-        $filePath = ASSETS_PATH . DIRECTORY_SEPARATOR . $file->Filename;
-
-        // Move the file to new location in assets
-        if (!rename($tmpPath, $filePath)) {
-            $this->utils->log(" - Not imported (rename() failed): ", $item->AbsoluteURL, $item->ProcessedMIME);
             return false;
         }
 
@@ -234,13 +244,11 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $definitiveName = basename($definitiveFilename);
 
         // Complete the construction of $file.
-        // TODO File::setFilename() _should_ deal with setting the 'ParentID' and 'Name' fields
         $file->setField('Name', $definitiveName);
-        $file->setField('ParentID', $parentFolder->ID);
         $file->setFilename($definitiveFilename);
-        $file->File->Filename = $definitiveFilename;
-        $file->write();
+        // updateFilesystem() must be called before the write() op
         $file->updateFilesystem();
+        $file->write();
 
         $this->utils->log(" - NOTICE: \"File-properties built successfully for: ", $url, $mime);
 

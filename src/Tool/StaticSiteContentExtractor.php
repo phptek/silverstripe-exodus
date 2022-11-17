@@ -93,10 +93,6 @@ class StaticSiteContentExtractor
         $this->content = $content;
         $this->mimeProcessor = singleton(StaticSiteMimeProcessor::class);
         $this->utils = singleton(StaticSiteUtils::class);
-
-        if (!class_exists(phpQuery::class)) {
-            throw new \Exception("The third-party library 'phpQuery' is required.");
-        }
     }
 
     /**
