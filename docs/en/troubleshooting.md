@@ -42,7 +42,7 @@ Contrary to popular belief, the default FPM `pm = dynamic` may not suffice. In (
 
 #### **PHPCrawl**
 
-There is a known issue with PHPCrawl. You'll need to hack a single line of a single file in this lib, to make craling work. See [this issue](https://github.com/phptek/silverstripe-exodus/issues/17) for more.
+There is a known issue with PHPCrawl with PHP8. See [this issue](https://github.com/phptek/silverstripe-exodus/issues/24) for more.
 
 #### **Other**
 

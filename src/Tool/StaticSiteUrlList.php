@@ -113,7 +113,7 @@ class StaticSiteUrlList
         $this->setIsRunningTest();
 
         // baseURL must not have a trailing slash
-        $baseURL = $source->BaseUrl;
+        $baseURL = (string) $source->BaseUrl;
 
         if (substr($baseURL, -1) == "/") {
             $baseURL = substr($baseURL, 0, -1);

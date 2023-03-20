@@ -134,7 +134,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
         $fields->addFieldToTab('Root.Main', $mimes);
         $notes = TextareaField::create('Notes', 'Notes')
             ->setDescription('Use this field to add any notes about this schema.'
-            . ' (Purely informational. Data is not used in imports).y');
+            . ' (Purely informational. Data is not used in imports).');
         $fields->addFieldToTab('Root.Main', $notes);
 
         $importRules = $fields->dataFieldByName('ImportRules');
