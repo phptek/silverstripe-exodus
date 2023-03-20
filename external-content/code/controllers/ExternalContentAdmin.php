@@ -482,7 +482,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                             SiteTree::class,
                         )
                             ->setValue($this->getRequest()->postVars()['MigrationTarget'] ?? null)
-                            ->setDescription('All imported page-like content will be organised hierarchically under here.')
+                            ->setDescription('All imported page-like content will be organised hierarchically beneath this folder.')
                     );
                 }
 
@@ -495,7 +495,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                             Folder::class,
                         )
                             ->setValue($this->getRequest()->postVars()['FileMigrationTarget'] ?? null)
-                            ->setDescription('All imported file-like content will be organised hierarchically beneath here.')
+                            ->setDescription('All imported file-like content will be organised hierarchically beneath this folder.')
                     );
                 }
 

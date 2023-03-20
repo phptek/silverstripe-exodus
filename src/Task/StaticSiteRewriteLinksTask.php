@@ -308,12 +308,15 @@ class StaticSiteRewriteLinksTask extends BuildTask
      */
     public function printMessage($message, $level = null, $url = null)
     {
-        singleton(StaticSiteUtils::class)->log("$level$message$url", null, null, __CLASS__);
+        singleton(StaticSiteUtils::class)->log("$level$message$url");
+
         if ($this->silentRun) {
             return;
         }
+
         $url = ($url ? '(' . $url . ') ' : '');
         $level = ($level ? '[' . $level .'] ' : '');
+
         if (Director::is_cli()) {
             echo "$level$message$url" . PHP_EOL;
         } else {
@@ -331,8 +334,8 @@ class StaticSiteRewriteLinksTask extends BuildTask
     public function writeFailedRewrites()
     {
         $importID = 0;
-        $postProcessed = [];
         $uniq = ($this->listFailedRewrites);
+
         foreach ($uniq as $failure) {
             $importID = $failure['ImportID']; // Will be the same value each time
 
@@ -359,6 +362,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
         }
 
         $summaryText = self::$summary_prefix . $this->contentImportID;
+        
         foreach ($this->countFailureTypes() as $label => $payload) {
             $label = FormField::name_to_label($label) . ': ';
             $summaryText .= ' ' . $label . $payload['count'] . ' ' . $payload['desc'] . PHP_EOL;
