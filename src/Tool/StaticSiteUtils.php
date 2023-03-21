@@ -23,15 +23,15 @@ class StaticSiteUtils
      * @param string $message
      * @param string $filename
      * @param string $mime
-     * @return null | void
+     * @return void
      */
     public function log(string $message, string $filename = '', string $mime = ''): void
     {
         $logFile = $filename ?: $this->config()->get('log_file');
 
-        if ($logFile && is_writable($logFile)) {
+        if ($logFile) {
             $message = $message . ($filename ? ' ' . $filename : '') . ($mime ? ' (' . $mime . ')' : '');
-            error_log($message. PHP_EOL, 3, $logFile);
+            file_put_contents($logFile, $message . PHP_EOL, FILE_APPEND);
         }
     }
 
