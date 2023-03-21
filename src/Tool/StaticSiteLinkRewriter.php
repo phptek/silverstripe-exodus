@@ -16,10 +16,6 @@ use SilverStripe\Core\Injector\Injectable;
  * @package phptek/silverstripe-exodus
  * @see {@link StaticSiteRewriteLinksTask}
  */
-
-// We need PHPQuery
-require_once(BASE_PATH . '/vendor/electrolinux/phpquery/phpQuery/phpQuery.php');
-
 class StaticSiteLinkRewriter
 {
     use Injectable;
