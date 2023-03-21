@@ -3,11 +3,10 @@
 namespace PhpTek\Exodus\Transform;
 
 use SilverStripe\Assets\File;
-use SilverStripe\Assets\Filesystem;
 use SilverStripe\Assets\Folder;
-use SilverStripe\Assets\Upload;
 use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\AssetAdmin\Helper\ImageThumbnailHelper;
 
 /**
  * URL transformer specific to SilverStripe's `File` class for use with the module's
@@ -84,7 +83,9 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         }
 
         // Prepare $file with all the correct properties, ready for writing
-        if (!$file = $this->buildFileProperties($file, $item->AbsoluteURL, $item->ProcessedMIME)) {
+        $tmpPath = $contentFields['tmp_path'];
+
+        if (!$file = $this->buildFileProperties($file, $item, $source, $tmpPath)) {
             $this->utils->log("END file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
             return false;
         }
@@ -96,7 +97,19 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
          * and the same filename was being used. This should be fixed now (@see: self::versionFile()).
          */
         try {
-            $this->write($file, $item, $source, $contentFields['tmp_path']);
+            if (!$file->write()) {
+                $this->utils->log(" - Not imported (no write): ", $item->AbsoluteURL, $item->ProcessedMIME);
+            }
+    
+            // Remove garbage tmp files if/when left lying around
+            if (file_exists($tmpPath)) {
+                unlink($tmpPath);
+            }
+    
+            $file->publishSingle();
+
+            // Generate thumbnails
+            ImageThumbnailHelper::singleton()->run();
         } catch (\Exception $e) {
             $this->utils->log($e->getMessage(), $item->AbsoluteURL, $item->ProcessedMIME);
         }
@@ -107,75 +120,21 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
     }
 
     /**
-     * Write the file to the DB and Filesystem, skipping \Upload.
-     * Will fix any stale tmp images lying around.
-     *
-     * @param File $file
-     * @param StaticSiteContentItem $item
-     * @param StaticSiteContentSource $source
-     * @param string $tmpPath
-     * @property number StaticSiteContentSourceID For imports to know which content source to reference
-     * @property string StaticSiteURL For the link-rewrite task
-     * @property numberStaticSiteImportID The 'pseudo' import ID. Used for FailedRewriteLinkReport
-     * @return boolean
-     */
-    public function write(File $file, $item, $source, $tmpPath): bool
-    {
-        $file->StaticSiteContentSourceID = $source->ID;
-        $file->StaticSiteURL = $item->AbsoluteURL;
-        $file->StaticSiteImportID = $this->getCurrentImportID();
-
-        $assetsPath = $this->getDirHierarchy($item->AbsoluteURL, true);
-
-        if (!is_writable($assetsPath)) {
-            $this->utils->log(" - Assets path isn't writable by the webserver. Permission denied.", $item->AbsoluteURL, $item->ProcessedMIME);
-            return false;
-        }
-
-        if (!$file->write()) {
-            $this->utils->log(" - Not imported (no write): ", $item->AbsoluteURL, $item->ProcessedMIME);
-            return false;
-        }
-
-        $filePath = ASSETS_PATH . DIRECTORY_SEPARATOR . $file->Filename;
-
-        // Move the file to new location in assets
-        if (!rename($tmpPath, $filePath)) {
-            $this->utils->log(" - Not imported (rename() failed): ", $item->AbsoluteURL, $item->ProcessedMIME);
-            return false;
-        }
-
-        // Remove garbage tmp files if/when left lying around
-        if (file_exists($tmpPath)) {
-            unlink($tmpPath);
-        }
-
-        return true;
-    }
-
-    /**
      * Build the properties required for a safely saved SilverStripe asset.
      * Attempts to detect and fix bad file-extensions based on the available Mime-Type.
      *
      * @param File $file
-     * @param string $url
-     * @param string $mime	Used to fixup bad-file extensions or filenames with no
-     *                      extension but which _do_ have a Mime-Type.
-     * @return mixed (boolean | \File)
+     * @param Object $item      Object properties are used to fixup bad-file extensions or filenames with no
+     *                            extension but which _do_ have a Mime-Type.
+     * @param Object $source    Source...TBC
+     * @param string $tmpPath
+     * @return mixed (boolean | File)
      */
-    public function buildFileProperties(File $file, string $url, string $mime)
+    public function buildFileProperties(File $file, $item, $source, $tmpPath)
     {
-        // Build the container directory to hold imported files
-        $path = $this->getDirHierarchy($url);
-        $assetsPath = $this->getDirHierarchy($url, true);
-        Filesystem::makeFolder($assetsPath);
-        $parentFolder = Folder::find_or_make($path);
-
-        if (!file_exists($assetsPath)) {
-            $this->utils->log(" - WARNING: File-import directory hierarchy wasn't created properly: $assetsPath", $url, $mime);
-
-            return false;
-        }
+        $url = $item->AbsoluteURL;
+        $mime = $item->ProcessedMIME;
+        $assetsPath = $this->getDirHierarchy($url);
 
         /*
          * Run checks on original filename and name it as per default if nothing can be done with it.
@@ -222,25 +181,14 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
             $useExtension = $oldExt;
         }
 
-        $filePath = $path . DIRECTORY_SEPARATOR . $origFilename;
-
-        /*
-         * Some files fail to save becuase of multiple dots in the filename.
-         * FileNameFilter only removes leading dots, so lose _all_ dots and re-append the correct suffix
-         * @todo add another filter expression as per \FileNameFilter to module _config instead of using str_replace() here.
-         */
-        $convertDotsFileName = sprintf('%s.%s', str_replace('.', '-', $filePath), $useExtension);
-        $definitiveFilename = $this->versionFile($convertDotsFileName);
-        $definitiveName = basename($definitiveFilename);
-
-        // Complete the construction of $file.
-        // TODO File::setFilename() _should_ deal with setting the 'ParentID' and 'Name' fields
-        $file->setField('Name', $definitiveName);
-        $file->setField('ParentID', $parentFolder->ID);
-        $file->setFilename($definitiveFilename);
-        $file->File->Filename = $definitiveFilename;
-        $file->write();
-        $file->updateFilesystem();
+        $folder = Folder::find_or_make($assetsPath);
+        $fileName = sprintf('%s.%s', $origFilename, $useExtension);
+        $file->setFromLocalFile($tmpPath, $fileName);
+        $file->setFilename($fileName);
+        $file->ParentID = $folder->ID;
+        $file->StaticSiteContentSourceID = $source->ID;
+        $file->StaticSiteURL = $url;
+        $file->StaticSiteImportID = $this->getCurrentImportID();
 
         $this->utils->log(" - NOTICE: \"File-properties built successfully for: ", $url, $mime);
 

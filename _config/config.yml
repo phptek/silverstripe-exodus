@@ -3,7 +3,7 @@ Name: exodus-config
 ---
 
 PhpTek\Exodus\Task\StaticSiteRewriteLinksTask:
-  log_file: '/tmp/exodus-failed-rewrite.log'
+  log_file: '/tmp/exodus.log'
 
 PhpTek\Exodus\Tool\StaticSiteUtils:
   log_file: '/tmp/exodus.log'
@@ -11,6 +11,10 @@ PhpTek\Exodus\Tool\StaticSiteUtils:
 PhpTek\Exodus\Tool\StaticSiteContentExtractor:
   user_agent: 'phptek/silverstripe-exodus'
 
-# Prevent File::updateFileSystem() messing with the connector's own versioning
-SilverStripe\Assets\File:
-  update_filesystem: false
+---
+Only:
+  environment: 'dev'
+---
+# Disable the uploaded-file authenticity check in dev (TODO: Add to docs)
+SilverStripe\Assets\Upload_Validator:
+  use_is_uploaded_file: false
