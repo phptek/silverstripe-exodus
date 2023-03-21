@@ -203,7 +203,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
                 'selector' => $rule->CSSSelector,
                 'attribute' => $rule->Attribute,
                 'plaintext' => $rule->PlainText,
-                'excludeselectors' => preg_split('/\s+/', trim($rule->ExcludeCSSSelector)),
+                'excludeselectors' => preg_split("#[\r\n\s,]+#", trim($rule->ExcludeCSSSelector)),
                 'outerhtml' => $rule->OuterHTML,
             ];
 

@@ -114,10 +114,10 @@ class StaticSiteContentSourceImportRule extends DataObject
                 ->setDescription('Source content matched by the CSS selector(s) below is written to this field ');
             $fields->insertBefore($fieldNameField, 'CSSSelector');
             $fields->dataFieldByName('CSSSelector')
-                ->setDescription('A list of valid CSS selectors (separated by a space) whose content'
+                ->setDescription('A list of valid CSS selectors (separated by newline or space) whose content'
                 . ' is written to the "Target Field" above');
             $fields->dataFieldByName('ExcludeCSSSelector')
-                ->setDescription('A list of valid CSS selectors (separated by a space) whose content'
+                ->setDescription('A list of valid CSS selectors (separated by newline or space) whose content'
                 . ' should be ignored. This is useful for fine-tuning what is returned in an import.');
         } else {
             $fields->replaceField('FieldName', $fieldName = ReadonlyField::create("FieldName", "Field Name"));
