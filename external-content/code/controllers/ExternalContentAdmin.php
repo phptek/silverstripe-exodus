@@ -333,9 +333,6 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
     /**
      * Action to migrate a selected object through to SS.
      *
-     * Note: Even if all content imports and url crawls are deleted, imports still stop prematurely and without error.
-     *       Could be to do with the select parent page to import into having been "marked"...? Nope..
-     *
      * @param array $request
      */
     public function migrate(array $request)
@@ -499,16 +496,6 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                     );
                 }
 
-                // This tells the module to include the selected "SiteTee" and "Folder" subclasses
-                // to be _included_ in the import. But it throws exceptions.
-                $fields->addFieldToTab(
-                    'Root.Import',
-                    CheckboxField::create(
-                        "IncludeSelected",
-                        _t('ExternalContent.INCLUDE_SELECTED', 'Include Selected Item in Import')
-                    )->setAttribute('disabled', true) // <-- temporary
-                );
-
                 $fields->addFieldToTab(
                     'Root.Import',
                     CheckboxField::create(
@@ -533,25 +520,6 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                         $duplicateOptions[ExternalContentTransformer::DS_SKIP]
                     )->setValue($this->getRequest()->postVars()['DuplicateMethod'] ?? ExternalContentTransformer::DS_SKIP)
                 );
-
-                if (class_exists(QueuedJobDescriptor::class)) {
-                    $repeats = [
-                        0		=> 'None',
-                        300		=> '5 minutes',
-                        900		=> '15 minutes',
-                        1800	=> '30 minutes',
-                        3600	=> '1 hour',
-                        33200	=> '12 hours',
-                        86400	=> '1 day',
-                        604800	=> '1 week',
-                    ];
-
-                    $fields->addFieldToTab(
-                        'Root.Import',
-                        DropdownField::create('Repeat', 'Import Repeat Interval', $repeats)
-                            ->setValue($this->getRequest()->postVars()['Repeat'] ?? null)
-                    );
-                }
 
                 $migrateButton = FormAction::create('migrate', _t('ExternalContent.IMPORT', 'Start Importing'))
                     ->setAttribute('data-icon', 'arrow-circle-double')
