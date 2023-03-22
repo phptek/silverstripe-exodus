@@ -7,27 +7,27 @@
 
 ## Introduction
 
-Exodus is a content migration tool that roughly follows the ETL standard ([**Extract Transform Load**](https://en.wikipedia.org/wiki/Extract,_transform,_load)). It will consume content from virtually any website, regardless of its underlying CMS technology and import it as native content objects (`SiteTree`, `File` etc) into a Silverstripe instance.
+Exodus is a content migration tool that follows the ETL standard ([**Extract Transform Load**](https://en.wikipedia.org/wiki/Extract,_transform,_load)). It will consume content from virtually any website, regardless of its underlying CMS technology and import it as native content objects (`SiteTree`, `File` etc) into a Silverstripe instance.
 
 Exodus crawls the source website's DOM and caches matching URLs to the local filesystem. It will then normalise page-URLs by stripping file-extensions, slashes and implementation-specific strings and run a site-scrape which imports content as native Silverstripe objects into your site-tree and assets hierarchy.
 
-Please [See the docs](./docs/en/index.md).
+Please [See the docs index](./docs/en/index.md).
 
 ![Migration into Silverstripe CMS](./docs/exodus.png "Migration into Silverstripe CMS")
 
 ## How it works
 
-**Extract** is where you configure "schemas" which tells the module how to gather content from the source site and map it to a Silverstripe class using a URL pattern, a Mime-Type and one or more CSS selectors mapped to fields on the selected class. Expect to spend a decent amount of time analysing the source website's DOM, tweaking these settings and repeating your crawls and imports until you're happy that you've got things just about right.
+**Extract** is analogous to the module's "Crawl" mode. Given a URL, the tool will crawl the target website and cache a collection of matching URLs to the local filesystem.
 
-**Transform** is the process of normalising URL patterns which are unique to particular systems such as Drupal, Wordpress or Plone. This is automatic and occurs with the selection made in the main "URL Processing" selection. This may be trial and error until the crawl process completes.
+**Transform** is the process of normalising the URLs cached in crawl mode and which are unique to the source system (Drupal, Wordpress or Plone). This is automatic and occurs with the selection made in the main "URL Processing" selection. This may be trial and error until the crawl process completes.
 
-**Load** is currently denoted as "Import" within the tool and is where the hard work of tweaking your crawl settings pays off, allowing you to import the extracted content into your site-tree and assets store.
+**Load** is analogous to the module's "Import" mode and is where the hard work of tweaking your crawl settings pays off, allowing you to import the content located at each cached URL into your site-tree and assets store.
 
-Please [See the docs](./docs/en/index.md).
+Please [See the docs index](./docs/en/index.md).
 
 ## Migration
 
-Please [See the docs](./docs/en/index.md).
+Please [See the migration docs](./docs/en/index.md).
 
 ## Requirements
 
