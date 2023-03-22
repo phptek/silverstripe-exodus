@@ -189,8 +189,7 @@ class StaticSiteContentSource extends ExternalContentSource
 
         // Schema Gridfield
         $fields->addFieldToTab('Root.Main', HeaderField::create('ImportConfigHeader', 'Import Schema Configuration'));
-        $addNewButton = new GridFieldAddNewButton('after');
-        $addNewButton->setButtonName("Add Schema");
+        $addNewButton = (new GridFieldAddNewButton('after'))->setButtonName("Add Schema");
         $importRules = $fields->dataFieldByName('Schemas');
         $importRules->getConfig()->removeComponentsByType(GridFieldAddNewButton::class);
         $importRules->getConfig()->addComponent($addNewButton);
