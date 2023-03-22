@@ -34,7 +34,8 @@
     }
   ],
   "replace": {
-    "phptek/staticsiteconnector": "*"
+    "phptek/staticsiteconnector": "*",
+    "silverstripe/staticsiteconnector": "*"
   },
   "autoload": {
     "psr-4": {
