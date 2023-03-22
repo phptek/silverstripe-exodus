@@ -1,6 +1,6 @@
 {
   "name": "phptek/silverstripe-exodus",
-  "description": "Export content from arbitrary websites and load it into a Silverstripe site in an ETL fashion.",
+  "description": "Full automated content migration from any site into Silverstripe.",
   "license": "BSD-3-Clause",
   "type": "silverstripe-vendormodule",
   "keywords": [
@@ -46,8 +46,7 @@
     "silverstripe/cms": "^4",
     "silverstripe/reports": "^4",
     "brittainmedia/phpcrawl": "^0.9",
-    "phptek/phpquery": "dev-master",
-    "symbiote/silverstripe-queuedjobs": "^4"
+    "phptek/phpquery": "dev-master"
   },
   "require-dev": {
     "phpunit/phpunit": "^9"
