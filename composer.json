@@ -45,7 +45,7 @@
     "silverstripe/cms": "^4",
     "silverstripe/reports": "^4",
     "brittainmedia/phpcrawl": "^0.9",
-    "obsoletepackage/phpquery": "^1.0",
+    "phptek/phpquery": "dev-master",
     "symbiote/silverstripe-queuedjobs": "^4"
   },
   "require-dev": {

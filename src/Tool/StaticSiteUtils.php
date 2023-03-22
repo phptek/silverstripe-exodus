@@ -21,16 +21,14 @@ class StaticSiteUtils
      * Log a message if the logging has been setup according to docs
      *
      * @param string $message
-     * @param string $filename
-     * @param string $mime
+     * @param string $_args Unused so that we need not have to update calling logic:
      * @return void
      */
-    public function log(string $message, string $filename = '', string $mime = ''): void
+    public function log(string $message, ...$_args): void
     {
-        $logFile = $filename ?: $this->config()->get('log_file');
+        $logFile = $this->config()->get('log_file');
 
         if ($logFile) {
-            $message = $message . ($filename ? ' ' . $filename : '') . ($mime ? ' (' . $mime . ')' : '');
             file_put_contents($logFile, $message . PHP_EOL, FILE_APPEND);
         }
     }
