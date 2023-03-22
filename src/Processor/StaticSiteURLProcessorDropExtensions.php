@@ -6,7 +6,7 @@ use PhpTek\Exodus\Tool\StaticSiteUrlProcessor;
 use SilverStripe\Core\Injector\Injectable;
 
 /**
- * Processor for MOSS Standard-URLs while dropping file extensions
+ * Base processor: Drops file extensions.
  */
 class StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
 {
@@ -18,7 +18,7 @@ class StaticSiteURLProcessorDropExtensions implements StaticSiteUrlProcessor
      */
     public function getName(): string
     {
-        return "Simple clean-up (recommended)";
+        return "Simple Processor";
     }
 
     /**

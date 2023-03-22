@@ -13,9 +13,6 @@ use PhpTek\Exodus\Processor\StaticSiteURLProcessorDropExtensions;
  *  1. Generating default URL and Title in the external content browser
  *  2. Building the content hierarchy
  *
- * For example, MOSS has a habit of putting unnecessary "/Pages/" elements into the URLs, and adding
- * .aspx extensions. We don't want to include these in the content hierarchy.
- *
  * More sophisticated processing might be done to facilitate importing of less.
  *
  * @author Sam Minee <sam@silverstripe.com>

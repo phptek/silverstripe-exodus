@@ -17,7 +17,7 @@ class StaticSiteMOSSURLProcessor extends StaticSiteURLProcessorDropExtensions im
      */
     public function getName(): string
     {
-        return "MOSS-style URLs";
+        return "Microsoft Sharepoint Processor";
     }
 
     /**
@@ -26,7 +26,7 @@ class StaticSiteMOSSURLProcessor extends StaticSiteURLProcessorDropExtensions im
      */
     public function getDescription(): string
     {
-        return "Removes '/Pages/' from URIs, removes extensions and trailing slashes.";
+        return "Removes '/Pages/',  file-extensions and trailing slashes from URIs.";
     }
 
     /**

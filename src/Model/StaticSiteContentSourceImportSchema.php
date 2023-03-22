@@ -91,12 +91,15 @@ class StaticSiteContentSourceImportSchema extends DataObject
     ];
 
     /**
-     *
+     * Used as the title in the CMS.
+     * 
      * @return string
      */
     public function getTitle(): string
     {
-        return $this->DataType . ' (' .$this->AppliesTo . ')';
+        $type = ClassInfo::shortName($this->DataType);
+
+        return sprintf('%s (%s)', $type, $this->AppliesTo);
     }
 
     /**
@@ -116,20 +119,23 @@ class StaticSiteContentSourceImportSchema extends DataObject
         $fields->insertBefore('Order', LiteralField::create(
             'ImportIntro',
             ''
-            . '<p class="message notice">An Import Schema maps a source URI regex and Mime-Type'
-            . ' to a target content-type (Usually a SiteTree subclass, but could be an ElementalBlock).'
-            . ' Content that matches will be saved as the selected Data Type.</p>'
+            . '<p class="message notice">Map MIME-Types to Silverstripe Data Types and'
+            . ' relate them to one or more Import Rules (See below).</p>'
         ));
+        $fields->dataFieldbyName('Order')
+            ->setDescription('Schema are assigned a higher priority through lower numbers.')
+            ->setAttribute('style', 'width: 100px');
 
         $fields->dataFieldByName('AppliesTo')
-            ->setDescription('A full or partial URI. Supports regular expressions.');
+            ->setDescription('A full or partial URI whose content is suited to the Data Type selected below. Supports regular expressions.');
         $fields->addFieldToTab('Root.Main', DropdownField::create('DataType', 'Data Type', $dataObjects));
         $mimes = TextareaField::create('MimeTypes', 'Mime-types')
             ->setRows(3)
             ->setDescription('Be sure to pick a Mime-type that the above Data Type supports'
-            . ' e.g. text/html (<strong>SiteTree</strong>),'
-            . ' image/png or image/jpeg (<strong>Image</strong>)'
-            . ' or application/pdf (<strong>File</strong>), separated by a newline.'
+            . ' e.g. text/html for <strong>SiteTree</strong>,'
+            . ' image/png, mage/jpeg, image/webp etc for <strong>Image</strong>'
+            . ' or application/pdf, text/csv etc for <strong>File</strong>.'
+            . ' Separate multiple Mimes by a newline.'
             );
         $fields->addFieldToTab('Root.Main', $mimes);
         $notes = TextareaField::create('Notes', 'Notes')
@@ -139,8 +145,12 @@ class StaticSiteContentSourceImportSchema extends DataObject
 
         $importRules = $fields->dataFieldByName('ImportRules');
         $fields->removeFieldFromTab('Root', 'ImportRules');
+        $fields->dataFieldByName('DataType')->setDescription(''
+            . 'The Silverstripe content class with which content from the selected'
+            . ' Mime-Types will be associated.'
+        );
 
-        // Don't show for File subclasses, these onbviously don't use CSS import rules
+        // Don't show for File subclasses, these obviously don't require CSS-based import rules
         if ($this->DataType && in_array(File::class, ClassInfo::ancestry($this->DataType))) {
             return $fields;
         }
@@ -151,10 +161,16 @@ class StaticSiteContentSourceImportSchema extends DataObject
                 GridFieldAddExistingAutocompleter::class,
                 GridFieldAddNewButton::class
             ]);
-            $addNewButton = new GridFieldAddNewButton('after');
-            $addNewButton->setButtonName("Add Rule");
+            $addNewButton = (new GridFieldAddNewButton('before'))->setButtonName("Add Rule");
             $conf->addComponent($addNewButton);
             $fields->addFieldToTab('Root.Main', $importRules);
+            $fields->insertBefore('ImportRules', LiteralField::create('ImportRuleIntro',
+                ''
+                . '<p class="message notice">An import rule determines how content located at crawled URLs'
+                . ' should be imported into a Data Type\'s fields with the use of CSS selectors.'
+                . ' Where more than one schema exists for the same Data Type, they\'ll be processed in the order of Priority,'
+                . ' where the first one to match a URI and Mime combination is the one that will be used.<p>'
+            ));
         }
 
         return $fields;
@@ -177,7 +193,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
                 $defaultSchema->MimeTypes = "text/html";
                 $defaultSchema->write();
 
-                foreach (StaticSiteContentSourceImportRule::get()->filter(array('SchemaID' => 0)) as $rule) {
+                foreach (StaticSiteContentSourceImportRule::get()->filter(['SchemaID' => 0]) as $rule) {
                     $rule->SchemaID = $defaultSchema->ID;
                     $rule->write();
                 }
@@ -200,10 +216,10 @@ class StaticSiteContentSourceImportSchema extends DataObject
             }
 
             $ruleArray = [
-                'selector' => $rule->CSSSelector,
+                'selector' => preg_split("#\n#", trim((string) $rule->CSSSelector,)),
                 'attribute' => $rule->Attribute,
                 'plaintext' => $rule->PlainText,
-                'excludeselectors' => preg_split('/\s+/', trim((string) $rule->ExcludeCSSSelector)),
+                'excludeselectors' => preg_split("#\n#", trim((string) $rule->ExcludeCSSSelector)),
                 'outerhtml' => $rule->OuterHTML,
             ];
 
@@ -291,6 +307,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
         if (preg_match("#(?<!.)(\+|\*)#", $this->AppliesTo)) {
             return $this->AppliesTo;
         }
+
         return true;
     }
 }

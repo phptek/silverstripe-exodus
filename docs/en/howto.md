@@ -1,6 +1,6 @@
 # Migration
 
-With the module installed, login to the CMS and observe a new Model Admin menu-item labelled "External Content". Select this and observe a dropdown menu and a 'Create' button. Select the 'Static Site Content Source' option in the dropdown and select 'Create', you'll see 'New Connector' in the list of Connectors, click it to open.
+With the module installed, login to the CMS and observe a new Model Admin menu-item labelled "Migration". Select this and observe a dropdown menu and a 'Create' button. Select the 'Static Site Content Source' option in the dropdown and select 'Create', you'll see 'New Connector' in the list of Connectors, click it to open.
 
 Fill in the fields, referring to the field-decriptions for context. The "NAme" field is merely for your references. The "Base URL" field should be of the form e.g. `https://www.example.org`. If the site you wish to import is a MOSS (Microsoft Office Sharepoint Server) site with `/Pages/some-page.aspx` styled URLs, then select 'MOSS-style URLs' under "URL Processing", then select the 'Save' button.
 
@@ -80,9 +80,9 @@ if (preg_match("|^$appliesTo|", $url) == 1) {
 
 #### Schema Priority
 
-Priority order of your schemas is important, the `Applies To` Url patterns are matched against the imported urls in priority order until the first matching schema is found.
+Priority order of your schema is important, the `Applies To` Url patterns are matched against the imported urls in priority order until the first matching schema is found.
 
-This means you need to order your schemas with the most specific patterns first (e.g. `CustomNewsPage`, `NewsPage`, `NewsHolder` etc), then gradually filter down the priority order to the default catch-all patterns for `Page`, `Image` and `File`.
+This means you need to order your schema with the most specific patterns first (e.g. `CustomNewsPage`, `NewsPage`, `NewsHolder` etc), then gradually filter down the priority order to the default catch-all patterns for `Page`, `Image` and `File`.
 
 The default catch-all patterns are:
 

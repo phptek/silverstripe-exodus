@@ -94,12 +94,7 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler
      */
     public function ImageForm()
     {
-        //Requirements::javascript(THIRDPARTY_DIR . "/behaviour.js");
         Requirements::javascript('phptek/silverstripe-exodus:external-content/javascript/external_tiny_mce_improvements.js');
-        //Requirements::css('cms/css/TinyMCEImageEnhancement.css');
-        //Requirements::javascript('cms/javascript/TinyMCEImageEnhancement.js');
-        //Requirements::javascript(THIRDPARTY_DIR . '/SWFUpload/SWFUpload.js');
-        //Requirements::javascript(CMS_DIR . '/javascript/Upload.js');
 
         $form = Form::create(
             $this->controller,
@@ -154,10 +149,7 @@ class ExternalHtmlEditorField_Toolbar extends RequestHandler
 
     public function FlashForm()
     {
-        //Requirements::javascript(THIRDPARTY_DIR . "/behaviour.js");
         Requirements::javascript("phptek/silverstripe-exodus:external-content/javascript/external_tiny_mce_improvements.js");
-        //Requirements::javascript(THIRDPARTY_DIR . '/SWFUpload/SWFUpload.js');
-        //Requirements::javascript(CMS_DIR . '/javascript/Upload.js');
 
         $form = Form::create(
             $this->controller,

@@ -57,9 +57,9 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
      *
      * @var string
      */
-    private static $url_segment = 'external-content';
+    private static $url_segment = 'migration';
     private static $url_rule = '$Action//$ID';
-    private static $menu_title = 'External Content';
+    private static $menu_title = 'Migration';
     private static $tree_class = ExternalContentSource::class;
     private static $allowed_actions = [
         'addprovider',
@@ -222,6 +222,11 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         );
     }
 
+    public function ContentSources()
+    {
+        return DataObject::get(ExternalContentSource::class);
+    }
+
     /**
      * Get extra CSS classes for a page's tree node
      *
@@ -288,17 +293,15 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
 
     public function currentPageID()
     {
-        $session = $this->getRequest()->getSession();
-
         if ($this->getRequest()->requestVar('ID') && preg_match(ExternalContent::ID_FORMAT, $this->getRequest()->requestVar('ID'))) {
             return $this->getRequest()->requestVar('ID');
         } elseif (isset($this->urlParams['ID']) && preg_match(ExternalContent::ID_FORMAT, $this->urlParams['ID'])) {
             return $this->urlParams['ID'];
-        } elseif ($session && $session->get($this->sessionNamespace() . ".currentPage")) {
-            return $session->get($this->sessionNamespace() . ".currentPage");
+        } else {
+            return ExternalContentSource::get()->sort('ID', 'ASC')->last()->ID;
         }
 
-        return null;
+        return 0;
     }
 
     /**
@@ -500,7 +503,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
                     'Root.Import',
                     CheckboxField::create(
                         "IncludeChildren",
-                        _t('ExternalContent.INCLUDE_CHILDREN', 'Include Child Items in Import'),
+                        _t('ExternalContent.INCLUDE_CHILDREN', 'Include child items in import'),
                         true
                     )
                 );
@@ -547,7 +550,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
             if ($record->canEdit()) {
                 $actions->push(
                     FormAction::create('save', _t('ExternalContent.SAVE', 'Save'))
-                        ->addExtraClass('save btn btn-primary tool-button font-icon-plus')
+                        ->addExtraClass('save btn action btn-outline-primary font-icon-tick')
                         ->setAttribute('data-icon', 'accept')
                         ->setUseButtonTag(true)
                 );
@@ -556,7 +559,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
             if ($isSource && $record->canDelete()) {
                 $actions->push(
                     FormAction::create('delete', _t('ExternalContent.DELETE', 'Delete'))
-                        ->addExtraClass('delete btn btn-primary tool-button font-icon-plus')
+                        ->addExtraClass('delete btn action btn-outline-primary font-icon-tick')
                         ->setAttribute('data-icon', 'decline')
                         ->setUseButtonTag(true)
                 );
@@ -579,6 +582,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         } else {
             // Create a dummy form
             $form = Form::create($this, "EditForm", FieldList::create(), FieldList::create());
+            $form->setMessage('Select or create a new Migration Profile on the left-hand side.', 'info');
         }
 
         $form
@@ -602,12 +606,13 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         array_shift($classes);
 
         foreach ($classes as $key => $class) {
-            if (!$class::create()->canCreate()) {
+            $model = $class::create();
+
+            if (!$model->canCreate()) {
                 unset($classes[$key]);
             }
 
-            $visible = explode('\\', $class);
-            $classes[$key] = FormField::name_to_label($visible[count($visible)-1]);
+            $classes[$key] = $model->i18n_singular_name();
         }
 
         $fields = FieldList::create(
@@ -641,7 +646,7 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         $parent = 0;
         $name = (isset($_REQUEST['Name'])) ?
             basename($_REQUEST['Name']) :
-            _t('ExternalContent.NEWCONNECTOR', "New Connector");
+            _t('ExternalContent.NEWCONNECTOR', "New Profile Name");
         $type = $_REQUEST['ProviderType'];
         $providerClasses = array_map(
             function ($item) {
@@ -660,14 +665,9 @@ class ExternalContentAdmin extends LeftAndMain implements CurrentPageIdentifier,
         $record = $type::create();
         $record->ParentID = $parent;
         $record->Name = $record->Title = $name;
+        $shortName = $record->i18n_singular_name();
 
-        // if (isset($_REQUEST['returnID'])) {
-        // 	return $p->ID;
-        // } else {
-        // 	return $this->returnItemToUser($p);
-        // }
-
-        $message = sprintf(_t('ExternalContent.SourceAdded', 'Successfully created %s'), $type);
+        $message = sprintf(_t('ExternalContent.SourceAdded', 'Successfully created a new %s.'), $shortName);
         $messageType = 'good';
 
         try {

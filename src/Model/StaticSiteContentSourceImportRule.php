@@ -39,8 +39,6 @@ class StaticSiteContentSourceImportRule extends DataObject
      */
     private static $summary_fields = [
         "FieldName",
-        "CSSSelector",
-        "Attribute",
         "PlainText",
         "OuterHTML",
     ];
@@ -54,8 +52,8 @@ class StaticSiteContentSourceImportRule extends DataObject
         "CSSSelector" => "CSS Selector(s)",
         'ExcludeCSSSelector' => 'Excluded CSS Selector(s)',
         "Attribute" => "Element Attribute",
-        "PlainText" => "Convert to plain text?",
-        "OuterHTML" => "Use outer HTML?",
+        "PlainText" => "Plain Text",
+        "OuterHTML" => "Outer HTML",
     ];
 
     /**
@@ -107,18 +105,26 @@ class StaticSiteContentSourceImportRule extends DataObject
                 unset($fieldList[$exclusion]);
             }
 
-            sort($fieldList);
+            natsort($fieldList);
 
             $fieldNameField = DropdownField::create("FieldName", 'Target Field', $fieldList)
                 ->setEmptyString("(choose)")
-                ->setDescription('Source content matched by the CSS selector(s) below is written to this field ');
+                ->setDescription('Remote content matched by the CSS selector(s) below is written to this field.'
+            );
             $fields->insertBefore($fieldNameField, 'CSSSelector');
             $fields->dataFieldByName('CSSSelector')
-                ->setDescription('A list of valid CSS selectors (separated by a space) whose content'
-                . ' is written to the "Target Field" above');
+                ->setDescription('A list of valid CSS selector whose content'
+                . ' is written to the "Target Field" above. Separate multiple selectors with a newline.'
+            );
             $fields->dataFieldByName('ExcludeCSSSelector')
-                ->setDescription('A list of valid CSS selectors (separated by a space) whose content'
-                . ' should be ignored. This is useful for fine-tuning what is returned in an import.');
+                ->setDescription('A list of valid CSS selectors whose content'
+                . ' should be ignored. This is useful for fine-tuning what is returned in an import.'
+                . ' Separate multiple exclusions with a newline.'
+            );
+            $fields->dataFieldByName('OuterHTML')
+                ->setDescription('Use outer HTML (Fetches parent element and content and that of its children)');
+            $fields->dataFieldByName('PlainText')
+                ->setDescription('Convert to plain text (Removes markup)');
         } else {
             $fields->replaceField('FieldName', $fieldName = ReadonlyField::create("FieldName", "Field Name"));
             $fieldName->setDescription('Save this rule before being able to add a field name');

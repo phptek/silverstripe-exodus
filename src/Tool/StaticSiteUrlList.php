@@ -136,7 +136,7 @@ class StaticSiteUrlList
      * These can be used to tranform URLs from CMS's that don't provide a natural hierarchy, into something
      * more useful.
      *
-     * @see {@link StaticSiteMOSSURLProcessor} for an example.
+     * @see implementors of {@link StaticSiteUrlProcessor} for examples.
      * @param StaticSiteUrlProcessor $urlProcessor
      * @return void
      */
@@ -237,6 +237,7 @@ class StaticSiteUrlList
         } else {
             return null;
         }
+        
         return $urls;
     }
 
@@ -355,7 +356,7 @@ class StaticSiteUrlList
     /**
      * Re-execute the URL processor on all the fetched URLs.
      * If the site has been crawled and then subsequently the URLProcessor was changed through
-     * user-interaction in the "external content" CMS admin, then we need to ensure that
+     * user-interaction in the "migration" CMS admin, then we need to ensure that
      * URLs are re-processed using the newly selected URL Preprocessor.
      *
      * @return void
@@ -405,7 +406,7 @@ class StaticSiteUrlList
 
         $crawler = StaticSiteCrawler::create($this, $limit, $verbose);
         $crawler->enableResumption();
-        $crawler->setUrlCacheType(PHPCrawlerUrlCacheTypes::URLCACHE_SQLITE);
+        $crawler->setUrlCacheType(PHPCrawlerUrlCacheTypes::URLCACHE_MEMORY);
         $crawler->setWorkingDirectory($this->cacheDir);
 
         // Find links in externally-linked CSS files
@@ -416,41 +417,34 @@ class StaticSiteUrlList
         // Set some proxy options for phpCrawler
         singleton(StaticSiteUtils::class)->defineProxyOpts(!Director::isDev(), $crawler);
 
+        $this->urls = [
+            'regular' => [],
+            'inferred' => [],
+        ];
+
         // Allow for resuming an incomplete crawl
         if (file_exists($this->cacheDir . 'crawlerid')) {
             // We should re-load the partial list of URLs, if relevant
             // This should only happen when we are resuming a partial crawl
             if (file_exists($this->cacheDir . 'urls')) {
                 $this->urls = unserialize(file_get_contents($this->cacheDir . 'urls'));
-            } else {
-                $this->urls = [
-                    'regular' => [],
-                    'inferred' => [],
-                ];
             }
 
             $crawlerID = file_get_contents($this->cacheDir . 'crawlerid');
             $crawler->resume($crawlerID);
         } else {
             $crawlerID = $crawler->getCrawlerId();
-
-            $this->urls = [
-                'regular' => [],
-                'inferred' => [],
-            ];
         }
 
         $crawler->setURL($this->baseURL);
         $crawler->setPort(preg_match('#^https#', $this->baseURL) ? 443 : 80);
         $crawler->go();
 
-        // TODO Why were we deleting this originally?
-        // unlink($this->cacheDir . 'crawlerid');
-
         // TODO Document these
         ksort($this->urls['regular']);
         ksort($this->urls['inferred']);
 
+        // Cache the URLs to a file for use by the importer
         $this->saveURLs();
 
         return $crawler;
@@ -709,7 +703,8 @@ class StaticSiteUrlList
     /**
      * Execute custom logic for processing URLs prior to heirachy generation.
      *
-     * This can be used to implement logic such as ignoring the "/Pages/" parts of MOSS URLs, or dropping extensions.
+     * This can be used to implement logic such as ignoring specific components of URLs, or dropping extensions.
+     * See implementors of {@link StaticSiteUrlProcessor}.
      *
      * @param  array $urlData The unprocessed URLData
      * @return array $urlData The processed URLData
