@@ -13,6 +13,8 @@ use PhpTek\Exodus\Tool\StaticSiteUrlList;
 use PhpTek\Exodus\Crawl\StaticSiteCrawler;
 use PhpTek\Exodus\Processor\StaticSiteMOSSURLProcessor;
 use PHPCrawl\PHPCrawlerDocumentInfo;
+use SilverStripe\Core\Config\Config;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
 
 /**
  *
@@ -92,6 +94,9 @@ class StaticSiteUrlListTest extends SapphireTest
         if (!file_exists($this->cacheDir)) {
             mkdir($this->cacheDir, 0777, true);
         }
+
+        Config::inst()->nest();
+        StaticSiteUtils::config()->set('log_file', null);
     }
 
     /**

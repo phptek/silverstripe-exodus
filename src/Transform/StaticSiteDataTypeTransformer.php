@@ -137,7 +137,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
 
         if ($existing) {
             if ($strategy === ExternalContentTransformer::DS_OVERWRITE) {
-                // "Overwrite" == Update
+                // "Overwrite" means "Update"/"Modify"
                 $object = $existing;
                 $object->ParentID = $existing->ParentID;
             } elseif ($strategy === ExternalContentTransformer::DS_DUPLICATE) {

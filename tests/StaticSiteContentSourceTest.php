@@ -8,6 +8,8 @@ use PhpTek\Exodus\Model\StaticSiteContentSourceImportRule;
 use PhpTek\Exodus\Model\StaticSiteContentSource;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Image;
+use SilverStripe\Core\Config\Config;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
 
 /**
  * @author Russell Michell <russ@theruss.com>
@@ -41,6 +43,14 @@ class StaticSiteContentSourceTest extends SapphireTest
      * @var StaticSiteContentSource
      */
     protected $source;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Config::inst()->nest();
+        StaticSiteUtils::config()->set('log_file', null);
+    }
 
     /*
      * Tests that when given a fake URL and Mime, getSchemaForURL() returns a suitable and expected Schema result

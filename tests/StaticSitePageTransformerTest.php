@@ -12,6 +12,8 @@ use PhpTek\Exodus\Transform\StaticSiteTransformResult;
 use PhpTek\Exodus\Tool\StaticSiteContentExtractor;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Image;
+use SilverStripe\Core\Config\Config;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
 
 /**
  *
@@ -73,6 +75,9 @@ class StaticSitePageTransformerTest extends SapphireTest
 
         // The transformer
         $this->transformer = singleton(StaticSitePageTransformer::class);
+
+        Config::inst()->nest();
+        StaticSiteUtils::config()->set('log_file', null);
     }
 
     /**

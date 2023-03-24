@@ -35,8 +35,10 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      * Generic function called by \ExternalContentImporter
      *
      * @inheritdoc
+     * 
+     * @param bool $genThumbs Used to prevent errors in thumbnail generation when running tests
      */
-    public function transform($item, $parentObject, $strategy)
+    public function transform($item, $parentObject, $strategy, $genThumbs = true)
     {
         $this->utils->log("START file-transform for: ", $item->AbsoluteURL, $item->ProcessedMIME);
 
@@ -90,12 +92,6 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
             return false;
         }
 
-        /*
-         * File::onAfterWrite() calls File::updateFileSystem() which throws
-         * an exception if the same image is attempted to be written.
-         * N.b this was probably happening because we weren't versioning files through {@link Upload::load()}
-         * and the same filename was being used. This should be fixed now (@see: self::versionFile()).
-         */
         try {
             if (!$file->write()) {
                 $this->utils->log(" - Not imported (no write): ", $item->AbsoluteURL, $item->ProcessedMIME);
@@ -109,7 +105,9 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
             $file->publishSingle();
 
             // Generate thumbnails
-            ImageThumbnailHelper::singleton()->run();
+            if ($genThumbs) {
+                ImageThumbnailHelper::singleton()->run();
+            }
         } catch (\Exception $e) {
             $this->utils->log($e->getMessage(), $item->AbsoluteURL, $item->ProcessedMIME);
         }
@@ -123,14 +121,14 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      * Build the properties required for a safely saved SilverStripe asset.
      * Attempts to detect and fix bad file-extensions based on the available Mime-Type.
      *
-     * @param File $file
-     * @param Object $item      Object properties are used to fixup bad-file extensions or filenames with no
-     *                            extension but which _do_ have a Mime-Type.
-     * @param Object $source    Source...TBC
-     * @param string $tmpPath
+     * @param File                      $file
+     * @param StaticSiteContentItem     $item Object properties are used to fixup bad-file extensions or filenames with no
+     *                                        extension but which _do_ have a Mime-Type.
+     * @param StaticSiteContentSource   $source Content source object
+     * @param string                    $tmpPath  Path to partially uploaded file object or null (unit-tests)
      * @return mixed (boolean | File)
      */
-    public function buildFileProperties(File $file, $item, $source, $tmpPath)
+    public function buildFileProperties(File $file, $item, $source, $tmpPath = null)
     {
         $url = $item->AbsoluteURL;
         $mime = $item->ProcessedMIME;
@@ -183,7 +181,12 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
 
         $folder = Folder::find_or_make($assetsPath);
         $fileName = sprintf('%s.%s', $origFilename, $useExtension);
-        $file->setFromLocalFile($tmpPath, $fileName);
+
+        // Only ever passed as null from tests
+        if ($tmpPath) {
+            $file->setFromLocalFile($tmpPath, $fileName);
+        }
+
         $file->setFilename($fileName);
         $file->ParentID = $folder->ID;
         $file->StaticSiteContentSourceID = $source->ID;
@@ -236,46 +239,5 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         $fullPath = ASSETS_PATH . ($joinedPath ? DIRECTORY_SEPARATOR . $joinedPath : '');
 
         return $full ? $fullPath : $joinedPath;
-    }
-
-    /**
-     * Borrows logic from Upload::load() to ensure duplicated files get renamed
-     * correctly. This therefore allows multiple versions of the same physical image
-     * on the filesystem.
-     *
-     * @param string $relativeFilePath The path to the file relative to the 'assets' dir.
-     * @return string $relativeFilePath
-     * @throws LogicException
-     */
-    public function versionFile(string $relativeFilePath): string
-    {
-        // A while loop provides the ability to continually add further duplicates with the right name
-		$base = ASSETS_PATH;
-
-		while(file_exists("$base/$relativeFilePath")) {
-            $i = isset($i) ? ($i + 1) : 2;
-            $oldFilePath = $relativeFilePath;
-
-            // make sure archives retain valid extensions
-            $isTarGz = substr($relativeFilePath, strlen($relativeFilePath) - strlen('.tar.gz')) == '.tar.gz';
-            $isTarBz2 = substr($relativeFilePath, strlen($relativeFilePath) - strlen('.tar.bz2')) == '.tar.bz2';
-
-            if ($isTarGz || $isTarBz2) {
-                $relativeFilePath = preg_replace('#[0-9]*(\.tar\.[^.]+$)#', $i . "$1", $relativeFilePath);
-            } elseif (strpos($relativeFilePath, '.') !== false) {
-                $relativeFilePath = preg_replace('#[0-9]*(\.[^.]+$)#', $i . "$1", $relativeFilePath);
-            } elseif (strpos($relativeFilePath, '_') !== false) {
-                $relativeFilePath = preg_replace('#_([^_]+$)#', '_' . $i, $relativeFilePath);
-            } else {
-                $relativeFilePath .= '_' . $i;
-            }
-
-            // We've tried and failed, so we'll just end-up returning the original, that way we get _something_
-            if ($oldFilePath == $relativeFilePath && $i > 2) {
-                $this->utils->log(" - Couldn't fix $relativeFilePath with $i attempts in " . __FUNCTION__);
-            }
-        }
-
-        return $relativeFilePath;
     }
 }

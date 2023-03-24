@@ -4,6 +4,8 @@ namespace PhpTek\Exodus\Test;
 
 use SilverStripe\Dev\SapphireTest;
 use PhpTek\Exodus\Tool\StaticSiteContentExtractor;
+use SilverStripe\Core\Config\Config;
+use PhpTek\Exodus\Tool\StaticSiteUtils;
 
 /**
  * @author Russell Michell <russ@theruss.com>
@@ -11,6 +13,14 @@ use PhpTek\Exodus\Tool\StaticSiteContentExtractor;
  */
 class StaticSiteContentExtractorTest extends SapphireTest
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Config::inst()->nest();
+        StaticSiteUtils::config()->set('log_file', null);
+    }
+
     /**
      * Check that we're extra clever by asserting that missing <html> tags
      * are magically prepended.
