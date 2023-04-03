@@ -4,7 +4,7 @@
 if(typeof SiteTreeHandlers == 'undefined') SiteTreeHandlers = {};
 // SiteTreeHandlers.parentChanged_url = 'admin/assets/ajaxupdateparent';
 // SiteTreeHandlers.orderChanged_url = 'admin/assets/ajaxupdatesort';
-SiteTreeHandlers.controller_url = 'admin/external-content';
+SiteTreeHandlers.controller_url = 'admin/migration';
 SiteTreeHandlers.loadPage_url = SiteTreeHandlers.controller_url + '/getitem';
 SiteTreeHandlers.loadTree_url = SiteTreeHandlers.controller_url + '/getsubtree';
 SiteTreeHandlers.showRecord_url = SiteTreeHandlers.controller_url + '/show/';

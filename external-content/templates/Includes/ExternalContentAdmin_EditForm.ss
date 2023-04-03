@@ -12,8 +12,9 @@
             $FieldHolder
         <% end_loop %>
     </fieldset>
-    <div class="toolbar--south cms-content-actions cms-content-controls south" style="height: 32px;">
-        <div class="btn-toolbar">
+
+    <div class="btn-toolbar" style="padding-top: 35px;">
+        <div role="group" id="Form_EditForm_MajorActions_Holder" class="btn-group field CompositeField composite form-group--no-label">
             <% if $Actions %>
             <% loop $Actions %>
             $FieldHolder

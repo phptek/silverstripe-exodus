@@ -15,7 +15,7 @@
 					// Update the external sources view.
 
 					$.ajax({
-						url: $('base').prop('href') + 'admin/external-content/updateSources'
+						url: $('base').prop('href') + 'admin/migration/updateSources'
 					}).done(function(data) {
 						$('#cms-content-treeview').html(data);
 						$('.ExternalContentAdmin #cms-content-tools-CMSMain .cms-content-loading-overlay, .ExternalContentAdmin #cms-content-tools-CMSMain .cms-content-loading-spinner').remove();

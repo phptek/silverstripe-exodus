@@ -65,11 +65,6 @@ class StaticSiteCrawler extends PHPCrawler
 
         $this->urlList = $urlList;
         $this->verbose = $verbose;
-
-        if ($limit) {
-            $this->setPageLimit($limit);
-        }
-
         $this->utils = singleton(StaticSiteUtils::class);
     }
 

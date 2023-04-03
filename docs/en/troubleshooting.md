@@ -18,6 +18,12 @@ It may not be desirable to enable logging on shared or cloud hosting environment
 
 You may find that images and files over a given size are not being imported. You may be subject to Silverstripe's `default_max_file_size` configuration. By default it's set to 1Mb for specific file-types. Review the Silverstripe documentation to ascertain how to increase this for each type of file affected.
 
+### Thumbnails
+
+As part of image importing, the module will go through each `Image` subclass and publish thumbnails to appear in the CMS' "Files" section. If you see an error in your logs ala `Uncaught Error: Call to undefined function Intervention\Image\Gd\imagecreatefromjpeg()` then it's likely that GD hasn't been properly configured with JPG graphics.
+
+Ensure GD is configured ala `--with-freetype --with-jpeg`.
+
 ### PHP
 
 Tweaking PHP and Nginx/Apache is beyond the remit of advice the authors are willing to provide. What follows therefore comes with a the caveat that these are the current settings in the author's own setup which seems to work without Gateway Timeouts occurring
@@ -44,10 +50,6 @@ Ensure that `max_execution_time` is changed in `php.ini` from the default `30s` 
 
 Contrary to popular belief, the default FPM `pm = dynamic` may not suffice. In (limited) testing we used `pm = static` with `pm.max_children = 25` or greater, as opposed to the default `10`, which helped crawling a ~250 page site. Tweaking php-fpm gives your application more system resources to call upon during larger site-crawls.
 
-#### **PHPCrawl**
-
-There is a known issue with PHPCrawl with PHP8. See [this issue](https://github.com/phptek/silverstripe-exodus/issues/24) for more.
-
 #### **Other**
 
 If you have alternatives that work for you, please do [submit them!](https://github.com/phptek/silverstripe-exodus/issues).
@@ -56,7 +58,17 @@ If you have alternatives that work for you, please do [submit them!](https://git
 
 #### Gateway Timeout
 
-If because of a gateway timeout your app container no longer responds (Silverstripe will give you a Toast notification, keep an eye out for it), you'll need to restart it. If you were in the middle of a crawl, once you've restarted the container, just hit the same button in the CMS which should be labelled "Re Crawl" now, and it will pickup where it left-off.
+There are a couple of issues you'll observe which are the result of an HTTP 504:
+
+If you were in the middle of a crawl, open up you're browser's devtools and you'll see something like this:
+
+```
+Failed to load resource: the server responded with a status of 504 (Gateway Time-out)
+```
+
+If you repeatedly list the contents of the current source's directory e.g. `ls -l `public/assets/static-site-1/` you may observe that the file `urls` is getting larger, despite the timeout. Just wait for it to complete.
+
+ Otherwise, you can restart the container and just hit the same button in the CMS which should now be labelled "Re Crawl". The module used to pickup where it left-off, but at the moment it starts again.
 
 #### Aborted crawling-process with crawler-id...
 

@@ -32,19 +32,33 @@ Please [See the migration docs](./docs/en/index.md).
 ## Requirements
 
 * PHP ^7||^8
-* silverstripe/cms ^4
-* silverstripe/reports ^4
-* symbiote/silverstripe-queuedjobs ^4
 
 ## Installation
 
 ```
-composer require phptek/silverstripe-exodus
+composer require --dev phptek/silverstripe-exodus
 ```
 
-Please see the included [Migration](docs/en/howto.md) document, that describes exactly how to configure the tool to perform a content migration.
+You'll need to setup PHP to allow for long-running processes. Depending on the number of URLs in the target site which need to be crawled, and your configuration, you may be looking at upwards of 20-30m. Therefore configure the following, depending on your setup:
 
-Please [See the docs](./docs/en/index.md).
+```
+# Tell PHP itself to allow for long-running processes in php.ini
+max_execution_time 72000
+```
+
+```
+# Tell php-fpm to not stop reading after 20m in nginx.conf
+fastcgi_read_timeout 72000;
+```
+
+```
+# Tell php-fpm to increase the no. of available child process up from the default of 5 in www.conf
+pm.max_children = 25
+```
+
+Please see the included [Migration](docs/en/howto.md) document which describes exactly how to configure the tool to perform a content migration.
+
+Please also [see the rest of the docs](./docs/en/index.md).
 
 ## History
 

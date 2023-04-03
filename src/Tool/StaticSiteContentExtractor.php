@@ -100,7 +100,7 @@ class StaticSiteContentExtractor
      *
      * @param  array $selectorMap A map of field name => css-selector
      * @param  StaticSiteContentItem $item The item to extract
-     * @return array Map of field name = >['selector' => selector, 'content' => field content]
+     * @return array Map of fieldname => ['selector' => selector, 'content' => field content]
      */
     public function extractMapAndSelectors($selectorMap, $item)
     {

@@ -21,6 +21,7 @@ use SilverStripe\Forms\ListboxField;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Assets\File;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Forms\DropdownField;
 use SilverStripe\ORM\FieldType\DBText;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\Forms\ToggleCompositeField;
@@ -29,8 +30,11 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDatetime;
 
+// We do this or PHP8+ complains about the ageing phpcrawl lib
+ini_set('error_reporting', 'E_ALL & ~E_DEPRECATED');
+
 /**
- * Define the overarching content-sources, schemas etc.
+ * Define the overarching content-sources, schemas etc. Probably better named a "Migration Profile".
  *
  * @package phptek/silverstripe-exodus
  * @author Sam Minee <sam@silverstripe.com>
@@ -41,12 +45,22 @@ class StaticSiteContentSource extends ExternalContentSource
     /**
      * @var string
      */
-    public const CACHE_DIR_PREFIX = 'static-site-0'; // Default (zero-suffix is used by tests)
+    public const CACHE_DIR_PREFIX = 'static-site-0'; // Default (The zero-suffix is used by test-suite)
 
     /**
      * @var string
      */
     private static $table_name = 'StaticSiteContentSource';
+
+    /**
+     * @var config
+     */
+    private static $singular_name = 'Migration Profile';
+
+    /**
+     * @var config
+     */
+    private static $plural_name = 'Migration Profiles';
 
     /**
      *
@@ -156,40 +170,48 @@ class StaticSiteContentSource extends ExternalContentSource
             'Pages',
             'Files',
             'ShowContentInMenu',
-            'Name']
-        );
-        $fields->insertBefore(HeaderField::create('CrawlConfigHeader', 'Import Configuration'), 'BaseUrl');
+            'Name'
+        ]);
 
-        // Processing Option
-        $processingOptions = ['' => "No pre-processing"];
+        // Because we can't pass arrays to FieldList::insertBefore
+        foreach ([
+            HeaderField::create('ProfileHeading', 'Migration Profile Configuration'),
+            LiteralField::create('ProfileIntro', ''
+                . '<p class="message notice">'
+                . 'This where the basics of your migration profile are configured.'
+                . '</p>'
+            )] as $introField) {
+                $fields->insertBefore('BaseUrl', $introField);
+        }
+
+        // Processing Options
+        $processingOptions = ['' => "No Processing"];
 
         foreach (ClassInfo::implementorsOf(StaticSiteUrlProcessor::class) as $processor) {
             $processorObj = singleton($processor);
-            $processingOptions[$processor] = sprintf(
-                '%s: %s',
-                $processorObj->getName(),
-                $processorObj->getDescription()
-            );
+            $processingOptions[$processor] = $processorObj->getName();
         }
 
         $fields->addFieldsToTab(
             'Root.Main', [
                 TextField::create("BaseUrl", "Base URL")
-                    ->setDescription('The main URL of the site you wish to import e.g. "https://foo.com".'),
-                OptionsetField::create("UrlProcessor", "URL Processing", $processingOptions),
+                    ->setDescription('The base URL of the site to be crawled and imported.'),
+                DropdownField::create("UrlProcessor", "URL Transformation", $processingOptions)
+                ->setDescription('Select the way in which crawled URLs should be transformed and cleaned-up.'),
                 CheckboxField::create("ParseCSS", "Fetch external CSS")
-                    ->setDescription("Fetch images defined as CSS <strong>background-image</strong> selectors which are not ordinarily reachable."),
+                    ->setDescription("Fetch images defined as CSS <strong>background-image</strong> which are not ordinarily reachable by crawling alone."),
                 CheckboxField::create("AutoRunTask", "Automatically rewrite links into Silverstripe-aware links")
-                    ->setDescription("This will run the built-in link-rewriter task automatically once an import has completed.")
+                    ->setDescription("This will run a link-rewrite task automatically once an import has completed.")
             ]
         );
+        $fields->fieldByName('Root.Main')->setTitle('Profile');
         $fields->insertBefore('BaseUrl', TextField::create('Name', 'Name')
-            ->setDescription('Allows you to differentiate between imports.')
+            ->setDescription('Allows you to differentiate between profiles.')
         );
 
         // Schema Gridfield
         $fields->addFieldToTab('Root.Main', HeaderField::create('ImportConfigHeader', 'Import Schema Configuration'));
-        $addNewButton = (new GridFieldAddNewButton('after'))->setButtonName("Add Schema");
+        $addNewButton = (new GridFieldAddNewButton('before'))->setButtonName("Add Schema");
         $importRules = $fields->dataFieldByName('Schemas');
         $importRules->getConfig()->removeComponentsByType(GridFieldAddNewButton::class);
         $importRules->getConfig()->addComponent($addNewButton);
@@ -197,11 +219,11 @@ class StaticSiteContentSource extends ExternalContentSource
         $fields->addFieldToTab('Root.Main', LiteralField::create(
             'SchemaIntro',
             ''
-            . '<p class="message notice">Schemas define'
-            . ' rules for importing crawled content into database fields'
-            . ' with the use of CSS selectors. If more than one schema exists for a field, then they will be'
-            . ' processed in the order of Priority. The first Schema to match a URI Pattern will be'
-            . ' the one used for that field.</p>'
+            . '<p class="message notice">Schema map MIME-Types to Silverstripe content classes and'
+            . ' are related to one or more Import Rules. Each rule determines how content located at crawled URLs'
+            . ' should be imported into a content classes\' fields with the use of CSS selectors.'
+            . ' Where more than one schema exists for a field, they\'ll be processed in the order of Priority:'
+            . ' The first Schema to match a URI Pattern will be the one used for that field.</p>'
         ));
         $fields->addFieldToTab("Root.Main", $importRules);
 
@@ -223,9 +245,10 @@ class StaticSiteContentSource extends ExternalContentSource
             ->setAttribute('data-icon', 'arrow-circle-double')
             ->setUseButtonTag(true)
             ->addExtraClass('btn action btn btn-primary tool-button font-icon-plus');
-        $crawlMsg = 'Select the button below to start or resume a crawl.';
+        $crawlMsg = '';
 
         // Disable crawl-button if assets dir isn't writable
+        // TODO this will need to change if change the default location of crawl data. Like _why_ is it in assets?
         if (!file_exists(ASSETS_PATH) || !is_writable(ASSETS_PATH)) {
             $crawlMsg = '<p class="message warning">Warning: Assets directory is not writable.</p>';
             $crawlButton->setDisabled(true);
@@ -236,11 +259,22 @@ class StaticSiteContentSource extends ExternalContentSource
             ReadonlyField::create("NumURIs", "Number of URIs Crawled", $this->urlList()->getNumURIs()),
             LiteralField::create(
                 'CrawlActions',
-                '<p class="message notice">Before you can load any content into Silverstripe, all source URLs must first be crawled. '
-                . $crawlMsg . '</p>'
+                $crawlMsg ? '<p class="message notice">' . $crawlMsg . '</p>' : ''
                 . '<div class="btn-toolbar">' . $crawlButton->forTemplate() . '</div>'
             )
         ]);
+
+        // Because we can't pass arrays to FieldList::insertBefore
+        foreach ([
+            HeaderField::create('CrawlHeading', 'Source Site Crawling'),
+            LiteralField::create('CrawlIntro', ''
+                . '<p class="message notice">'
+                . 'Before you can load any content into Silverstripe, all source URLs must first be crawled.'
+                . ' Select the button below to start or resume a crawl as applicable.'
+                . '</p>'
+            )] as $introField) {
+                $fields->insertBefore('CrawlStatus', $introField);
+        }
 
         /*
          * @todo use customise() and arrange this using an includes .ss template fragment
@@ -259,7 +293,7 @@ class StaticSiteContentSource extends ExternalContentSource
 
         $fields->dataFieldByName("ExtraCrawlUrls")
             ->setDescription("Add URIs that are not reachable via links when content scraping, eg: '/about/team'. One per line")
-            ->setTitle('Additional URLs');
+            ->setTitle('Additional URIs');
         $fields->dataFieldByName("UrlExcludePatterns")
             ->setDescription("URLs that should be excluded. (Supports regular expressions e.g. '/about/.*'). One per line")
             ->setTitle('Excluded URLs');
@@ -271,6 +305,15 @@ class StaticSiteContentSource extends ExternalContentSource
             $date = DBField::create_field(DBDatetime::class, $import->Created)->Time24();
             $_source[$import->ID] = $date . ' (Import #' . $import->ID . ')';
         }
+
+        $fields->addFieldsToTab('Root.Import', [
+            HeaderField::create('ImportHeading', 'Source Site Import'),
+            LiteralField::create('ImportIntro', ''
+                . '<p class="message notice">'
+                . 'Use this area to configure where in the current IA imported page content should appear.'
+                . ' The same goes for imported files and images.'
+                . '</p>'
+        )]);
 
         if ($importCount = $hasImports->count()) {
             $clearImportButton = FormAction::create('clearimports', 'Clear selected imports')
@@ -369,8 +412,9 @@ class StaticSiteContentSource extends ExternalContentSource
     public function getSchemaForURL($absoluteURL, $mimeType = null)
     {
         $mimeType = StaticSiteMimeProcessor::cleanse($mimeType);
-        // Ensure the "Priority" setting is respected
+        // Ensure the "Order" (Priority) setting is respected
         $schemas = $this->Schemas()->sort('Order');
+        
         foreach ($schemas as $i => $schema) {
             $schemaCanParseURL = $this->schemaCanParseURL($schema, $absoluteURL);
             $schemaMimeTypes = StaticSiteMimeProcessor::get_mimetypes_from_text($schema->MimeTypes);
