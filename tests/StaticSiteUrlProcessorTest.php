@@ -61,5 +61,23 @@ class StaticSiteUrlProcessorTest extends SapphireTest
             'mime' => 'text/html'
         ]);
         $this->assertEquals('http://fluff.com/test1', $testUrlWithPages['url']);
+
+        $testUrlWithBrackets = $processor->processUrl([
+            'url' => 'http://fluff.com/Pages/test(1).aspx',
+            'mime' => 'text/html'
+        ]);
+        $this->assertEquals('http://fluff.com/test1', $testUrlWithPages['url']);
+
+        $testUrlWithSingleBracket = $processor->processUrl([
+            'url' => 'http://fluff.com/Pages/test(1.aspx',
+            'mime' => 'text/html'
+        ]);
+        $this->assertEquals('http://fluff.com/test1', $testUrlWithPages['url']);
+
+        $testUrlWithRepeatedBracket = $processor->processUrl([
+            'url' => 'http://fluff.com/Pages/test((1.aspx',
+            'mime' => 'text/html'
+        ]);
+        $this->assertEquals('http://fluff.com/test1', $testUrlWithPages['url']);
     }
 }
