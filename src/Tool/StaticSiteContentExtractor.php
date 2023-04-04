@@ -450,7 +450,7 @@ class StaticSiteContentExtractor
     public function prepareContent(): void
     {
         // Trim it
-        $this->content = trim($this->content);
+        $this->content = trim($this->content ?? '');
 
         // Ensure the content begins with the 'html' tag
         if (stripos($this->content, '<html') === false) {
