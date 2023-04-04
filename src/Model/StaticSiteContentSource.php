@@ -341,9 +341,10 @@ class StaticSiteContentSource extends ExternalContentSource
                 . '</p>'),
             LiteralField::create('EnvInfo', ''
                 . '<ul>'
+                . '<li>PHP Info: ' . $_SERVER['PHP_VERSION'] . '</li>'
+                . '<li>Webserver Info: ' . $_SERVER['SERVER_SOFTWARE'] . '</li>'
                 . '<li>max_execution_time: ' . sprintf('%s seconds', ini_get('max_execution_time')) . '</li>'
                 . '<li>memory_limit: ' . sprintf('%d Mb', ini_get('memory_limit')) . '</li>'
-                . '<li>Webserver: ' . $_SERVER['SERVER_SOFTWARE'] . '</li>'
                 . '</ul>'
             )
         ]);

@@ -53,6 +53,7 @@ class StaticSitePageTransformerTest extends SapphireTest
      * @var string
      */
     protected $cacheDir = '';
+    
     /**
      * Setup the tests with a faked crawl result.
      *
