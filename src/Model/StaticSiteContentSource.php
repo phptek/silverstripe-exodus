@@ -332,6 +332,22 @@ class StaticSiteContentSource extends ExternalContentSource
             $fields->addFieldToTab('Root.Import', $clearImportField);
         }
 
+        $fields->addFieldsToTab('Root.Environment', [
+            HeaderField::create('EnvHeading', 'Webserver Environment'),
+            LiteralField::create('EnvIntro', ''
+                . '<p class="message notice">'
+                . 'Refer to this area for information related to the PHP and Webserver environment'
+                . ' which may affect the proper function and performance of this tool.'
+                . '</p>'),
+            LiteralField::create('EnvInfo', ''
+                . '<ul>'
+                . '<li>max_execution_time: ' . sprintf('%s seconds', ini_get('max_execution_time')) . '</li>'
+                . '<li>memory_limit: ' . sprintf('%d Mb', ini_get('memory_limit')) . '</li>'
+                . '<li>Webserver: ' . $_SERVER['SERVER_SOFTWARE'] . '</li>'
+                . '</ul>'
+            )
+        ]);
+
         return $fields;
     }
 
