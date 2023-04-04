@@ -46,7 +46,8 @@ class StaticSiteContentExtractor
     protected $mime = null;
 
     /**
-     *
+     * This is an HTML page's source markup.
+     * 
      * @var string
      */
     protected $content = null;
@@ -93,6 +94,8 @@ class StaticSiteContentExtractor
         $this->content = $content;
         $this->mimeProcessor = singleton(StaticSiteMimeProcessor::class);
         $this->utils = singleton(StaticSiteUtils::class);
+
+        $this->utils->log(sprintf('Begin extraction for URL: %s and Mime: %s', $this->url, $this->mime));
     }
 
     /**
@@ -102,7 +105,7 @@ class StaticSiteContentExtractor
      * @param  StaticSiteContentItem $item The item to extract
      * @return array Map of fieldname => ['selector' => selector, 'content' => field content]
      */
-    public function extractMapAndSelectors($selectorMap, $item)
+    public function extractMapAndSelectors($selectorMap, $item): array
     {
         if (!$this->phpQuery) {
             $this->fetchContent();
@@ -115,14 +118,17 @@ class StaticSiteContentExtractor
             }
 
             foreach ($extractionRules as $extractionRule) {
-                $content = null;
+                $content = '';
 
                 if (!is_array($extractionRule)) {
                     $extractionRule = ['selector' => $extractionRule];
                 }
 
                 if ($this->isMimeHTML()) {
-                    $content = $this->extractField($extractionRule['selector'], $extractionRule['attribute'], $extractionRule['outerhtml']);
+                    $cssSelector = $extractionRule['selector'] ?? '';
+                    $attribute = $extractionRule['attribute'] ?? '';
+                    $outerHTML = $extractionRule['outerhtml'] ?? false;
+                    $content = $this->extractField($cssSelector, $attribute, $outerHTML);
                 } elseif ($this->isMimeFileOrImage()) {
                     $content = $item->externalId;
                 }
@@ -131,6 +137,7 @@ class StaticSiteContentExtractor
                     continue;
                 }
 
+                // Further processing
                 if ($this->isMimeHTML()) {
                     $content = $this->excludeContent($extractionRule['excludeselectors'], $extractionRule['selector'], $content);
                 }
@@ -156,14 +163,15 @@ class StaticSiteContentExtractor
     /**
      * Extract content for a single css selector
      *
-     * @param  string $cssSelector The selector for which to extract content.
-     * @param  string $attribute If set, the value will be from this HTML attribute
-     * @param  bool $outherHTML should we return the full HTML of the whole field
-     * @return string The content for that selector
+     * @param  string $cssSelector The CSS selector for which to extract content.
+     * @param  string $attribute   If set, the value will be from this HTML attribute.
+     * @param  bool   $outherHTML  Should we return the full HTML markup of the whole field?
+     * @return string The content for the passed $cssSelector.
      */
-    public function extractField($cssSelector, $attribute = null, $outerHTML = false)
+    public function extractField(string $cssSelector, string $attribute = '', bool $outerHTML = false): string
     {
         if (!$this->phpQuery) {
+            // Sets $this->phpQuery - weird pattern 
             $this->fetchContent();
         }
 
@@ -248,7 +256,7 @@ class StaticSiteContentExtractor
     }
 
     /**
-     * Fetch the content, initialise $this->content and $this->phpQuery .
+     * Fetch the content, initialise $this->content and $this->phpQuery.
      * Initialise the latter only if an appropriate mime-type matches.
      *
      * @return void
@@ -266,6 +274,7 @@ class StaticSiteContentExtractor
             // Just stop here for files & images
             return;
         }
+
         $this->content = $response->getBody();
 
         // Clean up the content so phpQuery doesn't bork
@@ -277,6 +286,7 @@ class StaticSiteContentExtractor
      * Use cURL to request a URL, and return a HTTPResponse object (`SiteTree`) or write curl output directly to a tmp file
      * ready for uploading to SilverStripe via Upload#load() (`File` and `Image`)
      *
+     * @todo Refactor using Guzzle
      * @param string $url
      * @param string $method
      * @param string $data
@@ -433,11 +443,11 @@ class StaticSiteContentExtractor
     }
 
     /**
-     * Pre-process the content so phpQuery can parse it without violently barfing
+     * Pre-process the content so phpQuery can parse it without violently barfing.
      *
      * @return void
      */
-    public function prepareContent()
+    public function prepareContent(): void
     {
         // Trim it
         $this->content = trim($this->content);

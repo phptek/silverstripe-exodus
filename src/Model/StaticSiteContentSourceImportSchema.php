@@ -216,7 +216,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
             }
 
             $ruleArray = [
-                'selector' => preg_split("#\n#", trim((string) $rule->CSSSelector,)),
+                'selector' => trim((string) $rule->CSSSelector),
                 'attribute' => $rule->Attribute,
                 'plaintext' => $rule->PlainText,
                 'excludeselectors' => preg_split("#\n#", trim((string) $rule->ExcludeCSSSelector)),

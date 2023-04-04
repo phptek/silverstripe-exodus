@@ -21,7 +21,7 @@ class StaticSiteContentSourceImportRule extends DataObject
      */
     private static $db = [
         "FieldName" => DBVarchar::class,
-        "CSSSelector" => DBText::class,
+        "CSSSelector" => DBVarchar::class,
         "ExcludeCSSSelector" => DBText::class,
         "Attribute" => DBVarchar::class,
         "PlainText" => DBBoolean::class,
@@ -49,7 +49,7 @@ class StaticSiteContentSourceImportRule extends DataObject
      */
     private static $field_labels = [
         "FieldName" => "Target Field Name",
-        "CSSSelector" => "CSS Selector(s)",
+        "CSSSelector" => "CSS Selector",
         'ExcludeCSSSelector' => 'Excluded CSS Selector(s)',
         "Attribute" => "Element Attribute",
         "PlainText" => "Plain Text",
@@ -109,13 +109,12 @@ class StaticSiteContentSourceImportRule extends DataObject
 
             $fieldNameField = DropdownField::create("FieldName", 'Target Field', $fieldList)
                 ->setEmptyString("(choose)")
-                ->setDescription('Remote content matched by the CSS selector(s) below is written to this field.'
+                ->setDescription('Remote content matched by the CSS selector below is written to this field.'
             );
             $fields->insertBefore($fieldNameField, 'CSSSelector');
             $fields->dataFieldByName('CSSSelector')
-                ->setDescription('A list of valid CSS selector whose content'
-                . ' is written to the "Target Field" above. Separate multiple selectors with a newline.'
-            );
+                ->setDescription('A valid CSS selector whose content is written to the "Target Field" above.')
+                ->setAttribute('style', 'width: 300px;');
             $fields->dataFieldByName('ExcludeCSSSelector')
                 ->setDescription('A list of valid CSS selectors whose content'
                 . ' should be ignored. This is useful for fine-tuning what is returned in an import.'

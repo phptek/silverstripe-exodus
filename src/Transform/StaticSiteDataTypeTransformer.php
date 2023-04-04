@@ -69,7 +69,7 @@ abstract class StaticSiteDataTypeTransformer implements ExternalContentTransform
     /**
      * Get content from remote datasource (e.g. a File, Image or page-text).
      * If $dataType is anything but 'File' or 'SiteTree' a StaticSiteContentExtractor object
-     * is returned so sublclasses of StaticSiteDataTypeTransformer can implement custom logic
+     * is returned so subclasses of StaticSiteDataTypeTransformer can implement custom logic
      * based off it.
      *
      * @param StaticSiteContentItem $item The item to extract
