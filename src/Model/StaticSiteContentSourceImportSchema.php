@@ -44,7 +44,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
         "Order" => DBInt::class,
         "AppliesTo" => DBVarchar::class,
         "MimeTypes" => DBText::class,
-        "Notes" => DBText::class,	// Purely informational. Not used in imports.
+        "Notes" => DBText::class,   // Purely informational. Not used in imports.
     ];
 
     /**
@@ -65,7 +65,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
         "AppliesTo" => "URL Pattern",
         "DataType" => "Data Type",
         "Order" => "Priority",
-        "MimeTypes"	=> "Mime-types",
+        "MimeTypes" => "Mime-types",
     ];
 
     /**
@@ -92,7 +92,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
 
     /**
      * Used as the title in the CMS.
-     * 
+     *
      * @return string
      */
     public function getTitle(): string
@@ -135,8 +135,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
             . ' e.g. text/html for <strong>SiteTree</strong>,'
             . ' image/png, mage/jpeg, image/webp etc for <strong>Image</strong>'
             . ' or application/pdf, text/csv etc for <strong>File</strong>.'
-            . ' Separate multiple Mimes by a newline.'
-            );
+            . ' Separate multiple Mimes by a newline.');
         $fields->addFieldToTab('Root.Main', $mimes);
         $notes = TextareaField::create('Notes', 'Notes')
             ->setDescription('Use this field to add any notes about this schema.'
@@ -147,8 +146,7 @@ class StaticSiteContentSourceImportSchema extends DataObject
         $fields->removeFieldFromTab('Root', 'ImportRules');
         $fields->dataFieldByName('DataType')->setDescription(''
             . 'The Silverstripe content class with which content from the selected'
-            . ' Mime-Types will be associated.'
-        );
+            . ' Mime-Types will be associated.');
 
         // Don't show for File subclasses, these obviously don't require CSS-based import rules
         if ($this->DataType && in_array(File::class, ClassInfo::ancestry($this->DataType))) {
@@ -164,7 +162,8 @@ class StaticSiteContentSourceImportSchema extends DataObject
             $addNewButton = (new GridFieldAddNewButton('before'))->setButtonName("Add Rule");
             $conf->addComponent($addNewButton);
             $fields->addFieldToTab('Root.Main', $importRules);
-            $fields->insertBefore('ImportRules', LiteralField::create('ImportRuleIntro',
+            $fields->insertBefore('ImportRules', LiteralField::create(
+                'ImportRuleIntro',
                 ''
                 . '<p class="message notice">An import rule determines how content located at crawled URLs'
                 . ' should be imported into a Data Type\'s fields with the use of CSS selectors.'

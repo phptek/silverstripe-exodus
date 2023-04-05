@@ -237,7 +237,7 @@ class StaticSiteUrlList
         } else {
             return null;
         }
-        
+
         return $urls;
     }
 
@@ -693,7 +693,7 @@ class StaticSiteUrlList
             }
 
             return $this->urls['regular'][$url];
-        } elseif(isset($this->urls['inferred'][$url])) {
+        } elseif (isset($this->urls['inferred'][$url])) {
             return $this->urls['inferred'][$url];
         }
 

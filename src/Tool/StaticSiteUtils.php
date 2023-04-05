@@ -46,7 +46,7 @@ class StaticSiteUtils
         if ($set && is_bool($set) && $set !== false) {
             $proxyOpts = StaticSiteContentExtractor::config()->get('curl_opts_proxy');
 
-            if (!$proxyOpts || !is_array($proxyOpts) || !count($proxyOpts) >0) {
+            if (!$proxyOpts || !is_array($proxyOpts) || !count($proxyOpts) > 0) {
                 return [];
             }
 

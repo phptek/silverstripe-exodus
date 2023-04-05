@@ -35,7 +35,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
      * Generic function called by \ExternalContentImporter
      *
      * @inheritdoc
-     * 
+     *
      * @param bool $genThumbs Used to prevent errors in thumbnail generation when running tests
      */
     public function transform($item, $parentObject, $strategy, $genThumbs = true)
@@ -96,12 +96,12 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
             if (!$file->write()) {
                 $this->utils->log(" - Not imported (no write): ", $item->AbsoluteURL, $item->ProcessedMIME);
             }
-    
+
             // Remove garbage tmp files if/when left lying around
             if (file_exists($tmpPath)) {
                 unlink($tmpPath);
             }
-    
+
             $file->publishSingle();
 
             // Generate thumbnails
@@ -159,7 +159,7 @@ class StaticSiteFileTransformer extends StaticSiteDataTypeTransformer
         } elseif ($newExt) {
             $useExtension = $newExt;
             $logMessagePt1 = "NOTICE: Bad file-extension: \"$oldExt\". Assigned new file-extension: \"$newExt\" based on MimeType.";
-            $logMessagePt2 = PHP_EOL."\t - FROM: \"$url\"".PHP_EOL."\t - TO: \"$origFilename.$newExt\"";
+            $logMessagePt2 = PHP_EOL . "\t - FROM: \"$url\"" . PHP_EOL . "\t - TO: \"$origFilename.$newExt\"";
 
             $this->utils->log(' - ' . $logMessagePt1 . $logMessagePt2, '', $mime);
         } else {

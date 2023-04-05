@@ -45,7 +45,7 @@ class StaticSiteCrawler extends PHPCrawler
      * Example:
      * <code>
      * StaticSiteContentExtractor:
-     *	log_file:  ../logs/crawler-log.txt
+     *  log_file:  ../logs/crawler-log.txt
      * </code>
      *
      * @var string
@@ -81,7 +81,7 @@ class StaticSiteCrawler extends PHPCrawler
      * @return int
      * @todo Can we make use of PHPCrawlerDocumentInfo#error_occured instead of manually checking server codes??
      * @todo The comments below state that badly formatted URLs never make it to our caching logic. Wrong!
-     *	- Pass the preg_replace() call for "fixing" $mossBracketRegex into StaticSiteUrlProcessor#postProcessUrl()
+     *  - Pass the preg_replace() call for "fixing" $mossBracketRegex into StaticSiteUrlProcessor#postProcessUrl()
      * @todo Processor-specific logic (MOSS) should be ported into dedicated class under "Process" namespace
      */
     public function handleDocumentInfo(PHPCrawlerDocumentInfo $PageInfo): int

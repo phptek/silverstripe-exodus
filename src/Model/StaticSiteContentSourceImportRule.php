@@ -95,13 +95,15 @@ class StaticSiteContentSourceImportRule extends DataObject
             $fieldList = singleton(DataObjectSchema::class)
                 ->fieldSpecs($dataType, DataObjectSchema::DB_ONLY);
             $fieldList = array_combine(array_keys($fieldList), array_keys($fieldList));
-            foreach (array_merge(
-                array_keys(DataObject::config()->get('fixed_fields')),
-                array_filter($fieldList, function($item) {
-                    return preg_match('#(^Static|ID$)#i', $item);
-                }),
-                ['Version']
-            ) as $exclusion) {
+            foreach (
+                array_merge(
+                    array_keys(DataObject::config()->get('fixed_fields')),
+                    array_filter($fieldList, function ($item) {
+                        return preg_match('#(^Static|ID$)#i', $item);
+                    }),
+                    ['Version']
+                ) as $exclusion
+            ) {
                 unset($fieldList[$exclusion]);
             }
 
@@ -109,8 +111,7 @@ class StaticSiteContentSourceImportRule extends DataObject
 
             $fieldNameField = DropdownField::create("FieldName", 'Target Field', $fieldList)
                 ->setEmptyString("(choose)")
-                ->setDescription('Remote content matched by the CSS selector below is written to this field.'
-            );
+                ->setDescription('Remote content matched by the CSS selector below is written to this field.');
             $fields->insertBefore($fieldNameField, 'CSSSelector');
             $fields->dataFieldByName('CSSSelector')
                 ->setDescription('A valid CSS selector whose content is written to the "Target Field" above.')
@@ -118,8 +119,7 @@ class StaticSiteContentSourceImportRule extends DataObject
             $fields->dataFieldByName('ExcludeCSSSelector')
                 ->setDescription('A list of valid CSS selectors whose content'
                 . ' should be ignored. This is useful for fine-tuning what is returned in an import.'
-                . ' Separate multiple exclusions with a newline.'
-            );
+                . ' Separate multiple exclusions with a newline.');
             $fields->dataFieldByName('OuterHTML')
                 ->setDescription('Use outer HTML (Fetches parent element and content and that of its children)');
             $fields->dataFieldByName('PlainText')

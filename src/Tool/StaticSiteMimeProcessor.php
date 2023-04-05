@@ -91,7 +91,7 @@ class StaticSiteMimeProcessor
         array_push($mimes['file'], 'text/plain');
 
         // Included in Silverstripe's file-based Mime-Types which we don't want
-        $mimes['file'] = array_filter($mimes['file'], function($k, $v) {
+        $mimes['file'] = array_filter($mimes['file'], function ($k, $v) {
             return stristr($k, 'htm') ? false : true;
         }, ARRAY_FILTER_USE_BOTH);
 
@@ -133,9 +133,9 @@ class StaticSiteMimeProcessor
         // Get SilverStripe supported Image-ish mime categories
         $mimeKeysForImage = $mimeCategories['image'];
         $map = [
-            'sitetree'	=> $mimeKeysForSiteTree,
-            'file'		=> $mimeKeysForFile,
-            'image'		=> $mimeKeysForImage
+            'sitetree'  => $mimeKeysForSiteTree,
+            'file'      => $mimeKeysForFile,
+            'image'     => $mimeKeysForImage
         ];
 
         if ($nativeType) {
@@ -173,8 +173,8 @@ class StaticSiteMimeProcessor
         $mimeCategories = File::config()->get('app_categories');
         list($ext, $mime) = [strtolower($ext), strtolower($mime)];
 
-        $notAuthoratative = !isset($httpMimeTypes[$ext]);					// We've found ourselves a weird extension
-        $notMatch = (!$notAuthoratative && $httpMimeTypes[$ext] !== $mime);	// No match found for passed extension in our ext=>mime mapping from config
+        $notAuthoratative = !isset($httpMimeTypes[$ext]);                   // We've found ourselves a weird extension
+        $notMatch = (!$notAuthoratative && $httpMimeTypes[$ext] !== $mime); // No match found for passed extension in our ext=>mime mapping from config
 
         if ($notAuthoratative || $notMatch) {
             if (!$fix) {
@@ -185,8 +185,8 @@ class StaticSiteMimeProcessor
             $coreExts = array_merge($mimeCategories['document'], $mimeCategories['image']);
             foreach ($coreExts as $coreExt) {
                 // Make sure we check the correct category so we don't find a match for ms-excel in the image \File category (.cel) !!
-                $isFile = in_array($coreExt, $mimeCategories['document']) && singleton(__CLASS__)->isOfFile($mime);		// dirty
-                $isImge = in_array($coreExt, $mimeCategories['image']) && singleton(__CLASS__)->isOfImage($mime);	// more dirt
+                $isFile = in_array($coreExt, $mimeCategories['document']) && singleton(__CLASS__)->isOfFile($mime);     // dirty
+                $isImge = in_array($coreExt, $mimeCategories['image']) && singleton(__CLASS__)->isOfImage($mime);   // more dirt
 
                 if (($isFile || $isImge) && stristr($mime, $coreExt) !== false) {
                     // "Manually" force "jpg" as the file-suffix to be returned

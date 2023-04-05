@@ -47,7 +47,7 @@ class StaticSiteContentExtractor
 
     /**
      * This is an HTML page's source markup.
-     * 
+     *
      * @var string
      */
     protected $content = null;
@@ -171,7 +171,7 @@ class StaticSiteContentExtractor
     public function extractField(string $cssSelector, string $attribute = '', bool $outerHTML = false): string
     {
         if (!$this->phpQuery) {
-            // Sets $this->phpQuery - weird pattern 
+            // Sets $this->phpQuery - weird pattern
             $this->fetchContent();
         }
 
@@ -220,7 +220,7 @@ class StaticSiteContentExtractor
             if (!trim($excludeSelector)) {
                 continue;
             }
-            $element = $this->phpQuery[$parentSelector.' '.$excludeSelector];
+            $element = $this->phpQuery[$parentSelector . ' ' . $excludeSelector];
             if ($element) {
                 $remove = $element->htmlOuter();
                 $content = str_replace($remove, '', $content);
@@ -336,7 +336,7 @@ class StaticSiteContentExtractor
         // Run request
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         // See: http://forums.devshed.com/php-development-5/curlopt-timeout-option-for-curl-calls-isn-t-being-obeyed-605642.html
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);		// No. seconds to wait while trying to connect.
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);     // No. seconds to wait while trying to connect.
 
         // Deal to files, write to them directly and then return
         if ($this->mimeProcessor->isOfFileOrImage($this->mime)) {

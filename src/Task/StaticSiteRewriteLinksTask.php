@@ -208,7 +208,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
             if ($siteTreeObject = $pageLookup->find('StaticSiteURL', $pageMapKey)) {
                 $output = '[sitetree_link,id=' . $siteTreeObject->ID . ']';
                 $task->printMessage("\tFound: SiteTree ID#" . $siteTreeObject->ID, null, $output);
-                $anchorPattern = "<[\w]+\s+(name|id)=('|\")?". $anchor ."('|\")?";
+                $anchorPattern = "<[\w]+\s+(name|id)=('|\")?" . $anchor . "('|\")?";
 
                 if (strlen($anchor) && preg_match("#$anchorPattern#mi", $siteTreeObject->Content)) {
                     $output = "#$anchor";
@@ -289,7 +289,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
         $this->printMessage("Amended $changedFields content fields for {$pages->count()} pages and {$files->count()} files processed.");
 
         $msgNextSteps = " - Not all links will get fixed. It's recommended to also run a 3rd party link-checker over your imported content.";
-        $msgSeeReport = " - Check the CMS \"".singleton(FailedURLRewriteReport::class)->title()."\" report for a summary of failed link-rewrites.";
+        $msgSeeReport = " - Check the CMS \"" . singleton(FailedURLRewriteReport::class)->title() . "\" report for a summary of failed link-rewrites.";
 
         $this->printMessage("Tips:");
         $this->printMessage("{$newLine}$msgNextSteps");
@@ -315,7 +315,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
         }
 
         $url = ($url ? '(' . $url . ') ' : '');
-        $level = ($level ? '[' . $level .'] ' : '');
+        $level = ($level ? '[' . $level . '] ' : '');
 
         echo "$level$message$url" . PHP_EOL;
     }
@@ -345,7 +345,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
                 'ContainedInID' => $failure['ContainedInID']
             ));
 
-            if ($failureExists->count() >0) {
+            if ($failureExists->count() > 0) {
                 continue;
             }
 
@@ -403,12 +403,12 @@ class StaticSiteRewriteLinksTask extends BuildTask
             }
         }
         return [
-            'Total failed link rewrites'	=> ['count' => count($rawData), 'desc' => ''],
-            'ThirdParty'		=> ['count' => $countThirdParty, 'desc' => '(Links to external websites)'],
-            'BadScheme'			=> ['count' => $countBadScheme, 'desc' => '(Links with bad/unimportable scheme)'],
-            'NotImported'		=> ['count' => $countNotImported, 'desc' => '(Links to pages or assets that were not imported)'],
+            'Total failed link rewrites'    => ['count' => count($rawData), 'desc' => ''],
+            'ThirdParty'        => ['count' => $countThirdParty, 'desc' => '(Links to external websites)'],
+            'BadScheme'         => ['count' => $countBadScheme, 'desc' => '(Links with bad/unimportable scheme)'],
+            'NotImported'       => ['count' => $countNotImported, 'desc' => '(Links to pages or assets that were not imported)'],
             'Junk'                      => ['count' => $countJunk, 'desc' => '(Junk links)'],
-            'Unknown'			=> ['count' => $countUnknown, 'desc' => '(Not categorisable)'],
+            'Unknown'           => ['count' => $countUnknown, 'desc' => '(Not categorisable)'],
         ];
     }
 
@@ -499,10 +499,10 @@ class StaticSiteRewriteLinksTask extends BuildTask
     /**
      * Whether or not to ingore a URL. Returns true if a URL is either:
      *
-     *	- An empty string
-     *	- A non-HTTP scheme like an email link see: self::$non_http_uri_schemes
-     *	- A CMS sitetree shortcode or file/image asset path, e.g. [sitetree_link,id=1234] or assets/Images/logo.gif
-     *	- An absolute url, i.e. anything that begins with 'http'
+     *  - An empty string
+     *  - A non-HTTP scheme like an email link see: self::$non_http_uri_schemes
+     *  - A CMS sitetree shortcode or file/image asset path, e.g. [sitetree_link,id=1234] or assets/Images/logo.gif
+     *  - An absolute url, i.e. anything that begins with 'http'
      *
      * @param string $url A URL
      * @return boolean true if the url can be ignored
@@ -591,13 +591,13 @@ class StaticSiteRewriteLinksTask extends BuildTask
 
         // List the content sources to prompt user for selection
         if ($contentSources = StaticSiteContentSource::get()) {
-            $this->printMessage($newLine.'Available content-sources:'.$newLine);
+            $this->printMessage($newLine . 'Available content-sources:' . $newLine);
             foreach ($contentSources as $i => $contentSource) {
                 $this->printMessage("\tdev/tasks/" . __CLASS__ . ' SourceID=' . $contentSource->ID . ' ImportID=<number>');
             }
             echo $newLine;
             if (Director::is_cli()) {
-                $this->printMessage('Available command line options: '.$newLine);
+                $this->printMessage('Available command line options: ' . $newLine);
                 $this->printMessage("\tSourceID=<number> \t\tThe ID of the original crawl.");
                 $this->printMessage("\tImportID=<number> \t\tThe ID of the import to use.");
                 $this->printMessage("\tSHOW=pages \tPrint the contents of the pages map.");

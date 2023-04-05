@@ -174,13 +174,14 @@ class StaticSiteContentSource extends ExternalContentSource
         ]);
 
         // Because we can't pass arrays to FieldList::insertBefore
-        foreach ([
+        foreach (
+            [
             HeaderField::create('ProfileHeading', 'Migration Profile Configuration'),
             LiteralField::create('ProfileIntro', ''
                 . '<p class="message notice">'
                 . 'This where the basics of your migration profile are configured.'
-                . '</p>'
-            )] as $introField) {
+                . '</p>')] as $introField
+        ) {
                 $fields->insertBefore('BaseUrl', $introField);
         }
 
@@ -193,7 +194,8 @@ class StaticSiteContentSource extends ExternalContentSource
         }
 
         $fields->addFieldsToTab(
-            'Root.Main', [
+            'Root.Main',
+            [
                 TextField::create("BaseUrl", "Base URL")
                     ->setDescription('The base URL of the site to be crawled and imported.'),
                 DropdownField::create("UrlProcessor", "URL Transformation", $processingOptions)
@@ -206,8 +208,7 @@ class StaticSiteContentSource extends ExternalContentSource
         );
         $fields->fieldByName('Root.Main')->setTitle('Profile');
         $fields->insertBefore('BaseUrl', TextField::create('Name', 'Name')
-            ->setDescription('Allows you to differentiate between profiles.')
-        );
+            ->setDescription('Allows you to differentiate between profiles.'));
 
         // Schema Gridfield
         $fields->addFieldToTab('Root.Main', HeaderField::create('ImportConfigHeader', 'Import Schema Configuration'));
@@ -238,7 +239,7 @@ class StaticSiteContentSource extends ExternalContentSource
                 $crawlButtonText = _t('StaticSiteContentSource.RECRAWL_SITE', 'Re-Crawl');
                 break;
             default:
-                throw new \LogicException("Invalid getSpiderStatus() value '".$this->urlList()->getSpiderStatus().";");
+                throw new \LogicException("Invalid getSpiderStatus() value '" . $this->urlList()->getSpiderStatus() . ";");
         }
 
         $crawlButton = FormAction::create('crawlsite', $crawlButtonText)
@@ -265,14 +266,15 @@ class StaticSiteContentSource extends ExternalContentSource
         ]);
 
         // Because we can't pass arrays to FieldList::insertBefore
-        foreach ([
+        foreach (
+            [
             HeaderField::create('CrawlHeading', 'Source Site Crawling'),
             LiteralField::create('CrawlIntro', ''
                 . '<p class="message notice">'
                 . 'Before you can load any content into Silverstripe, all source URLs must first be crawled.'
                 . ' Select the button below to start or resume a crawl as applicable.'
-                . '</p>'
-            )] as $introField) {
+                . '</p>')] as $introField
+        ) {
                 $fields->insertBefore('CrawlStatus', $introField);
         }
 
@@ -312,8 +314,7 @@ class StaticSiteContentSource extends ExternalContentSource
                 . '<p class="message notice">'
                 . 'Use this area to configure where in the current IA imported page content should appear.'
                 . ' The same goes for imported files and images.'
-                . '</p>'
-        )]);
+                . '</p>')]);
 
         if ($importCount = $hasImports->count()) {
             $clearImportButton = FormAction::create('clearimports', 'Clear selected imports')
@@ -345,8 +346,7 @@ class StaticSiteContentSource extends ExternalContentSource
                 . '<li>Webserver Info: ' . $_SERVER['SERVER_SOFTWARE'] . '</li>'
                 . '<li>max_execution_time: ' . sprintf('%s seconds', ini_get('max_execution_time')) . '</li>'
                 . '<li>memory_limit: ' . sprintf('%d Mb', ini_get('memory_limit')) . '</li>'
-                . '</ul>'
-            )
+                . '</ul>')
         ]);
 
         return $fields;
@@ -431,7 +431,7 @@ class StaticSiteContentSource extends ExternalContentSource
         $mimeType = StaticSiteMimeProcessor::cleanse($mimeType);
         // Ensure the "Order" (Priority) setting is respected
         $schemas = $this->Schemas()->sort('Order');
-        
+
         foreach ($schemas as $i => $schema) {
             $schemaCanParseURL = $this->schemaCanParseURL($schema, $absoluteURL);
             $schemaMimeTypes = StaticSiteMimeProcessor::get_mimetypes_from_text($schema->MimeTypes);
@@ -513,7 +513,7 @@ class StaticSiteContentSource extends ExternalContentSource
     public function allowedImportTargets()
     {
         return [
-            'sitetree'	=> true,
+            'sitetree'  => true,
             'file' => true,
         ];
     }
