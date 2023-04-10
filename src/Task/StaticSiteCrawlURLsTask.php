@@ -4,7 +4,6 @@ namespace PhpTek\Exodus\Task;
 
 use PhpTek\Exodus\Model\StaticSiteContentSource;
 use SilverStripe\Dev\BuildTask;
-use SilverStripe\Core\Injector\Injectable;
 
 /**
  *
@@ -23,8 +22,6 @@ class StaticSiteCrawlURLsTask extends BuildTask
         $id = $request->getVar('ID');
 
         if (!$id or !is_numeric($id)) {
-            echo "<p>Specify ?ID=(number)</p>";
-
             return null;
         }
 

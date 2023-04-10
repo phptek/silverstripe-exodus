@@ -131,9 +131,9 @@ class StaticSiteRewriteLinksTask extends BuildTask
         $this->newLine = Director::is_cli() ? PHP_EOL : '<br/>';
 
         // Get the StaticSiteContentSource and Import ID from request parameters
-        $this->contentSourceID = trim($request->getVar('SourceID'));
-        $this->contentImportID = trim($request->getVar('ImportID'));
-        $this->silentRun = trim($request->getVar('SilentRun'));
+        $this->contentSourceID = trim($request->getVar('SourceID') ?? '');
+        $this->contentImportID = trim($request->getVar('ImportID') ?? '');
+        $this->silentRun = trim($request->getVar('SilentRun') ?? '');
 
         if (!$this->checkInputs()) {
             return;
@@ -151,24 +151,8 @@ class StaticSiteRewriteLinksTask extends BuildTask
 
         $pageLookup = $pages;
         $fileLookup = $files->map('StaticSiteURL', 'ID');
-
-        if ($show = $request->getVar('SHOW')) {
-            if ($show == 'pages') {
-                $this->printMessage('Page Map');
-                foreach ($pageLookup as $page) {
-                    $this->printMessage($page->ID . ' => ' . $page->StaticSiteURL);
-                }
-            }
-
-            if ($show == 'files') {
-                $this->printMessage('File Map');
-                foreach ($fileLookup as $url => $id) {
-                    $this->printMessage($id . ' => ' . $url);
-                }
-            }
-        }
-
         $task = $this;
+
         // Callback for URL rewriter, called from StaticSiteLinkRewriter and passed through $callback($url)
         $rewriter = StaticSiteLinkRewriter::create(function ($url) use ($pageLookup, $fileLookup, $task) {
             $origUrl = $url;
@@ -179,7 +163,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
             }
 
             // Just return now if the url is un-rewritable
-            if ($task->ignoreUrl($url)) {
+            if ($task->urlUnrewritable($url)) {
                 // If it's being ignored, log it for a summary used in the CMS report.
                 $task->pushFailedRewrite($task, $url);
                 return;
@@ -188,7 +172,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
             // Strip the trailing slash, if any
             $url = substr($url, -1) == '/' ? rtrim($url, '/') : $url;
 
-            // The keys to use to when URL-matching in $pageLookup and $fileLookup
+            // The keys to use when URL-matching in $pageLookup and $fileLookup
             $pageMapKey = Controller::join_links($task->contentSource->BaseUrl, parse_url($url, PHP_URL_PATH));
             $fileMapKey = Controller::join_links($task->contentSource->BaseUrl, $origUrl);
 
@@ -215,7 +199,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
                 }
 
                 return $output;
-                // Rewrite Asset links by replacing phpQuery processed URLs with appropriate filename.
+                // Rewrite Asset links by replacing phpQuery processed URLs with the appropriate filename.
             } elseif (isset($fileLookup[$fileMapKey]) && $fileID = $fileLookup[$fileMapKey]) {
                 if ($file = DataObject::get_by_id(File::class, $fileID)) {
                     $output = $file->RelativeLink();
@@ -241,12 +225,15 @@ class StaticSiteRewriteLinksTask extends BuildTask
             $url = $page->StaticSiteURL;
 
             // Get the schema that matches the page's legacy url
+            // TODO should arg 2 for getSchemaForURL() be based on user-input and not baked-in?
             if ($schema = $this->contentSource->getSchemaForURL($url, 'text/html')) {
                 $fields = [];
 
                 foreach ($schema->ImportRules() as $rule) {
                     if (!$rule->PlainText) {
                         $fields[] = $rule->FieldName;
+                    } else {
+                        $this->printMessage("\tPlain-text enabled in import rule. Skipping.");
                     }
                 }
 
@@ -262,6 +249,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
                 $task->printMessage("START Rewriter for links in: '$url'");
                 $newContent = $rewriter->rewriteInContent($page->$field);
                 // Square-brackets are converted upstream, so change them back.
+                // Leave this well-alone. Removing it will blank all imported content and titles!
                 $fieldContent = str_replace(array('%5B', '%5D'), ['[', ']'], $newContent);
 
                 // If rewrite succeeded, then the content returned should differ from the original
@@ -507,7 +495,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
      * @param string $url A URL
      * @return boolean true if the url can be ignored
      */
-    public function ignoreUrl($url)
+    public function urlUnrewritable($url)
     {
         $url = trim($url);
 
@@ -553,7 +541,7 @@ class StaticSiteRewriteLinksTask extends BuildTask
      *
      * @return boolean
      */
-    public function checkInputs()
+    public function checkInputs(): bool
     {
         $hasSid = ($this->contentSourceID && is_numeric($this->contentSourceID));
         $hasIid = ($this->contentImportID && is_numeric($this->contentImportID));
@@ -566,14 +554,17 @@ class StaticSiteRewriteLinksTask extends BuildTask
         // Load the content source using the passed content-source ID and Import ID
         $this->contentSource = (StaticSiteContentSource::get()->byID($this->contentSourceID));
         $contentImport = (StaticSiteImportDataObject::get()->byID($this->contentImportID));
+
         if (!$this->contentSource) {
             $this->printMessage("No content-source found via SourceID: " . $this->contentSourceID, 'WARNING');
             return false;
         }
+
         if (!$contentImport) {
             $this->printMessage("No content-import found via ImportID: " . $this->contentImportID, 'WARNING');
             return false;
         }
+
         return true;
     }
 

@@ -72,10 +72,10 @@ class StaticSiteLinkRewriter
 
     /**
      *
-     * @param type $pq
+     * @param phpQueryObject $pq
      * @return void
      */
-    public function rewriteInPQ($pq)
+    public function rewriteInPQ($pq): void
     {
         $callback = $this->callback;
 

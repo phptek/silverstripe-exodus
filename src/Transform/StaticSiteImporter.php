@@ -6,7 +6,6 @@ use ExternalContentImporter;
 use PhpTek\Exodus\Transform\StaticSitePageTransformer;
 use PhpTek\Exodus\Model\StaticSiteImportDataObject;
 use SilverStripe\Control\Controller;
-use SilverStripe\Dev\TaskRunner;
 use SilverStripe\Control\HTTPRequest;
 use PhpTek\Exodus\Task\StaticSiteRewriteLinksTask;
 use SilverStripe\Core\Injector\Injector;
@@ -88,7 +87,6 @@ class StaticSiteImporter extends ExternalContentImporter
         $autoRun = !empty($params['AutoRunTask']) ? $params['AutoRunTask'] : null;
 
         if ($sourceID && $autoRun) {
-            $task = TaskRunner::create();
             $getVars = [
                 'SourceID' => $sourceID,
                 'ImportID' => $importID,
